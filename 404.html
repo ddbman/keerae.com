@@ -5,23 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Not here. KEERAE</title>
   <meta name="robots" content="noindex">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316151A'/%3E%3Cpath d='M10 8v16M22 8l-9.5 8L22 24' stroke='%23F7F6F3' stroke-width='2.6' stroke-linecap='square' fill='none'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#1E1D25">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231E1D25'/%3E%3Cpath d='M10 8v16M22 8l-9.5 8L22 24' stroke='%23FF6A13' stroke-width='2.8' stroke-linecap='square' fill='none'/%3E%3C/svg%3E">
   <style>
-    @font-face { font-family: 'Space Grotesk'; font-weight: 400 700; font-display: swap; src: url('/fonts/space-grotesk-latin.woff2') format('woff2'); }
-    :root { color-scheme: light; --paper: #F7F6F3; --ink: #16151A; --ink-2: #46444E; }
-    @media (prefers-color-scheme: dark) { :root { color-scheme: dark; --paper: #131217; --ink: #F2F0EC; --ink-2: #B6B2BE; } }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--paper); color: var(--ink); font: 17px/1.6 'Space Grotesk', system-ui, sans-serif; padding: 24px; }
+    /* Absolute paths: this page gets served at whatever address was wrong. */
+    @font-face { font-family: "Bricolage"; src: url("/fonts/bricolage-display.woff2") format("woff2"); font-weight: 700 800; font-stretch: 75% 100%; font-display: swap; }
+    @font-face { font-family: "Atkinson"; src: url("/fonts/atkinson.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
+    @font-face { font-family: "Martian"; src: url("/fonts/martian-mono.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; display: grid; grid-template-rows: 50px 1fr 40px; background: #1E1D25; color: #15141B; font: 18px/1.6 "Atkinson", system-ui, sans-serif; }
+    .bar { display: flex; align-items: center; gap: 14px; padding: 0 16px; color: #D6D4E0; font: 500 13px "Martian", ui-monospace, monospace; border-bottom: 1px solid #3A3946; }
+    .bar b { font: 800 17px "Bricolage", sans-serif; letter-spacing: .1em; color: #fff; }
+    .view {
+      display: grid; place-items: center; padding: 32px 20px;
+      background:
+        linear-gradient(#E5484D, #E5484D) 0 64px / 100% 1.5px no-repeat,
+        linear-gradient(#3B9C55, #3B9C55) 40px 0 / 1.5px 100% no-repeat,
+        linear-gradient(to right, #CDCED9 1px, transparent 1px) 40px 0 / 32px 32px,
+        linear-gradient(to bottom, #CDCED9 1px, transparent 1px) 0 64px / 32px 32px,
+        #DCDDE6;
+    }
     main { max-width: 34rem; }
-    h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.05; letter-spacing: -.02em; margin: 0 0 16px; }
-    p { color: var(--ink-2); margin: 0 0 26px; }
-    a { display: inline-block; background: var(--ink); color: var(--paper); text-decoration: none; padding: 12px 20px; border-radius: 6px; font-weight: 500; }
+    h1 { margin: 0 0 14px; font: 800 clamp(44px, 8vw, 84px)/.92 "Bricolage", sans-serif; font-stretch: 75%; }
+    p { margin: 0 0 26px; color: #44424F; }
+    a { display: inline-block; background: #FF6A13; color: #1A0A00; font-weight: 700; text-decoration: none; padding: 13px 20px; border-radius: 8px; }
+    a:focus-visible { outline: 3px solid #15141B; outline-offset: 3px; }
+    .out { display: flex; align-items: center; padding: 0 16px; background: #26252E; color: #F2C14E; font: 400 12.5px "Martian", ui-monospace, monospace; border-top: 1px solid #3A3946; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   </style>
 </head>
 <body>
-  <main>
-    <h1>Nothing lives here.</h1>
-    <p>Could be a typo, could be me moving something around. Either way, the front page is still where it was.</p>
-    <a href="/">Back to keerae.com</a>
-  </main>
+  <div class="bar"><b>KEERAE</b><span>404.scene</span></div>
+  <div class="view">
+    <main>
+      <h1>Nothing at this path.</h1>
+      <p>Could be a typo, could be me moving something around. Either way, the front page is still where it was.</p>
+      <a href="/">Back to the scene</a>
+    </main>
+  </div>
+  <div class="out" id="out">warn: no node at this path</div>
+  <script>
+    try { document.getElementById('out').textContent = 'warn: no node at ' + decodeURIComponent(location.pathname); } catch (e) {}
+  </script>
 </body>
 </html>

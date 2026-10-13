@@ -1,28 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
   <script>
-    // Runs before first paint. A saved choice wins over the system setting,
-    // and the .js class is what reveals the toggle at all.
+    // Runs before first paint. Scripts on means the editor, unless the reader
+    // asked for the plain page last time. Scripts off means the plain page.
     (function () {
-      var r = document.documentElement;
-      try {
-        var t = localStorage.getItem('keerae-theme');
-        if (t === 'light' || t === 'dark') {
-          r.setAttribute('data-theme', t);
-          // Match the browser toolbar to the saved choice from the start, not
-          // only once the page script runs. The page script reuses this meta.
-          var m = document.createElement('meta');
-          m.name = 'theme-color'; m.id = 'theme-color-now';
-          m.content = t === 'dark' ? '#131217' : '#F7F6F3';
-          document.head.appendChild(m);
-        }
-      } catch (e) {}
-      r.className += ' js';
+      var r = document.documentElement, mode = 'edit';
+      try { if (localStorage.getItem('keerae-mode') === 'normal') mode = 'normal'; } catch (e) {}
+      r.className = r.className.replace('no-js', 'js');
+      r.setAttribute('data-mode', mode);
     })();
   </script>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
   <title>KEERAE. I make games.</title>
   <meta name="description" content="Seven games going at once. The code, the art and the music, all mine. Squish n Pops, Into Ember Depths, Rattlecup and Rollaway.">
@@ -32,479 +22,385 @@
   <meta property="og:url" content="https://keerae.com/">
   <meta property="og:site_name" content="KEERAE">
   <meta property="og:title" content="KEERAE. I make games.">
-  <meta property="og:description" content="Seven games going at once. The code, the art and the music, all mine.">
+  <meta property="og:description" content="Seven going at once. The code, the art and the music, all mine.">
   <meta property="og:image" content="https://keerae.com/assets/og-cover.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="KEERAE. I make games, and I mean all of it. Seven going at once. The code, the art and the music, all mine. A row of pixel-art bosses from Into Ember Depths along the bottom.">
+  <meta property="og:image:alt" content="KEERAE. I make games, or at least I try. Seven going at once. The code, the art and the music, all mine. Shown as a selected label in a game editor, with pixel-art bosses from Into Ember Depths along the bottom.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="KEERAE. I make games.">
-  <meta name="twitter:description" content="Seven games going at once. The code, the art and the music, all mine.">
+  <meta name="twitter:description" content="Seven going at once. The code, the art and the music, all mine.">
   <meta name="twitter:image" content="https://keerae.com/assets/og-cover.png">
-  <meta name="twitter:image:alt" content="KEERAE. I make games, and I mean all of it. Seven going at once. The code, the art and the music, all mine. A row of pixel-art bosses from Into Ember Depths along the bottom.">
+  <meta name="twitter:image:alt" content="KEERAE. I make games, or at least I try. Seven going at once. The code, the art and the music, all mine. Shown as a selected label in a game editor, with pixel-art bosses from Into Ember Depths along the bottom.">
 
-  <meta name="theme-color" content="#F7F6F3" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#131217" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#1E1D25" id="theme-color">
 
   <!-- Typographic monogram, not a stock glyph. -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316151A'/%3E%3Cpath d='M10 8v16M22 8l-9.5 8L22 24' stroke='%23F7F6F3' stroke-width='2.6' stroke-linecap='square' fill='none'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231E1D25'/%3E%3Cpath d='M10 8v16M22 8l-9.5 8L22 24' stroke='%23FF6A13' stroke-width='2.8' stroke-linecap='square' fill='none'/%3E%3C/svg%3E">
+  <link rel="preload" href="fonts/bricolage-display.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/atkinson.woff2" as="font" type="font/woff2" crossorigin>
 
   <style>
     /* ============================================================
-       Fonts: self-hosted, OFL. No external requests anywhere.
+       Fonts. Self-hosted, all SIL OFL, licences next to the files.
+       Nothing on this page loads from anywhere else.
        ============================================================ */
-    @font-face {
-      font-family: 'Space Grotesk';
-      font-style: normal;
-      font-weight: 400 700;
-      font-display: swap;
-      src: url('fonts/space-grotesk-latin.woff2') format('woff2');
-    }
+    @font-face { font-family: "Bricolage"; src: url("fonts/bricolage-display.woff2") format("woff2"); font-weight: 700 800; font-stretch: 75% 100%; font-display: swap; }
+    @font-face { font-family: "Atkinson"; src: url("fonts/atkinson.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
+    @font-face { font-family: "Newsreader"; src: url("fonts/newsreader-italic.woff2") format("woff2"); font-style: italic; font-weight: 400 500; font-display: swap; }
+    @font-face { font-family: "Martian"; src: url("fonts/martian-mono.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
 
     /* ============================================================
-       Tokens. The frame owns NO accent colour.
-       Each project supplies its own through inline --acc, --acc-ink and --stage.
+       Tokens. Two looks share one page:
+       the editor (default with scripts on) and the plain page (normal mode,
+       no scripts, and print). Each game still owns its accent, via inline
+       --acc, --acc-ink and --stage on its section.
        ============================================================ */
     :root {
       color-scheme: light;
+      /* editor chrome */
+      --c0: #1E1D25; --c1: #26252E; --c2: #2F2E39; --line: #3A3946;
+      --cink: #D6D4E0; --cdim: #9794A8; --ctime: #918EA3;
+      /* editor viewport */
+      --view: #DCDDE6; --grid: #CDCED9; --grid2: #BCBDCD; --ax: #E5484D; --ay: #3B9C55;
+      --sel: #FF6A13; --on-sel: #1A0A00;
+      /* the page itself */
+      --paper: #F7F6F3; --paper-2: #EFEDE7; --rule: #DEDBD4; --rule-2: #C9C5BC;
+      --ink: #15141B; --ink-2: #44424F; --ink-3: #5E5C6E;
+      --card: rgba(255,255,255,.62);
 
-      --paper:    #F7F6F3;
-      --paper-2:  #EFEDE7;
-      --ink:      #16151A;
-      --ink-2:    #46444E;
-      --ink-3:    #656271;
-      --rule:     #DEDBD4;
-      --rule-2:   #C9C5BC;
-      /* Borders that outline a control, not decoration. Must clear 3:1. */
-      --control-edge: #8F8B81;
-
-      /* One elevation ladder. Three tiers, nothing else. */
-      --lift-0: none;
-      --lift-1: 0 1px 2px rgba(22,21,26,.06), 0 6px 18px rgba(22,21,26,.06);
-      --lift-2: 0 2px 4px rgba(22,21,26,.08), 0 18px 48px rgba(22,21,26,.14);
-
-      --sans: 'Space Grotesk', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
-      --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
-
-      --measure: 62ch;
-      --gutter: clamp(20px, 5vw, 72px);
-      --page: 1240px;
+      --display: "Bricolage", "Arial Narrow", sans-serif;
+      --text: "Atkinson", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --voice: "Newsreader", "Iowan Old Style", Palatino, Georgia, serif;
+      --mono: "Martian", ui-monospace, SFMono-Regular, Menlo, monospace;
+      --measure: 60ch;
     }
 
-    /* Dark comes from one of two places: the system asks for it and the reader
-       hasn't overridden, or the reader picked it. The two blocks are identical
-       on purpose; a media query and a plain selector can't be combined, so if
-       you change one, change the other. */
+    /* The plain page follows the reader's system for dark. The editor doesn't:
+       its viewport is always the light grid, inside dark chrome. */
     @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
+      :root:not([data-mode="edit"]) {
         color-scheme: dark;
-        --control-edge: #646070;
-        --paper:   #131217;
-        --paper-2: #1B1A21;
-        --ink:     #F2F0EC;
-        --ink-2:   #B6B2BE;
-        --ink-3:   #8A8694;
-        --rule:    #2C2A33;
-        --rule-2:  #3D3A46;
-        --lift-1: 0 1px 2px rgba(0,0,0,.5), 0 6px 18px rgba(0,0,0,.35);
-        --lift-2: 0 2px 4px rgba(0,0,0,.5), 0 18px 48px rgba(0,0,0,.55);
+        --paper: #131217; --paper-2: #1B1A21; --rule: #2C2A33; --rule-2: #3D3A46;
+        --ink: #F2F0EC; --ink-2: #B9B5C1; --ink-3: #9A96A5;
+        --card: rgba(255,255,255,.04);
       }
-      /* The per-project accents are tuned for the light ground and go to about
-         3:1 on the dark one. On dark, use the bright accent instead. */
-      :root:not([data-theme="light"]) .p-status,
-      :root:not([data-theme="light"]) .index a:hover .nm { color: var(--acc); }
+      :root:not([data-mode="edit"]) .acc-ink { color: var(--acc); }
     }
 
-    :root[data-theme="dark"] {
-      color-scheme: dark;
-      --control-edge: #646070;
-      --paper:   #131217;
-      --paper-2: #1B1A21;
-      --ink:     #F2F0EC;
-      --ink-2:   #B6B2BE;
-      --ink-3:   #8A8694;
-      --rule:    #2C2A33;
-      --rule-2:  #3D3A46;
-      --lift-1: 0 1px 2px rgba(0,0,0,.5), 0 6px 18px rgba(0,0,0,.35);
-      --lift-2: 0 2px 4px rgba(0,0,0,.5), 0 18px 48px rgba(0,0,0,.55);
-    }
-    :root[data-theme="dark"] .p-status,
-    :root[data-theme="dark"] .index a:hover .nm { color: var(--acc); }
-
-    /* ============================================================ Base */
+    /* ============================================================ base */
     *, *::before, *::after { box-sizing: border-box; }
-
-    html { -webkit-text-size-adjust: 100%; }
-    @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
-
-    body {
-      margin: 0;
-      background: var(--paper);
-      color: var(--ink);
-      font-family: var(--sans);
-      font-size: 17px;
-      line-height: 1.65;
-      font-variant-numeric: tabular-nums;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
-
+    html { -webkit-text-size-adjust: 100%; scroll-padding-top: 72px; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.62 var(--text); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
     img { display: block; max-width: 100%; height: auto; }
     a { color: inherit; }
-    ::selection { background: var(--ink); color: var(--paper); }
-
-    :focus-visible {
-      outline: 2px solid var(--ink);
-      outline-offset: 3px;
-      border-radius: 2px;
-    }
-
-    /* Keeps anchor jumps AND keyboard focus clear of the sticky masthead. */
-    html { scroll-padding-top: 88px; }
-
-    .wrap {
-      max-width: var(--page);
-      margin-inline: auto;
-      padding-inline: var(--gutter);
-    }
-
-    .skip {
-      position: absolute; left: var(--gutter); top: -100px; z-index: 200;
-      background: var(--ink); color: var(--paper);
-      padding: 12px 20px; border-radius: 4px; text-decoration: none; font-weight: 500;
-    }
-    .skip:focus { top: 12px; }
-
-    /* Type scale: one ramp, used everywhere. */
-    .eyebrow {
-      font-size: 12px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase;
-      color: var(--ink-3); margin: 0; line-height: 1.65;
-    }
-    .display {
-      font-size: clamp(38px, 6.2vw, 76px); font-weight: 700; line-height: 1.02;
-      letter-spacing: -.028em; margin: 0;
-      text-wrap: balance;
-    }
-    h2 {
-      font-size: clamp(25px, 3.1vw, 36px); font-weight: 700; line-height: 1.12;
-      letter-spacing: -.02em; margin: 0;
-      text-wrap: balance;
-    }
-    h3 {
-      font-size: clamp(23px, 2.6vw, 30px); font-weight: 700; line-height: 1.15;
-      letter-spacing: -.018em; margin: 0;
-    }
     p { margin: 0; }
-    .lede {
-      font-size: clamp(18px, 1.7vw, 21px); line-height: 1.55; color: var(--ink-2);
-      max-width: var(--measure);
+    button { font: inherit; color: inherit; }
+    /* Focus rings: ink on light surfaces, signal orange on the dark chrome. Both clear 3:1. */
+    :focus-visible { outline: 2.5px solid var(--ink); outline-offset: 3px; border-radius: 2px; }
+    .bar :focus-visible, .tree :focus-visible, .insp :focus-visible, .out :focus-visible { outline-color: var(--sel); }
+    .bar .tbtn.run:focus-visible { outline-color: #fff; }
+    ::selection { background: var(--sel); color: var(--on-sel); }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .skip { position: absolute; left: 12px; top: -80px; z-index: 300; background: var(--sel); color: var(--on-sel); padding: 10px 16px; border-radius: 4px; text-decoration: none; font-weight: 700; }
+    .skip:focus { top: 10px; }
+
+    /* ============================================================ type */
+    .headline {
+      margin: 0; max-width: 13ch;
+      font: 800 clamp(52px, 8.2vw, 128px)/.9 var(--display); font-stretch: 75%;
+      letter-spacing: -.012em; text-wrap: balance;
     }
+    .headline .w { display: inline-block; }
+    h2 { margin: 0; font: 800 clamp(38px, 5.2vw, 78px)/.94 var(--display); font-stretch: 80%; letter-spacing: -.01em; text-wrap: balance; }
+    h3 { margin: 0; font: 800 clamp(24px, 2.4vw, 32px)/1.05 var(--display); font-stretch: 85%; }
+    .lede { font-size: clamp(19px, 1.6vw, 21px); line-height: 1.55; color: var(--ink-2); max-width: 48ch; }
     .prose { color: var(--ink-2); max-width: var(--measure); }
+    /* Two registers, never crossed: serif italic is Eric talking, mono is the machine. */
+    .note { font: italic 400 20px/1.55 var(--voice); color: var(--ink); max-width: 46ch; padding-left: 16px; border-left: 3px solid var(--rule-2); }
+    .note + .note { margin-top: 18px; }
+    .mono, .status { font-family: var(--mono); }
+    .status { font-size: 13px; line-height: 1.5; color: var(--ink-2); }
+    .status b { font-weight: 700; }
+    .acc-ink { color: var(--acc-ink, var(--ink)); }
 
-    /* The second register: Eric's own voice, in serif italic.
-       Rule: serif italic = something he said. Sans = something a machine
-       or a calendar said. Never crossed. */
-    .aside {
-      font-family: var(--serif);
-      font-style: italic;
-      font-size: 17px;
-      line-height: 1.6;
-      color: var(--ink-2);
-      max-width: 46ch;
-      padding-left: 18px;
-      border-left: 2px solid var(--rule-2);
-    }
+    /* ============================================================ plain-page chrome */
+    .masthead { position: sticky; top: 0; z-index: 60; background: color-mix(in srgb, var(--paper) 90%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--rule); }
+    .masthead .in { max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px); min-height: 60px; display: flex; align-items: center; gap: 22px; }
+    .wordmark { font: 800 20px/1 var(--display); font-stretch: 100%; letter-spacing: .1em; text-decoration: none; }
+    .masthead nav { margin-left: auto; display: flex; gap: clamp(14px, 2.2vw, 26px); align-items: center; }
+    .masthead nav a { text-decoration: none; color: var(--ink-2); font-size: 15px; }
+    .masthead nav a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+    .mode-btn { display: none; }
+    .js .mode-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 13px; border-radius: 999px; border: 1.5px solid var(--ink); background: transparent; cursor: pointer; font: 600 14px/1 var(--text); }
+    .js .mode-btn:hover { background: var(--ink); color: var(--paper); }
+    @media (max-width: 640px) { .masthead .nav-wide { display: none; } }
 
-    /* ============================================================ Header */
-    .masthead {
-      position: sticky; top: 0; z-index: 60;
-      background: color-mix(in srgb, var(--paper) 88%, transparent);
-      backdrop-filter: saturate(1.6) blur(12px);
-      border-bottom: 1px solid var(--rule);
-    }
-    @supports not (backdrop-filter: blur(1px)) { .masthead { background: var(--paper); } }
+    /* ============================================================ the scene (content) */
+    .app { display: block; }
+    .bar, .tree, .insp, .out, .edit-only { display: none; }
+    .scene { max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px) 40px; }
+    .group { padding-block: clamp(56px, 8vw, 104px); border-top: 1px solid var(--rule); position: relative; }
+    .group.hero { border-top: 0; padding-top: clamp(48px, 8vw, 104px); }
+    .hero .lede { margin-top: 28px; }
+    .hero .note { margin-top: 26px; }
 
-    .masthead .wrap {
-      display: flex; align-items: center; justify-content: space-between; gap: 20px;
-      min-height: 64px;
-    }
-    .wordmark {
-      font-weight: 700; font-size: 19px; letter-spacing: .14em;
-      text-decoration: none; white-space: nowrap;
-    }
-    .masthead nav { display: flex; align-items: center; gap: clamp(16px, 2.4vw, 30px); }
-    .masthead nav a {
-      text-decoration: none; color: var(--ink-2); font-size: 15px;
-      padding-block: 6px;
-      border-bottom: 1px solid transparent;
-    }
-    .masthead nav a:hover { color: var(--ink); border-bottom-color: var(--ink); }
-    .nav-wide { display: none; }
-    @media (min-width: 720px) { .nav-wide { display: flex; } }
-
-    /* Theme toggle. It does nothing without JS, so without JS it isn't there. */
-    .theme-toggle { display: none; }
-    .js .theme-toggle {
-      display: inline-grid; place-items: center;
-      width: 34px; height: 34px; padding: 0;
-      background: var(--paper); color: var(--ink-2);
-      border: 1px solid var(--control-edge); border-radius: 50%;
-      cursor: pointer;
-      transition: color .15s ease, border-color .15s ease, background .15s ease;
-    }
-    .js .theme-toggle:hover { color: var(--ink); border-color: var(--ink); background: var(--paper-2); }
-    .theme-toggle svg { width: 15px; height: 15px; }
-
-    /* The icon shows what you'd switch TO, and it has to follow the same
-       three-way logic as the tokens so it's right before JS runs. */
-    .ico-sun { display: none; }
-    .ico-moon { display: block; }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) .ico-sun { display: block; }
-      :root:not([data-theme="light"]) .ico-moon { display: none; }
-    }
-    :root[data-theme="dark"] .ico-sun { display: block; }
-    :root[data-theme="dark"] .ico-moon { display: none; }
-    :root[data-theme="light"] .ico-sun { display: none; }
-    :root[data-theme="light"] .ico-moon { display: block; }
-
-    /* ============================================================ Hero */
-    .hero { padding-block: clamp(56px, 9vw, 116px) clamp(40px, 5vw, 64px); }
-    .hero .display { margin-top: 20px; max-width: 24ch; text-wrap: pretty; }
-    .hero .lede { margin-top: 26px; }
-
-    .hero-note { margin-top: 30px; }
-
-    /* The index: four games, named immediately. The range IS the argument. */
-    .index {
-      margin-top: clamp(44px, 6vw, 72px);
-      border-top: 1px solid var(--rule);
-    }
-    .index a {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: baseline;
-      gap: 8px 20px;
-      padding-block: 18px;
-      border-bottom: 1px solid var(--rule);
-      text-decoration: none;
-    }
-    .index .nm {
-      font-size: clamp(20px, 2.4vw, 27px); font-weight: 700; letter-spacing: -.015em;
-      line-height: 1.2;
-    }
-    .index .st { font-size: 13px; color: var(--ink-3); letter-spacing: .04em; }
-    .index .kd { grid-column: 1 / -1; font-size: 14px; color: var(--ink-3); }
-    .index a:hover .nm { color: var(--acc-ink, var(--ink)); }
-    @media (min-width: 720px) {
-      .index a { grid-template-columns: minmax(0,22ch) 1fr auto; }
-      .index .kd { grid-column: auto; }
-      .index .st { text-align: right; }
+    /* the index: all four games, named immediately */
+    .index { margin-top: 40px; display: grid; border-top: 1px solid var(--rule); max-width: 900px; }
+    .index a { display: grid; grid-template-columns: 18px minmax(0, 20ch) 1fr auto; align-items: baseline; gap: 6px 16px; padding: 14px 0; border-bottom: 1px solid var(--rule); text-decoration: none; }
+    .index .dot { width: 12px; height: 12px; border-radius: 3px; background: var(--acc); transform: translateY(1px); }
+    .index .nm { font: 800 clamp(20px, 2.2vw, 26px)/1.1 var(--display); font-stretch: 88%; }
+    .index .kd { font-size: 14px; color: var(--ink-3); }
+    .index .st { font: 500 12px/1.4 var(--mono); color: var(--ink-3); text-align: right; }
+    .index a:hover .nm { color: var(--acc-ink, var(--ink)); text-decoration: underline; text-underline-offset: 4px; }
+    @media (max-width: 700px) {
+      .index a { grid-template-columns: 18px 1fr auto; }
+      .index .dot, .index .nm { grid-row: 1; }
+      .index .st { grid-column: 3; grid-row: 1; }
+      .index .kd { grid-column: 2 / -1; grid-row: 2; }
     }
 
-    /* ============================================================ Sections */
-    section { padding-block: clamp(56px, 8vw, 104px); }
-    .sec-head { display: grid; gap: 14px; margin-bottom: clamp(36px, 5vw, 60px); }
-    .sec-head .prose { margin-top: 4px; }
+    .skip-to-hi { margin-top: 18px; font-size: 15.5px; color: var(--ink-2); }
+    .skip-to-hi a { font-weight: 700; color: var(--ink); text-underline-offset: 3px; }
 
-    /* A full-bleed tinted band; its own .wrap holds the measure. */
-    .band { background: var(--paper-2); border-block: 1px solid var(--rule); }
-
-    /* ============================================================ Projects */
-    .project { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var(--rule); }
-    .project:first-of-type { border-top: 0; }
-
-    .p-head { display: grid; gap: 12px; margin-bottom: 30px; }
-    .p-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px 16px; }
-    .p-mark {
-      display: inline-block; width: 9px; height: 9px; border-radius: 2px;
-      background: var(--acc); flex: none; transform: translateY(-3px);
-    }
-    .p-status {
-      font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase;
-      color: var(--acc-ink, var(--ink-2));
-    }
-
-    /* The stage: each project's own colour world, framed but not styled by the site. */
-    .stage {
-      background: var(--stage, var(--paper-2));
-      border-radius: 10px;
-      overflow: hidden;
-      /* The hairline keeps the plate legible in dark mode, where a shadow
-         on a dark ground carries almost nothing. */
-      box-shadow: var(--lift-2), 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent);
-      margin-block: 30px;
-    }
+    /* a game */
+    .p-head { display: grid; gap: 14px; }
+    .p-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 18px; }
+    .p-head .prose { margin-top: 4px; }
+    .stage { background: var(--stage, #111); border-radius: 10px; overflow: hidden; margin-top: 28px; box-shadow: 0 1px 0 rgba(0,0,0,.06), 0 18px 40px -18px rgba(21,20,27,.45); }
     .stage img { width: 100%; }
-    .stage-pad { padding: clamp(18px, 3vw, 40px); }
-    .stage-cap {
-      font-size: 13px; color: var(--ink-3); margin-top: 12px;
-      max-width: var(--measure);
-    }
-
-    /* The one place a project asks the reader for something. Tinted with the
-       project's own accent so it belongs to the game, not to the site. */
-    .callout {
-      border-left: 3px solid var(--acc);
-      background: color-mix(in srgb, var(--acc) 7%, transparent);
-      border-radius: 0 6px 6px 0;
-      padding: 18px 22px;
-      max-width: var(--measure);
-    }
-    .callout-lead { font-weight: 700; font-size: 17px; letter-spacing: -.01em; }
-    .callout-sub { font-size: 15px; color: var(--ink-2); margin-top: 6px; }
-
-    .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 2vw, 22px); }
-    .shots-4 { grid-template-columns: repeat(4, 1fr); }
-    @media (max-width: 860px) { .shots-4 { grid-template-columns: repeat(2, 1fr); } }
-    /* Landscape stills need width to stay legible. Two across, never three. */
-    .shots-wide { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(10px, 2vw, 22px); }
-    .shots-wide img { border-radius: 4px; }
-    @media (max-width: 620px) { .shots-wide { grid-template-columns: 1fr; } }
-    .shots img { border-radius: 4px; }
-
-    .p-body { display: grid; gap: clamp(26px, 4vw, 48px); }
-    @media (min-width: 900px) { .p-body { grid-template-columns: 1.15fr .85fr; } }
-
-    /* Facts: sans, tabular. Machine voice. */
-    .facts { display: grid; gap: 0; margin: 0; }
-    .facts div {
-      display: grid; grid-template-columns: minmax(0,13ch) 1fr; gap: 6px 18px;
-      padding-block: 10px; border-top: 1px solid var(--rule);
-      font-size: 15px;
-    }
-    .facts dt { color: var(--ink-3); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; padding-top: 3px; }
+    .stage.pad { padding: clamp(14px, 2.6vw, 32px); }
+    .cap { margin-top: 12px; font-size: 14px; color: var(--ink-3); max-width: 56ch; }
+    .shots-wide { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px, 2vw, 20px); }
+    .shots-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(8px, 1.6vw, 18px); }
+    .shots-wide img, .shots-4 img { border-radius: 4px; }
+    @media (max-width: 760px) { .shots-4 { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 560px) { .shots-wide { grid-template-columns: 1fr; } }
+    .callout { margin-top: 26px; padding: 16px 20px; border-left: 4px solid var(--acc); background: color-mix(in srgb, var(--acc) 10%, transparent); border-radius: 0 8px 8px 0; max-width: var(--measure); }
+    .callout b { display: block; font-size: 17px; }
+    .callout p { margin-top: 6px; font-size: 15.5px; color: var(--ink-2); }
+    .p-body { margin-top: 34px; display: grid; gap: clamp(26px, 4vw, 48px); }
+    @media (min-width: 1000px) { .p-body { grid-template-columns: 1.1fr .9fr; } }
+    .tags { margin: 24px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+    .tags li { display: inline-block; padding: 4px 11px; border-radius: 999px; border: 1.5px solid var(--rule-2); font: 500 12px/1.5 var(--mono); color: var(--ink-2); }
+    .facts { margin: 0; display: grid; align-content: start; }
+    .facts > div { display: grid; grid-template-columns: minmax(0, 12ch) 1fr; gap: 4px 16px; padding: 10px 0; border-top: 1px solid var(--rule); font-size: 15.5px; }
+    .facts dt { font: 500 12px/1.9 var(--mono); color: var(--ink-3); }
     .facts dd { margin: 0; color: var(--ink-2); }
+    @media (max-width: 520px) { .facts > div { grid-template-columns: 1fr; gap: 0; } }
+    code { font: .9em var(--mono); padding: 1px 5px; border-radius: 3px; background: color-mix(in srgb, var(--ink) 8%, transparent); }
 
-    code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: .9em;
-      background: color-mix(in srgb, var(--ink) 7%, transparent);
-      padding: 1px 5px; border-radius: 3px;
-    }
+    /* Rollaway: nothing to show yet, and it says so */
+    .empty-slot { margin-top: 28px; min-height: 220px; display: grid; place-items: center; padding: 28px; border: 2px dashed var(--rule-2); border-radius: 10px; text-align: center; }
+    .empty-slot p { font: italic 400 20px/1.5 var(--voice); max-width: 32ch; }
+    .empty-slot small { display: block; margin-top: 10px; font: 500 12px/1.5 var(--mono); color: var(--ink-3); font-style: normal; }
 
-    /* Browsers without color-mix() drop those declarations entirely, which
-       would leave the sticky masthead see-through. Plain fallbacks here. This block has
-       to stay below every rule that uses color-mix(), or those win instead. */
-    @supports not (color: color-mix(in srgb, red 50%, blue)) {
-      .masthead { background: var(--paper); }
-      .stage { box-shadow: var(--lift-2), 0 0 0 1px var(--rule-2); }
-      .callout, code { background: var(--paper-2); }
+    /* the three not yet */
+    .sealed-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; }
+    .sealed {
+      position: relative; width: 148px; height: 92px; padding: 10px; display: grid; place-items: end start; text-align: left;
+      border: 2px dashed var(--rule-2); border-radius: 8px; background: transparent; cursor: pointer;
+      font: 500 12px/1.4 var(--mono); color: var(--ink-3);
     }
+    .sealed svg { position: absolute; top: 10px; right: 10px; width: 18px; height: 18px; opacity: .7; }
+    .sealed .says { position: absolute; left: 10px; top: 10px; font: 700 13px/1 var(--text); color: var(--ink); opacity: 0; transition: opacity .15s; }
+    .sealed.nope { animation: nope .42s; }
+    .sealed.nope .says { opacity: 1; }
+    @keyframes nope { 20%, 60% { transform: translateX(-6px) } 40%, 80% { transform: translateX(6px) } }
 
-    .tags { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; list-style: none; }
-    .tags li {
-      font-size: 13px; color: var(--ink-2);
-      padding: 4px 11px; border: 1px solid var(--rule-2); border-radius: 999px;
-    }
-
-    /* ============================================================ Score */
-    .tracks { display: grid; gap: 0; margin-top: 8px; border-top: 1px solid var(--rule); max-width: 640px; }
-    .track {
-      display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px;
-      padding-block: 14px; border-bottom: 1px solid var(--rule);
-    }
-    .play {
-      width: 40px; height: 40px; flex: none;
-      border: 1px solid var(--control-edge); border-radius: 50%;
-      background: transparent; color: var(--ink); cursor: pointer;
-      display: grid; place-items: center; padding: 0;
-      transition: border-color .15s ease, background .15s ease;
-    }
-    .play:hover { border-color: var(--ink); background: var(--paper-2); }
-    .play svg { width: 15px; height: 15px; }
-    .play .ico-pause { display: none; }
-    .play[aria-pressed="true"] .ico-play { display: none; }
-    .play[aria-pressed="true"] .ico-pause { display: block; }
-    .track .t-name { font-size: 16px; font-weight: 500; }
-    .track .t-from { font-size: 13px; color: var(--ink-3); }
-    .track .t-len { font-size: 13px; color: var(--ink-3); }
-
-    /* ============================================================ Range table */
-    .stack { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    .stack th, .stack td { text-align: left; vertical-align: top; padding: 14px 18px 14px 0; border-top: 1px solid var(--rule); font-size: 15px; }
-    .stack th {
-      font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3);
-      font-weight: 500; border-top: 0; padding-top: 0;
-    }
-    .stack tbody th {
-      font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--ink);
-      font-weight: 500; white-space: nowrap; border-top: 1px solid var(--rule); padding-top: 14px;
-    }
-    .stack td:nth-child(2) { color: var(--ink-3); white-space: nowrap; }
+    /* range table */
+    .stack { width: 100%; border-collapse: collapse; margin-top: 30px; }
+    .stack th, .stack td { text-align: left; vertical-align: top; padding: 13px 18px 13px 0; border-top: 1px solid var(--rule); font-size: 15.5px; }
+    .stack thead th { font: 500 12px/1.5 var(--mono); color: var(--ink-3); border-top: 0; padding-top: 0; }
+    .stack tbody th { font-weight: 700; white-space: nowrap; }
+    .stack td:nth-child(2) { color: var(--ink-3); white-space: nowrap; font-size: 14px; }
     .stack td:last-child { color: var(--ink-2); padding-right: 0; }
-    .stack-scroll { overflow-x: auto; }
-    /* On a phone three columns leave the last one, the one that matters,
-       off screen. Stack each row instead: tool, where, then the note. */
-    @media (max-width: 600px) {
+    @media (max-width: 640px) {
       .stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
       .stack, .stack tbody, .stack tr, .stack th, .stack td { display: block; }
-      .stack tr { border-top: 1px solid var(--rule); padding-block: 14px; }
-      .stack tbody th, .stack td { border-top: 0; padding: 0; white-space: normal; }
-      .stack td:nth-child(2) { font-size: 13px; margin-top: 2px; }
-      .stack td:last-child { margin-top: 8px; }
+      .stack tr { border-top: 1px solid var(--rule); padding: 13px 0; }
+      .stack tbody th, .stack td { border: 0; padding: 0; white-space: normal; }
+      .stack td:last-child { margin-top: 6px; }
     }
 
-    /* ============================================================ Footer */
-    .foot { border-top: 1px solid var(--rule); padding-block: clamp(52px, 7vw, 84px) 36px; }
-    .foot-grid { display: grid; gap: clamp(32px, 5vw, 64px); }
-    @media (min-width: 860px) { .foot-grid { grid-template-columns: 1.2fr .8fr; } }
+    /* score */
+    .tracks { margin-top: 26px; display: grid; max-width: 640px; border-top: 1px solid var(--rule); }
+    .track { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--rule); }
+    .play { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--ink); background: transparent; cursor: pointer; display: grid; place-items: center; padding: 0; }
+    .play:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+    .play[aria-pressed="true"] { background: var(--sel); border-color: var(--sel); color: var(--on-sel); }
+    .play svg { width: 14px; height: 14px; }
+    .play .ico-pause { display: none; } .play[aria-pressed="true"] .ico-play { display: none; } .play[aria-pressed="true"] .ico-pause { display: block; }
+    .t-name { font-weight: 700; } .t-from { display: block; font-size: 14px; color: var(--ink-3); } .t-len { font: 500 12px var(--mono); color: var(--ink-3); }
 
-    .btn {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: var(--ink); color: var(--paper);
-      font-family: inherit; font-size: 16px; font-weight: 500;
-      padding: 14px 24px; border: 1px solid var(--ink); border-radius: 6px;
-      text-decoration: none;
-      transition: opacity .15s ease;
-    }
-    .btn:hover { opacity: .84; }
-    .btn svg { width: 15px; height: 15px; }
+    /* contact */
+    .mail { display: inline-flex; align-items: center; gap: 10px; margin-top: 26px; padding: 15px 24px; border-radius: 8px; background: var(--ink); color: var(--paper); text-decoration: none; font-weight: 700; font-size: 18px; }
+    .mail:hover { background: var(--sel); color: var(--on-sel); }
+    .mail svg { width: 15px; height: 15px; }
+    .contact-grid { display: grid; gap: clamp(30px, 5vw, 60px); }
+    @media (min-width: 900px) { .contact-grid { grid-template-columns: 1.15fr .85fr; } }
+    .channels { margin-top: 14px; display: grid; border-top: 1px solid var(--rule); }
+    .channel { display: flex; justify-content: space-between; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+    .channel .c-state { font: 500 12px/1.9 var(--mono); color: var(--ink-3); }
+    .colophon { margin-top: clamp(40px, 6vw, 64px); padding-top: 18px; border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; font-size: 13.5px; color: var(--ink-3); }
+    .run-hint { display: none; }
 
-    .channels { display: grid; gap: 0; margin-top: 6px; border-top: 1px solid var(--rule); }
-    .channel {
-      display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
-      padding-block: 13px; border-bottom: 1px solid var(--rule);
-      font-size: 15px;
-    }
-    .channel .c-state { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
-    a.channel { text-decoration: none; }
-    a.channel:hover { color: var(--ink); }
-    a.channel:hover .c-name { text-decoration: underline; text-underline-offset: 3px; }
-
-    .colophon {
-      display: flex; flex-wrap: wrap; gap: 8px 28px; justify-content: space-between;
-      margin-top: clamp(44px, 6vw, 72px); padding-top: 22px; border-top: 1px solid var(--rule);
-      font-size: 13px; color: var(--ink-3);
-    }
-
-    /* ============================================================ Motion
-       Content is NEVER hidden unless JS has proven it can un-hide it:
-       .reveal only becomes invisible once .js-reveal is set from the
-       reveal script itself, and a failsafe timer clears it regardless. */
-    @media screen and (prefers-reduced-motion: no-preference) {
-      .js-reveal .reveal { opacity: 0; transform: translateY(10px); }
-      .js-reveal .reveal { transition: opacity .55s ease, transform .55s ease; }
-      /* Tabbing into a section that hasn't faded in yet shows it straight away. */
-      .js-reveal .reveal:focus-within { opacity: 1; transform: none; }
-    }
-    .reveal.in { opacity: 1; transform: none; }
-
-    /* ============================================================ Print
-       Always prints on the light palette, whatever theme is on screen,
-       because most print dialogs drop backgrounds but keep text colour. */
-    @media print {
-      :root {
-        color-scheme: light !important;
-        --paper: #F7F6F3 !important; --paper-2: #EFEDE7 !important;
-        --ink: #16151A !important; --ink-2: #46444E !important; --ink-3: #656271 !important;
-        --rule: #DEDBD4 !important; --rule-2: #C9C5BC !important;
+    /* ============================================================
+       THE EDITOR. Screen only, so printing always gets the plain page.
+       ============================================================ */
+    @media screen {
+      :root[data-mode="edit"] { color-scheme: dark; }
+      :root[data-mode="edit"] body { background: var(--c0); overflow: hidden; }
+      :root[data-mode="edit"] .masthead { display: none; }
+      :root[data-mode="edit"] .app {
+        display: grid; height: 100vh; height: 100dvh;
+        grid-template-columns: 248px minmax(0, 1fr) 312px;
+        grid-template-rows: 50px minmax(0, 1fr) 150px;
+        grid-template-areas: "bar bar bar" "tree view insp" "tree out insp";
       }
-      .p-status { color: var(--acc-ink, var(--ink-2)) !important; }
-      .masthead { position: static; backdrop-filter: none; }
-      .skip, .theme-toggle, .play { display: none !important; }
+      :root[data-mode="edit"] .edit-only { display: revert; }
+
+      /* ---------------------------------------- toolbar */
+      :root[data-mode="edit"] .bar { grid-area: bar; display: flex; align-items: center; gap: 10px; padding: 0 12px; background: var(--c0); border-bottom: 1px solid var(--line); color: var(--cink); font: 500 13px/1 var(--mono); }
+      .bar .logo { font: 800 17px/1 var(--display); font-stretch: 100%; letter-spacing: .1em; color: #fff; text-decoration: none; margin-right: 4px; }
+      .bar .tab { align-self: end; padding: 9px 14px; border: 1px solid var(--line); border-bottom: 0; border-radius: 6px 6px 0 0; background: var(--c1); white-space: nowrap; }
+      .bar .tab small { color: var(--cdim); margin-left: 8px; font-size: 12px; }
+      .bar .sp { flex: 1; }
+      .tbtn { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 13px; border-radius: 6px; border: 1px solid var(--line); background: var(--c2); color: var(--cink); cursor: pointer; font: 500 13px/1 var(--mono); text-decoration: none; white-space: nowrap; }
+      .tbtn:hover { border-color: var(--cdim); }
+      .tbtn svg { width: 13px; height: 13px; flex: none; }
+      .tbtn.run { background: var(--sel); border-color: var(--sel); color: var(--on-sel); font-weight: 700; }
+      .tbtn.run:hover { filter: brightness(1.08); }
+      .tbtn[disabled] { opacity: .45; cursor: default; filter: none; }
+      .tbtn[aria-pressed="true"] { background: #3B3A48; border-color: var(--cdim); color: #fff; }
+      .tbtn .lbl-short { display: none; }
+      .fps { min-width: 70px; text-align: right; color: var(--cdim); }
+      :root.running .fps { color: var(--sel); }
+      .small-only { display: none !important; }
+
+      /* ---------------------------------------- docks */
+      :root[data-mode="edit"] .tree, :root[data-mode="edit"] .insp, :root[data-mode="edit"] .out { display: block; background: var(--c1); color: var(--cink); font: 400 13px/1.5 var(--mono); overflow: auto; overscroll-behavior: contain; }
+      .dock-h { margin: 0; padding: 11px 14px; font: 600 12px/1 var(--mono); color: var(--cdim); border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--c1); z-index: 1; display: flex; justify-content: space-between; align-items: center; }
+      :root[data-mode="edit"] .tree { grid-area: tree; border-right: 1px solid var(--line); }
+      .tree ul { list-style: none; margin: 0; padding: 0 0 0 14px; }
+      .tree > ul { padding: 8px 6px 20px; }
+      .tree a { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 5px; text-decoration: none; white-space: nowrap; color: var(--cink); }
+      .tree a:hover { background: var(--c2); }
+      .tree a[aria-current="true"] { background: color-mix(in srgb, var(--sel) 24%, transparent); color: #fff; }
+      .tree .ico { width: 14px; height: 14px; flex: none; }
+      .tree .hidden-node { color: var(--cdim); }
+      .tree .eye { margin-left: auto; width: 13px; height: 13px; opacity: .8; }
+      .tree .kind { margin-left: auto; color: var(--cdim); font-size: 11px; }
+
+      :root[data-mode="edit"] .insp { grid-area: insp; border-left: 1px solid var(--line); }
+      .props { margin: 0; padding: 4px 0; }
+      .props > div { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: 7px 14px; border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+      .props dt { color: var(--cdim); }
+      .props dd { margin: 0; overflow-wrap: anywhere; }
+      .insp .said { margin: 14px; padding: 13px 15px; border-radius: 8px; background: var(--c2); font: italic 400 16px/1.5 var(--voice); color: #EEEBF5; }
+      .insp .said[hidden] { display: none; }
+      .insp .tip { margin: 6px 14px 16px; color: var(--cdim); font-size: 12px; }
+
+      :root[data-mode="edit"] .out { grid-area: out; border-top: 1px solid var(--line); font-size: 12.5px; }
+      .log { margin: 0; padding: 8px 14px 12px; list-style: none; }
+      .log li { white-space: pre-wrap; }
+      .log time { color: var(--ctime); margin-right: 10px; }
+      .log .ok { color: #8FD19E; } .log .warn { color: #F2C14E; } .log .info { color: #A9C2FF; } .log .run { color: #FF8A47; } .log .hint { color: var(--cink); }
+
+      /* ---------------------------------------- the viewport */
+      :root[data-mode="edit"] .view {
+        grid-area: view; position: relative; overflow: auto; min-width: 0; overscroll-behavior: contain;
+        background:
+          linear-gradient(var(--ax), var(--ax)) 0 96px / 100% 1.5px no-repeat,
+          linear-gradient(var(--ay), var(--ay)) 64px 0 / 1.5px 100% no-repeat,
+          linear-gradient(to right, var(--grid2) 1px, transparent 1px) 64px 0 / 160px 160px,
+          linear-gradient(to bottom, var(--grid2) 1px, transparent 1px) 0 96px / 160px 160px,
+          linear-gradient(to right, var(--grid) 1px, transparent 1px) 64px 0 / 32px 32px,
+          linear-gradient(to bottom, var(--grid) 1px, transparent 1px) 0 96px / 32px 32px,
+          var(--view);
+        background-attachment: local;
+        color: var(--ink); color-scheme: light;
+        --rule: rgba(21,20,27,.16); --rule-2: rgba(21,20,27,.34); --ink-3: #4E4C5C;
+      }
+      :root[data-mode="edit"] .view:focus { outline: none; }
+      :root[data-mode="edit"] .scene { max-width: 1060px; margin: 0; padding: 128px 56px 120px 96px; }
+      :root[data-mode="edit"] .group { border-top: 0; padding-block: 0; margin-top: 150px; }
+      :root[data-mode="edit"] .group.hero { margin-top: 0; }
+      :root[data-mode="edit"] .run-hint { display: block; margin-top: 30px; font: 500 13px/1.6 var(--mono); color: var(--ink-2); }
+      .run-hint kbd { font: inherit; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: var(--sel); color: var(--on-sel); }
+
+      /* every game is a group node with its frame drawn */
+      :root[data-mode="edit"] [data-game] { padding: 34px 30px 36px; margin-left: -31px; margin-right: -31px; border: 1.5px dashed rgba(21,20,27,.28); border-radius: 4px; }
+      :root[data-mode="edit"] [data-game]::before {
+        content: attr(data-node); position: absolute; left: -1.5px; top: -24px; padding: 4px 8px; border-radius: 4px 4px 0 0;
+        font: 500 11px/1.3 var(--mono); background: rgba(21,20,27,.78); color: #fff;
+      }
+      :root[data-mode="edit"] .facts > div { background: var(--card); border-top: 0; margin-top: 6px; padding: 9px 12px; border-radius: 4px; }
+      :root[data-mode="edit"] .tags li { background: #fff; border-color: var(--ink); color: var(--ink); }
+      :root[data-mode="edit"] .index a { border-color: rgba(21,20,27,.16); }
+      :root[data-mode="edit"] .note { border-left-color: #9E9BB0; }
+      :root[data-mode="edit"] .sealed { border-color: rgba(21,20,27,.38); }
+
+      /* hover and selection: one node at a time, set by script */
+      :root[data-mode="edit"] .hov { outline: 1.5px solid rgba(21,20,27,.6); outline-offset: 4px; }
+      :root[data-mode="edit"] .sel { outline: 2px solid var(--sel); outline-offset: 4px; }
+      .tagline {
+        position: absolute; z-index: 20; pointer-events: none; padding: 3px 7px; border-radius: 3px 3px 3px 0;
+        font: 500 11px/1.35 var(--mono); background: var(--ink); color: #fff; white-space: nowrap; transform: translateY(-100%);
+      }
+      .tagline.is-sel { background: var(--sel); color: var(--on-sel); }
+      .handles { position: absolute; z-index: 19; pointer-events: none; }
+      .handles i { position: absolute; width: 9px; height: 9px; background: #fff; border: 2px solid var(--sel); }
+      .handles i:nth-child(1) { left: -4.5px; top: -4.5px; } .handles i:nth-child(2) { right: -4.5px; top: -4.5px; }
+      .handles i:nth-child(3) { left: -4.5px; bottom: -4.5px; } .handles i:nth-child(4) { right: -4.5px; bottom: -4.5px; }
+
+      /* ---------------------------------------- run mode */
+      :root.running .view { overflow: hidden; cursor: grab; user-select: none; -webkit-user-select: none; outline: 3px solid var(--sel); outline-offset: -3px; touch-action: none; }
+      :root.running .hov, :root.running .sel { outline: 0; }
+      :root.running .tagline, :root.running .handles { display: none; }
+      .phys, .plat { will-change: auto; }
+      :root.running .phys { will-change: transform; }
+      #fx { position: fixed; z-index: 30; pointer-events: none; display: none; }
+      :root.running #fx { display: block; }
+
+      /* ---------------------------------------- small screens: drawers */
+      @media (max-width: 999px) {
+        :root[data-mode="edit"] .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: 50px minmax(0, 1fr) 34px; grid-template-areas: "bar" "view" "out"; }
+        :root[data-mode="edit"] .tree, :root[data-mode="edit"] .insp {
+          position: fixed; z-index: 80; top: 50px; bottom: 34px; width: min(86vw, 330px);
+          transform: translateX(-104%); transition: transform .22s ease; box-shadow: 0 20px 50px rgba(0,0,0,.5); visibility: hidden;
+        }
+        :root[data-mode="edit"] .insp { right: 0; transform: translateX(104%); }
+        :root.show-tree .tree, :root.show-insp .insp { transform: none !important; visibility: visible; }
+        .small-only { display: inline-flex !important; }
+        .wide-only { display: none !important; }
+        .bar .tab, .bar .logo { display: none; }
+        :root[data-mode="edit"] .bar { gap: 6px; padding: 0 8px; }
+        .tbtn { padding: 0 10px; }
+        .tbtn .lbl-long { display: none; } .tbtn .lbl-short { display: inline; }
+        #stop { display: none; }
+        :root.running #run { display: none; }
+        :root.running #stop { display: inline-flex; }
+        :root[data-mode="edit"] .out { overflow: hidden; }
+        .log li { display: none; }
+        .log li:last-child { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        :root[data-mode="edit"] .scene { padding: 82px 18px 80px 30px; }
+        :root[data-mode="edit"] .view { background-position: 0 56px, 18px 0, 18px 0, 0 56px, 18px 0, 0 56px, 0 0; }
+        :root[data-mode="edit"] [data-game] { padding: 26px 16px 28px; margin-left: -17px; margin-right: -9px; }
+        :root[data-mode="edit"] .group { margin-top: 110px; }
+      }
+      @media (max-width: 420px) { .fps { display: none; } #tgl-tree { font-size: 0; gap: 0; } #tgl-tree svg { width: 15px; height: 15px; } }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sealed.nope { animation: none; }
+      :root[data-mode="edit"] .tree, :root[data-mode="edit"] .insp { transition: none; }
+    }
+    @media print {
+      .masthead, .mode-btn, .play, .skip, .sealed-row, .run-hint { display: none !important; }
+      body { background: #fff; color: #000; }
       .stage { box-shadow: none; }
-      .btn { background: none; color: var(--ink); }
+      .mail { background: none; color: #000; padding: 0; }
     }
   </style>
 </head>
@@ -512,671 +408,668 @@
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
+  <!-- The plain page's masthead. Hidden in the editor. -->
   <header class="masthead">
-    <div class="wrap">
+    <div class="in">
       <a class="wordmark" href="#top">KEERAE</a>
       <nav aria-label="Primary">
-        <span class="nav-wide" style="gap: inherit">
-          <a href="#work">Work</a>
-          <a href="#range">Range</a>
-          <a href="#score">Score</a>
-        </span>
+        <a class="nav-wide" href="#work">Work</a>
+        <a class="nav-wide" href="#range">Range</a>
+        <a class="nav-wide" href="#score">Score</a>
         <a href="#contact">Contact</a>
-        <button class="theme-toggle" type="button" aria-label="Switch theme">
-          <svg class="ico-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
-          <svg class="ico-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3.1"/><path d="M8 1v1.6M8 13.4V15M15 8h-1.6M2.6 8H1M12.9 3.1l-1.1 1.1M4.2 11.8l-1.1 1.1M12.9 12.9l-1.1-1.1M4.2 4.2 3.1 3.1"/></svg>
-        </button>
+        <button class="mode-btn" type="button" data-set-mode="edit">Make it weird</button>
       </nav>
     </div>
   </header>
 
-  <main id="main">
-    <span id="top"></span>
+  <div class="app">
+    <!-- ======================================================== toolbar -->
+    <header class="bar">
+      <button class="tbtn small-only" type="button" id="tgl-tree" aria-controls="tree" aria-expanded="false" aria-label="Scene tree"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 3h10M4.5 7H12M4.5 11H12"/></svg>Scene</button>
+      <a class="logo" href="#top">KEERAE</a>
+      <span class="tab wide-only">index.scene <small>4 games, 3 hidden</small></span>
+      <span class="sp wide-only"></span>
+      <button class="tbtn run" type="button" id="run">
+        <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><path d="M2 1v10l9-5z"/></svg>Run
+      </button>
+      <button class="tbtn" type="button" id="stop" disabled>
+        <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="8" height="8"/></svg>Stop
+      </button>
+      <span class="sp small-only"></span>
+      <button class="tbtn" type="button" id="snd" aria-pressed="false" aria-label="Sound effects" title="Sound effects">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 5h2.5L8 2v10L4.5 9H2z" fill="currentColor"/><path class="wave" d="M10 4.5c1 .9 1 4.1 0 5"/></svg><span class="lbl-long" aria-hidden="true">Sound off</span>
+      </button>
+      <button class="tbtn" type="button" data-set-mode="normal" title="Plain page, no editor">
+        <span class="lbl-long">Make it normal</span><span class="lbl-short">Normal</span>
+      </button>
+      <a class="tbtn wide-only" href="#contact">Say hi</a>
+      <span class="fps" id="fps" aria-hidden="true">idle</span>
+      <button class="tbtn small-only" type="button" id="tgl-insp" aria-controls="insp" aria-expanded="false" aria-label="Inspector"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5.2"/><path d="M7 6.2v3.6M7 4.2v.2"/></svg></button>
+    </header>
 
-    <!-- ==================================================== HERO -->
-    <section class="hero wrap">
-      <p class="eyebrow">One person &middot; seven games going &middot; code, art, music</p>
-      <h1 class="display">I make games,<br>and I mean all of it.</h1>
-      <p class="lede">
-        Seven of them going at once right now, on phones and desktops and in a
-        browser. Four are far enough along that I&rsquo;m happy to put
-        them in front of you. The other three really aren&rsquo;t, so I left them out.
-      </p>
+    <!-- ======================================================== scene tree (navigation) -->
+    <nav class="tree" id="tree" aria-label="Scene">
+      <h2 class="dock-h">Scene <span>7 games</span></h2>
+      <ul>
+        <li><a href="#top" data-pick="top" aria-current="true"><svg class="ico" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/></svg>KEERAE</a>
+          <ul>
+            <li><a href="#top" data-pick="hero"><svg class="ico" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3.5h10M2 7h10M2 10.5h6"/></svg>Hello</a></li>
+            <li><a href="#squish" data-pick="squish"><svg class="ico" viewBox="0 0 14 14" fill="none" stroke="#5FCF9B" stroke-width="1.8"><circle cx="7" cy="7" r="5"/></svg>Squish n Pops</a></li>
+            <li><a href="#ember" data-pick="ember"><svg class="ico" viewBox="0 0 14 14" fill="#FF7A2F"><rect x="2" y="2" width="4.5" height="4.5"/><rect x="7.5" y="7.5" width="4.5" height="4.5"/><rect x="7.5" y="2" width="4.5" height="4.5" opacity=".5"/></svg>Into Ember Depths</a></li>
+            <li><a href="#rattlecup" data-pick="rattlecup"><svg class="ico" viewBox="0 0 14 14" fill="none" stroke="#C9A24F" stroke-width="1.5"><rect x="2" y="2" width="10" height="10" rx="2"/><circle cx="5" cy="5" r=".9" fill="#C9A24F"/><circle cx="9" cy="9" r=".9" fill="#C9A24F"/></svg>Rattlecup</a></li>
+            <li><a href="#rollaway" data-pick="rollaway"><svg class="ico" viewBox="0 0 14 14" fill="none" stroke="#9AA6C2" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="M3.5 9c2 1.2 5 1 7-1.2"/></svg>Rollaway</a></li>
+            <li><a href="#hidden" data-pick="hidden1" class="hidden-node"><svg class="ico" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"><rect x="2" y="2" width="10" height="10"/></svg>Untitled 5<svg class="eye" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" aria-label="hidden"><path d="M1.5 7s2.2-4 5.5-4 5.5 4 5.5 4-2.2 4-5.5 4-5.5-4-5.5-4z"/><path d="M2.5 12 11.5 2"/></svg></a></li>
+            <li><a href="#hidden" data-pick="hidden2" class="hidden-node"><svg class="ico" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"><rect x="2" y="2" width="10" height="10"/></svg>Untitled 6<svg class="eye" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" aria-label="hidden"><path d="M1.5 7s2.2-4 5.5-4 5.5 4 5.5 4-2.2 4-5.5 4-5.5-4-5.5-4z"/><path d="M2.5 12 11.5 2"/></svg></a></li>
+            <li><a href="#hidden" data-pick="hidden3" class="hidden-node"><svg class="ico" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 2"><rect x="2" y="2" width="10" height="10"/></svg>Untitled 7<svg class="eye" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" aria-label="hidden"><path d="M1.5 7s2.2-4 5.5-4 5.5 4 5.5 4-2.2 4-5.5 4-5.5-4-5.5-4z"/><path d="M2.5 12 11.5 2"/></svg></a></li>
+            <li><a href="#range" data-pick="range"><svg class="ico" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2.5" width="10" height="9"/><path d="M2 6h10M6 6v5.5"/></svg>Range</a></li>
+            <li><a href="#score" data-pick="score"><svg class="ico" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 10.5V3.5L12 2v7"/><circle cx="4" cy="10.5" r="1.7"/><circle cx="10.4" cy="9" r="1.7"/></svg>Score</a></li>
+            <li><a href="#contact" data-pick="contact"><svg class="ico" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="3" width="11" height="8" rx="1"/><path d="m2 3.6 5 3.8 5-3.8"/></svg>Say hi</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
 
-      <div class="hero-note">
-        <p class="aside">
-          The bubble game and the bullet hell look nothing like each other, and
-          that&rsquo;s deliberate. I don&rsquo;t think a one-person studio needs a house style.
-          I&rsquo;d rather each game just look like itself. It does mean I&rsquo;ve got three
-          art directions running at the same time, four once Rollaway gets some
-          art. Some weeks that feels like range. Other weeks it&rsquo;s a scheduling
-          problem.
-        </p>
-      </div>
+    <!-- ======================================================== the page itself -->
+    <main class="view" id="main" tabindex="-1">
+      <div class="scene" id="scene">
 
-      <nav class="index" aria-label="Projects">
-        <a href="#squish" style="--acc:#5FCF9B; --acc-ink:#24704F">
-          <span class="nm">Squish n Pops</span>
-          <span class="kd">Mobile browser · tilt-and-tap arcade · 400 levels</span>
-          <span class="st">Demo ready</span>
-        </a>
-        <a href="#ember" style="--acc:#FF7A2F; --acc-ink:#A8420F">
-          <span class="nm">Into Ember Depths</span>
-          <span class="kd">Desktop &amp; browser · online bullet-hell action RPG</span>
-          <span class="st">In development</span>
-        </a>
-        <a href="#rattlecup" style="--acc:#C9A24F; --acc-ink:#7A5C1C">
-          <span class="nm">Rattlecup</span>
-          <span class="kd">iOS &amp; Android · liar&rsquo;s dice roguelike · working title</span>
-          <span class="st">Vertical slice</span>
-        </a>
-        <a href="#rollaway" style="--acc:#7F8CA8; --acc-ink:#55627E">
-          <span class="nm">Rollaway</span>
-          <span class="kd">iOS &amp; Android · 3D tilt platformer · working title</span>
-          <span class="st">Builds running</span>
-        </a>
-      </nav>
+        <!-- ================================================ HELLO -->
+        <section class="group hero" id="top" data-node="Hello (Group)" data-props='{"Type":"Group","Says":"hello","Children":"5"}'>
+          <h1 class="headline" data-node="Headline (Label)" data-props='{"Type":"Label","Font":"Bricolage Grotesque 800, condensed","Text":"I make games, or at least I try :D"}'><span class="w phys">I</span> <span class="w phys">make</span> <span class="w phys">games,</span> <span class="w phys">or</span> <span class="w phys">at</span> <span class="w phys">least</span> <span class="w phys">I</span> <span class="w phys">try</span> <span class="w phys">:D</span></h1>
+          <p class="lede phys" data-node="Lede (Label)" data-props='{"Type":"Label","Games":"7 going at once","Shown":"4","Hidden":"3, not ready"}'>
+            Seven of them going at once right now, on phones and desktops and in a
+            browser. Four are far enough along that I&rsquo;m happy to put them in
+            front of you. The other three really aren&rsquo;t, so I left them out.
+          </p>
+          <p class="note phys" data-node="Note (Comment)" data-props='{"Type":"Comment","Author":"Eric","Register":"human, serif italic"}'>
+            The bubble game and the bullet hell look nothing like each other, and
+            that&rsquo;s deliberate. I don&rsquo;t think a one-person studio needs a house
+            style. I&rsquo;d rather each game just look like itself. Some weeks that
+            feels like range. Other weeks it&rsquo;s a scheduling problem.
+          </p>
+          <p class="run-hint phys">This whole page is a scene. Hit <kbd>Run</kbd> and it plays. Each game does its own thing, so try it on all four.</p>
 
-      <p class="stage-cap" style="margin-top:18px; max-width:56ch">
-        There are three more I&rsquo;ve only just started. Nothing worth putting in
-        front of anyone yet.
-      </p>
-    </section>
+          <nav class="index phys" aria-label="Games" data-node="Games (Index)" data-props='{"Type":"Index","Games":"4 shown, 3 hidden"}'>
+            <a href="#squish" style="--acc:#5FCF9B; --acc-ink:#226B4B"><span class="dot"></span><span class="nm">Squish n Pops</span><span class="kd">Mobile browser arcade, 400 levels</span><span class="st">Demo ready</span></a>
+            <a href="#ember" style="--acc:#FF7A2F; --acc-ink:#A13F0E"><span class="dot"></span><span class="nm">Into Ember Depths</span><span class="kd">Online bullet-hell action RPG</span><span class="st">In development</span></a>
+            <a href="#rattlecup" style="--acc:#C9A24F; --acc-ink:#775A1B"><span class="dot"></span><span class="nm">Rattlecup</span><span class="kd">Liar&rsquo;s dice roguelike, iOS and Android</span><span class="st">Vertical slice</span></a>
+            <a href="#rollaway" style="--acc:#7F8CA8; --acc-ink:#515E78"><span class="dot"></span><span class="nm">Rollaway</span><span class="kd">3D tilt platformer, iOS and Android</span><span class="st">Builds running</span></a>
+          </nav>
+          <p class="skip-to-hi phys">Or skip all this and just say hi. <a href="mailto:eric@keerae.com">eric@keerae.com</a></p>
+        </section>
 
-    <!-- ==================================================== WORK -->
-    <section id="work" class="wrap">
-      <div class="sec-head reveal">
-        <p class="eyebrow">The work</p>
-        <h2>Four games. Four completely different problems.</h2>
-        <p class="prose">
-          All of this is mine. The code, the art, the music. If something isn&rsquo;t
-          public yet, or just isn&rsquo;t done, I say so. I&rsquo;d rather you knew where each
-          one actually is.
-        </p>
-      </div>
+        <div id="work"></div>
 
-      <!-- ---------------------------------------- Squish n Pops -->
-      <article class="project reveal" id="squish" style="--acc:#5FCF9B; --acc-ink:#24704F; --stage:#171A2E">
-        <div class="p-head">
-          <div class="p-title">
-            <span class="p-mark" aria-hidden="true"></span>
-            <h3>Squish n Pops</h3>
-            <span class="p-status">400 levels · demo is done, page isn&rsquo;t up yet</span>
+        <!-- ================================================ SQUISH N POPS -->
+        <section class="group" id="squish" data-game="squish" style="--acc:#5FCF9B; --acc-ink:#226B4B; --stage:#171A2E"
+          data-node="Squish n Pops (Game)" data-props='{"Type":"Game","Platform":"Mobile browser","Levels":"400","Engine":"Phaser 3, TypeScript","Status":"Demo done, store page not up yet","Run":"Bubbles. Tap one, it splits in two."}'>
+          <div class="p-head">
+            <div class="p-title plat">
+              <h2>Squish n Pops</h2>
+              <span class="status acc-ink"><b>400 levels.</b> The demo&rsquo;s done, the page isn&rsquo;t up yet.</span>
+            </div>
+            <p class="prose plat">
+              Hold your phone sideways. Tilt to steer, tap to fire. Every hit splits a
+              bubble into two smaller ones, so a good shot basically hands you two new
+              problems. Clear the screen and you&rsquo;re out.
+            </p>
           </div>
-          <p class="prose">
-            Hold your phone sideways. Tilt to steer, tap to fire. Every hit splits a
-            bubble into two smaller ones, so a good shot basically hands you two new
-            problems. Clear the screen and you&rsquo;re out.
-          </p>
-        </div>
-
-        <!-- TODO(eric): the day the itch.io page is live, replace this block with
-             a real <a class="btn" href="...">. Do not put a guessed URL here.
-             The same day, also change: the .p-status above ("demo is done, page"),
-             the "Next" row in the facts below, the contact paragraph in the
-             footer ("on a store yet ... goes up soon"), the itch.io
-             row in the footer, and the "placeholders on purpose" line under it.
-             README.md "Before going live" has the full list. -->
-        <div class="callout">
-          <p class="callout-lead">The demo is done. Ten levels, free, no ads.</p>
-          <p class="callout-sub">
-            The first seven teach you the basics. The last three skip ahead to where
-            the weird bubbles start showing up. Beat all ten and you get a quick look
-            at the late game. It runs right in your phone browser. No account, no payment, nothing to install. The itch.io page
-            isn&rsquo;t live yet. The second it is, the link goes right here.
-          </p>
-        </div>
-
-        <div class="stage" style="margin:24px 0 12px">
-          <img src="assets/squish-play-1.jpg"
-               width="1600" height="739" loading="lazy" decoding="async"
-               alt="Squish n Pops gameplay: two green bubbles with lit fuses drift above four smaller pink bubbles, with the marshmallow player below a floating shelf.">
-        </div>
-        <p class="stage-cap">
-          This is SHORT FUSE, the last one in the demo. Set one bomb off and the
-          chain pretty much plays the level for you.
-        </p>
-
-        <div class="stage" style="margin:22px 0 12px">
-          <div class="stage-pad">
+          <!-- TODO(eric): the day the itch.io page is live, this callout becomes a real
+               link button. Do not put a guessed URL here. README "Before going live" has
+               the full list of lines that change that day. -->
+          <div class="callout plat" data-node="Demo (Callout)" data-props='{"Type":"Callout","Levels":"10","Price":"Free","Ads":"None","Store":"itch.io, not live yet"}'>
+            <b>The demo is done. Ten levels, free, no ads.</b>
+            <p>The first seven teach you the basics. The last three skip ahead to where the weird bubbles start showing up. It runs right in your phone browser. No account, nothing to install. The itch.io page isn&rsquo;t live yet. The second it is, the link goes right here.</p>
+          </div>
+          <div class="stage plat" data-node="short_fuse (Texture)" data-props='{"Type":"Texture","File":"squish-play-1.jpg","Size":"1600 × 739","Source":"store/screenshot-5-short-fuse.png","Real":"Gameplay, not a mockup"}'>
+            <img src="assets/squish-play-1.jpg" width="1600" height="739" decoding="async"
+                 alt="Squish n Pops gameplay: two green bubbles with lit fuses drift above four smaller pink bubbles, with the marshmallow player below a floating shelf.">
+          </div>
+          <p class="cap">This is SHORT FUSE, the last one in the demo. Set one bomb off and the chain pretty much plays the level for you.</p>
+          <div class="stage pad" data-node="hard_candy, level_select (Textures)" data-props='{"Type":"Textures","Files":"squish-play-2.jpg, squish-levels.jpg","Source":"store/screenshot-3, screenshot-6"}'>
             <div class="shots-wide">
-              <img src="assets/squish-play-2.jpg" width="1000" height="462" loading="lazy" decoding="async"
-                   alt="HARD CANDY. A green bubble inside a riveted metal ring that eats your first hit.">
-              <img src="assets/squish-levels.jpg" width="1000" height="462" loading="lazy" decoding="async"
-                   alt="The demo&rsquo;s level select screen, showing all ten levels by name.">
+              <img src="assets/squish-play-2.jpg" width="1000" height="462" loading="lazy" decoding="async" alt="HARD CANDY. A green bubble inside a riveted metal ring that eats your first hit.">
+              <img src="assets/squish-levels.jpg" width="1000" height="462" loading="lazy" decoding="async" alt="The demo&rsquo;s level select screen, showing all ten levels by name.">
             </div>
           </div>
-        </div>
-        <p class="stage-cap">
-          HARD CANDY, where your first hit just rings off the shell. And the ten
-          levels you get.
-        </p>
-
-        <div class="p-body" style="margin-top:34px">
-          <div>
-            <p class="aside">
-              Nothing in this game ever speeds up. A bubble in level 200 moves at
-              exactly the same speed as one in level 1, and each size always bounces
-              back to the same height. All the difficulty is in how many there are,
-              what they do, when they show up and how the room is shaped. Well, until
-              201. From there it&rsquo;s the same 200 rooms again, zoomed way in, so you
-              get a lot less warning. I wanted levels you could actually learn, not
-              levels you barely survive.
-            </p>
-            <p class="aside" style="margin-top:20px">
-              iOS will only hand a web page the tilt sensors if you ask from inside a
-              real tap, and only over HTTPS. So if someone says no, the game just
-              flips to touch and lets them keep playing. I really didn&rsquo;t want a permission
-              popup to be the thing that ended somebody&rsquo;s run.
-            </p>
-            <ul class="tags" style="margin-top:26px">
-              <li>TypeScript</li>
-              <li>Phaser 3</li>
-              <li>Vite</li>
-              <li>Arcade Physics</li>
-              <li>PWA</li>
-              <li>Vitest</li>
-            </ul>
+          <p class="cap">HARD CANDY, where your first hit just rings off the shell. And the ten levels you get.</p>
+          <div class="p-body">
+            <div>
+              <p class="note plat" data-node="Note (Comment)" data-props='{"Type":"Comment","Author":"Eric"}'>Nothing in this game ever speeds up. A bubble in level 200 moves at exactly the same speed as one in level 1, and each size always bounces back to the same height. All the difficulty is in how many there are, what they do, when they show up and how the room is shaped. Well, until 201. From there it&rsquo;s the same 200 rooms again, zoomed way in, so you get a lot less warning.</p>
+              <p class="note plat">iOS will only hand a web page the tilt sensors if you ask from inside a real tap, and only over HTTPS. So if someone says no, the game just flips to touch and lets them keep playing. I really didn&rsquo;t want a permission popup to be the thing that ended somebody&rsquo;s run.</p>
+              <ul class="tags"><li>TypeScript</li><li>Phaser 3</li><li>Vite</li><li>Arcade Physics</li><li>PWA</li><li>Vitest</li></ul>
+            </div>
+            <dl class="facts plat" data-node="Facts (Properties)" data-props='{"Type":"Properties","Register":"machine"}'>
+              <div><dt>Campaign</dt><dd>400 levels across five acts, opening up one at a time.</dd></div>
+              <div><dt>Vocabulary</dt><dd>Nineteen bubble traits, and they start stacking in the late acts. Shielded, pi&ntilde;ata, bomb, ghost and a bunch more. Plus eight powerups.</dd></div>
+              <div><dt>Controls</dt><dd>Tilt, touch or keyboard. Whatever angle you&rsquo;re holding it at when you start becomes neutral, so you can play lying down.</dd></div>
+              <div><dt>Co-op</dt><dd>Two phones over local Wi-Fi. Shared field, separate scores and lives.</dd></div>
+              <div><dt>Next</dt><dd>itch.io demo first, then Steam and mobile.</dd></div>
+            </dl>
           </div>
+        </section>
 
-          <dl class="facts">
-            <div><dt>Campaign</dt><dd>400 levels across five acts, opening up one at a time.</dd></div>
-            <div><dt>Vocabulary</dt><dd>Nineteen bubble traits, and they start stacking in the late acts. Shielded, pi&ntilde;ata, bomb, ghost and a bunch more. Plus eight powerups.</dd></div>
-            <div><dt>Controls</dt><dd>Tilt, touch or keyboard. Whatever angle you&rsquo;re holding it at when you start becomes neutral, so you can play lying down.</dd></div>
-            <div><dt>Co-op</dt><dd>Two phones over local Wi-Fi. Shared field, separate scores and lives.</dd></div>
-            <div><dt>Next</dt><dd>itch.io demo first, then Steam and mobile.</dd></div>
-          </dl>
-        </div>
-      </article>
-
-      <!-- ---------------------------------------- Into Ember Depths -->
-      <article class="project reveal" id="ember" style="--acc:#FF7A2F; --acc-ink:#A8420F; --stage:#0A0812">
-        <div class="p-head">
-          <div class="p-title">
-            <span class="p-mark" aria-hidden="true"></span>
-            <h3>Into Ember Depths</h3>
-            <span class="p-status">In development · desktop and browser</span>
+        <!-- ================================================ INTO EMBER DEPTHS -->
+        <section class="group" id="ember" data-game="ember" style="--acc:#FF7A2F; --acc-ink:#A13F0E; --stage:#0A0812"
+          data-node="Into Ember Depths (Game)" data-props='{"Type":"Game","Platform":"Desktop and browser","Bosses":"33","Sprites":"384","Tracks":"33","Engine":"None. Canvas2D, Node, WebSockets","Status":"In development","Run":"The bosses wake up. Click one."}'>
+          <div class="p-head">
+            <div class="p-title plat">
+              <h2>Into Ember Depths</h2>
+              <span class="status acc-ink"><b>In development.</b> Desktop and browser.</span>
+            </div>
+            <p class="prose plat">
+              An online bullet-hell action RPG. You start out in a daylight town and
+              fight your way inward through rings that keep getting darker, then head
+              down into a descent that doesn&rsquo;t end. Every floor&rsquo;s boss opens the next one.
+            </p>
           </div>
-          <p class="prose">
-            An online bullet-hell action RPG. You start out in a daylight town and
-            fight your way inward through rings that keep getting darker, then head
-            down into a descent that doesn&rsquo;t end. Every floor&rsquo;s boss opens the next
-            one.
-          </p>
-        </div>
-
-        <div class="stage" style="margin:0 0 12px">
-          <div class="stage-pad">
-            <img src="assets/ember-bosses.png"
-                 width="3036" height="828" loading="lazy" decoding="async"
-                 style="image-rendering: pixelated"
+          <div class="stage pad plat" data-node="bosses (Texture)" data-props='{"Type":"Texture","File":"ember-bosses.png","Size":"3036 × 828","Filter":"Nearest","Source":"assets/sprites/bosses, all 33","Palette swaps":"0"}'>
+            <img id="ember-sheet" src="assets/ember-bosses.png" width="3036" height="828" loading="lazy" decoding="async" style="image-rendering: pixelated"
                  alt="A grid of all thirty-three boss sprites from Into Ember Depths, each one its own pixel-art design, on a near-black background.">
           </div>
-        </div>
-        <p class="stage-cap">
-          Every boss in the game, in no particular order. Seven up top, six in the
-          dungeons, twenty down in the descent. Not a single palette swap.
-        </p>
+          <p class="cap">Every boss in the game, in no particular order. Seven up top, six in the dungeons, twenty down in the descent. Not a single palette swap.</p>
+          <div class="p-body">
+            <div>
+              <p class="note plat">The desktop build and the browser build run the exact same code now, and they play on the same server. They did drift apart for a while. I cut every cooldown so abilities come out of MP, tightened the aggro range, and gave the two easiest rings four map bosses each instead of one. Then I moved the browser build over to the new code, so I&rsquo;m back to keeping one balance table in my head instead of two.</p>
+              <ul class="tags"><li>Electron</li><li>Node.js</li><li>Canvas2D</li><li>ES modules</li><li>WebSockets</li><li>No build step</li></ul>
+            </div>
+            <dl class="facts plat">
+              <div><dt>Bosses</dt><dd>33 of them, and no two are the same.</dd></div>
+              <div><dt>Classes</dt><dd>8 you can play.</dd></div>
+              <div><dt>Sprites</dt><dd>384 of them, all made for this game.</dd></div>
+              <div><dt>Score</dt><dd>33 original tracks. <a href="#score">Have a listen below.</a></dd></div>
+              <div><dt>Online</dt><dd>One server, with desktop and browser players on the same wire.</dd></div>
+            </dl>
+          </div>
+        </section>
 
-        <div class="p-body" style="margin-top:34px">
-          <div>
-            <p class="aside">
-              The desktop build and the browser build run the exact same code now,
-              and they play on the same server. They did drift apart for a while. I
-              cut every cooldown so abilities come out of MP, tightened the aggro
-              range, and gave the two easiest rings four map bosses each instead of
-              one. Then I moved the browser build over to the new code, so I&rsquo;m back
-              to keeping one balance table in my head instead of two.
+        <!-- ================================================ RATTLECUP -->
+        <section class="group" id="rattlecup" data-game="rattlecup" style="--acc:#C9A24F; --acc-ink:#775A1B; --stage:#0E0A06"
+          data-node="Rattlecup (Game)" data-props='{"Type":"Game","Platform":"iOS and Android","Engine":"Godot 4.7, GDScript","Opponents":"6, plus the bosses","Status":"Vertical slice","Title":"Working title","Run":"A candle and five dice. Click the dice to throw again."}'>
+          <div class="p-head">
+            <div class="p-title plat">
+              <h2>Rattlecup</h2>
+              <span class="status acc-ink"><b>Vertical slice,</b> building for iOS and Android. Working title.</span>
+            </div>
+            <p class="prose plat">
+              A liar&rsquo;s dice roguelike. One rule does all the heavy lifting here. Are
+              they telling the truth, or do I call them a liar? That question carries a
+              whole run. Three floors of a crooked gambling house, your dice are your
+              build, and every claim that misses gets paid out of your own health.
             </p>
-            <ul class="tags" style="margin-top:26px">
-              <li>Electron</li>
-              <li>Node.js</li>
-              <li>Canvas2D</li>
-              <li>ES modules</li>
-              <li>WebSockets</li>
-              <li>No build step</li>
-            </ul>
           </div>
-
-          <dl class="facts">
-            <div><dt>Bosses</dt><dd>33 of them, and no two are the same.</dd></div>
-            <div><dt>Classes</dt><dd>8 you can play.</dd></div>
-            <div><dt>Sprites</dt><dd>384 of them, all made for this game.</dd></div>
-            <div><dt>Score</dt><dd>33 original tracks. <a href="#score">Have a listen below.</a></dd></div>
-            <div><dt>Online</dt><dd>One server, with desktop and browser players on the same wire.</dd></div>
-          </dl>
-        </div>
-      </article>
-
-      <!-- ---------------------------------------- Rattlecup -->
-      <article class="project reveal" id="rattlecup" style="--acc:#C9A24F; --acc-ink:#7A5C1C; --stage:#0E0A06">
-        <div class="p-head">
-          <div class="p-title">
-            <span class="p-mark" aria-hidden="true"></span>
-            <h3>Rattlecup</h3>
-            <span class="p-status">Vertical slice, building for iOS and Android · working title</span>
-          </div>
-          <p class="prose">
-            A liar&rsquo;s dice roguelike. One rule does all the heavy lifting here. Are
-            they telling the truth, or do I call them a liar? That question carries a
-            whole run. Three floors of a crooked gambling house, your dice are your
-            build, and every claim that misses gets paid out of your own health.
-          </p>
-        </div>
-
-        <div class="stage" style="margin:0 0 12px">
-          <div class="stage-pad">
-            <div class="shots shots-4">
-              <img src="assets/rattlecup-menu.jpg" width="780" height="1688" loading="lazy" decoding="async"
-                   alt="Rattlecup title screen: a gilt-framed portrait and one candle above the RATTLECUP wordmark, in near-darkness.">
-              <img src="assets/rattlecup-table.jpg" width="780" height="1688" loading="lazy" decoding="async"
-                   alt="Rattlecup table view: three gilt-framed opponent portraits above five bone dice lit in a pool of light.">
-              <img src="assets/rattlecup-claim.jpg" width="780" height="1688" loading="lazy" decoding="async"
-                   alt="Rattlecup: a claim hanging in the air as lit type above the player&rsquo;s dice.">
-              <img src="assets/rattlecup-strongbox.jpg" width="780" height="1688" loading="lazy" decoding="async"
-                   alt="Rattlecup&rsquo;s strongbox screen: a gold chest with straps and a red wax seal above the word Gilt, with a LIFT THE LID button.">
+          <div class="stage pad plat" data-node="the_vigil (Textures)" data-props='{"Type":"Textures","Files":"4","Size":"780 × 1688 each","Source":"tests/screenshot_tour.gd, tests/engagement_sheet.gd"}'>
+            <div class="shots-4">
+              <img src="assets/rattlecup-menu.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="Rattlecup title screen: a gilt-framed portrait and one candle above the RATTLECUP wordmark, in near-darkness.">
+              <img src="assets/rattlecup-table.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="Rattlecup table view: three gilt-framed opponent portraits above five bone dice lit in a pool of light.">
+              <img src="assets/rattlecup-claim.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="Rattlecup: a claim hanging in the air as lit type above the player&rsquo;s dice.">
+              <img src="assets/rattlecup-strongbox.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="Rattlecup&rsquo;s strongbox screen: a gold chest with straps and a red wax seal above the word Gilt, with a LIFT THE LID button.">
             </div>
           </div>
-        </div>
-        <p class="stage-cap">
-          The art direction is called The Vigil. A candle, some faces, nothing else.
-          Warm gold nearly everywhere, and red pretty much just means damage or the
-          call. The opponents only got their own faces in September. Before that
-          they were the same drawing
-          three times over, which I could live with for a while and then really
-          couldn&rsquo;t.
-        </p>
-
-        <div class="p-body" style="margin-top:34px">
-          <div>
-            <p class="aside">
-              Special dice and charms run on one effect system. Tricks and table
-              modifiers are basically just data. So a new item is usually a line in
-              a file, not new code. The smarter opponents read a public tell ledger
-              and price you into it, which is still my favourite thing in there.
-            </p>
-            <ul class="tags" style="margin-top:26px">
-              <li>Godot 4.7</li>
-              <li>GDScript</li>
-              <li>Deterministic core</li>
-              <li>Headless test suite</li>
-            </ul>
+          <p class="cap">The art direction is called The Vigil. A candle, some faces, nothing else. Warm gold nearly everywhere, and red pretty much just means damage or the call. The opponents only got their own faces in September. Before that they were the same drawing three times over, which I could live with for a while and then really couldn&rsquo;t.</p>
+          <div class="p-body">
+            <div>
+              <p class="note plat">Special dice and charms run on one effect system. Tricks and table modifiers are basically just data. So a new item is usually a line in a file, not new code. The smarter opponents read a public tell ledger and price you into it, which is still my favourite thing in there.</p>
+              <ul class="tags"><li>Godot 4.7</li><li>GDScript</li><li>Deterministic core</li><li>Headless test suite</li></ul>
+            </div>
+            <dl class="facts plat">
+              <div><dt>Run</dt><dd>Three floors of tables, elites, corridor choices, a shop and events.</dd></div>
+              <div><dt>Strongbox</dt><dd>One on every table you win. Tin, Silver or Gilt. Lift the lid and keep whatever the tier lets you.</dd></div>
+              <div><dt>The debt</dt><dd>One number that a run only ever pushes up. Past a certain point the House notices you and the tables get harder.</dd></div>
+              <div><dt>Opponents</dt><dd>Six AI personalities, plus bosses that bend the rules. The Pit Boss, the Auditor, the Blind King.</dd></div>
+              <div><dt>Sound</dt><dd>Synthesized placeholder running on real audio buses. I haven&rsquo;t written the actual score yet.</dd></div>
+              <div><dt>Builds</dt><dd>Signed <code>.ipa</code> and <code>.apk</code>. It&rsquo;s been running on an iPhone and an Android phone since September.</dd></div>
+            </dl>
           </div>
+        </section>
 
-          <dl class="facts">
-            <div><dt>Run</dt><dd>Three floors of tables, elites, corridor choices, a shop and events.</dd></div>
-            <div><dt>Strongbox</dt><dd>One on every table you win. Tin, Silver or Gilt. Lift the lid and keep whatever the tier lets you.</dd></div>
-            <div><dt>The debt</dt><dd>One number that a run only ever pushes up. Past a certain point the House notices you and the tables get harder.</dd></div>
-            <div><dt>Opponents</dt><dd>Six AI personalities, plus bosses that bend the rules. The Pit Boss, the Auditor, the Blind King.</dd></div>
-            <div><dt>Systems</dt><dd>A dice bag, passive charms, one-use tricks, table modifiers.</dd></div>
-            <div><dt>Robustness</dt><dd>Saves and resumes mid-table. Headless test suite that prints its own check count.</dd></div>
-            <div><dt>Sound</dt><dd>Synthesized placeholder running on real audio buses. I haven&rsquo;t written the actual score yet.</dd></div>
-            <div><dt>Builds</dt><dd>Signed <code>.ipa</code> and <code>.apk</code>. It&rsquo;s been running on an iPhone and an Android phone since September.</dd></div>
-          </dl>
-        </div>
-      </article>
-
-      <!-- ---------------------------------------- Rollaway -->
-      <article class="project reveal" id="rollaway" style="--acc:#7F8CA8; --acc-ink:#55627E">
-        <div class="p-head">
-          <div class="p-title">
-            <span class="p-mark" aria-hidden="true"></span>
-            <h3>Rollaway</h3>
-            <span class="p-status">Running on real hardware &middot; working title</span>
+        <!-- ================================================ ROLLAWAY -->
+        <section class="group" id="rollaway" data-game="rollaway" style="--acc:#7F8CA8; --acc-ink:#515E78; --stage:#12141B"
+          data-node="Rollaway (Game)" data-props='{"Type":"Game","Platform":"iOS and Android","Engine":"Godot 4.7, GDScript","Builds":"Signed .apk and .ipa","Screenshot":"None yet","Status":"Builds running","Title":"Working title","Run":"A ball. Not the game. Tilt or use the arrow keys."}'>
+          <div class="p-head">
+            <div class="p-title plat">
+              <h2>Rollaway</h2>
+              <span class="status acc-ink"><b>Running on real hardware.</b> Working title.</span>
+            </div>
+            <p class="prose plat">A physics-based 3D tilt platformer for phones. Tilt to roll the ball, flick the phone upward to jump.</p>
           </div>
-          <p class="prose">
-            A physics-based 3D tilt platformer for phones. Tilt to roll the ball,
-            flick the phone upward to jump.
-          </p>
-        </div>
-
-        <div class="p-body" style="margin-top:26px">
-          <div>
-            <p class="aside">
-              No screenshot yet, sorry. I&rsquo;d rather show you nothing than show
-              you a mockup. It did finally get off my desktop though, which was a
-              good week. There are signed Android and iOS builds now, so the flick to
-              jump I could only ever guess at in the editor is something I can hold
-              in my hand and be wrong about.
-            </p>
-            <p class="aside" style="margin-top:20px">
-              Getting there meant building a verification chain that won&rsquo;t ship
-              a build it can&rsquo;t vouch for. I found three ways it could have
-              passed something it should have rejected, and closed all of them.
-              Tedious work. Also the only reason I trust what&rsquo;s on the phone.
-            </p>
-            <ul class="tags" style="margin-top:26px">
-              <li>Godot 4.7</li>
-              <li>GDScript</li>
-              <li>iOS</li>
-              <li>Android</li>
-              <li>Device sensors</li>
-            </ul>
+          <div class="empty-slot plat" data-node="screenshot (Texture, empty)" data-props='{"Type":"Texture","File":"none","Why":"No screenshot yet. I&rsquo;d rather show you nothing than show you a mockup."}'>
+            <p>No screenshot yet, sorry. I&rsquo;d rather show you nothing than show you a mockup.<small>Hit Run for a ball instead. It&rsquo;s not the game. It&rsquo;s just a ball.</small></p>
           </div>
+          <div class="p-body">
+            <div>
+              <p class="note plat">It did finally get off my desktop though, which was a good week. There are signed Android and iOS builds now, so the flick to jump I could only ever guess at in the editor is something I can hold in my hand and be wrong about.</p>
+              <p class="note plat">Getting there meant building a verification chain that won&rsquo;t ship a build it can&rsquo;t vouch for. I found three ways it could have passed something it should have rejected, and closed all of them. Tedious work. Also the only reason I trust what&rsquo;s on the phone.</p>
+              <ul class="tags"><li>Godot 4.7</li><li>GDScript</li><li>iOS</li><li>Android</li><li>Device sensors</li></ul>
+            </div>
+            <dl class="facts plat">
+              <div><dt>Builds</dt><dd>Signed <code>.apk</code> and <code>.ipa</code>. I&rsquo;ve played it on a real Android and a real iPhone, just not the newest builds yet.</dd></div>
+              <div><dt>Built</dt><dd>Core physics, lives and checkpoints, a goal with a star rating, and collectibles. Moving, rotating and crumbling platforms. Enemies on reusable health, damage, knockback and vulnerability systems. Hazards and spawners.</dd></div>
+              <div><dt>Slice</dt><dd>A tutorial plus stages 1 to 3, a level select with an unlock chain, and settings that actually change things.</dd></div>
+              <div><dt>Audio</dt><dd>Placeholder music, finally. Three short synth loops, just so I can hear the wiring work.</dd></div>
+              <div><dt>Open</dt><dd>Flick sensitivity works, I just haven&rsquo;t played it enough. It needs hours on an actual phone, not another test.</dd></div>
+            </dl>
+          </div>
+        </section>
 
-          <dl class="facts">
-            <div><dt>Builds</dt><dd>Signed <code>.apk</code> and <code>.ipa</code>. I&rsquo;ve played it on a real Android and a real iPhone, just not the newest builds yet.</dd></div>
-            <div><dt>Built</dt><dd>Core physics, lives and checkpoints, a goal with a star rating, and collectibles. Moving, rotating and crumbling platforms. Enemies on reusable health, damage, knockback and vulnerability systems. Hazards and spawners.</dd></div>
-            <div><dt>Slice</dt><dd>A tutorial plus stages 1 to 3, a level select with an unlock chain, and settings that actually change things.</dd></div>
-            <div><dt>Audio</dt><dd>Placeholder music, finally, on a bus that had been sitting there live and empty since milestone 7. Three short synth loops, just so I can hear the wiring work.</dd></div>
-            <div><dt>Open</dt><dd>Flick sensitivity works, I just haven&rsquo;t played it enough. It needs hours on an actual phone, not another test.</dd></div>
-          </dl>
-        </div>
-      </article>
+        <!-- ================================================ THE THREE NOT YET -->
+        <section class="group" id="hidden" data-node="Hidden (3 scenes)" data-props='{"Type":"Group","Visible":"false","Count":"3","Why":"Only just started. Nothing worth putting in front of anyone yet."}'>
+          <h3 class="phys">Three more, hidden.</h3>
+          <p class="prose phys" style="margin-top:10px">I&rsquo;ve only just started them. Nothing worth putting in front of anyone yet.</p>
+          <div class="sealed-row">
+            <button class="sealed" type="button" data-pick-id="hidden1"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M1.5 7s2.2-4 5.5-4 5.5 4 5.5 4-2.2 4-5.5 4-5.5-4-5.5-4z"/><path d="M2.5 12 11.5 2"/></svg><span class="says" aria-hidden="true">Not yet.</span>Untitled 5</button>
+            <button class="sealed" type="button" data-pick-id="hidden2"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M1.5 7s2.2-4 5.5-4 5.5 4 5.5 4-2.2 4-5.5 4-5.5-4-5.5-4z"/><path d="M2.5 12 11.5 2"/></svg><span class="says" aria-hidden="true">Not yet.</span>Untitled 6</button>
+            <button class="sealed" type="button" data-pick-id="hidden3"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M1.5 7s2.2-4 5.5-4 5.5 4 5.5 4-2.2 4-5.5 4-5.5-4-5.5-4z"/><path d="M2.5 12 11.5 2"/></svg><span class="says" aria-hidden="true">Not yet.</span>Untitled 7</button>
+          </div>
+        </section>
 
-    </section>
-
-    <!-- ==================================================== RANGE -->
-    <section id="range" class="band">
-      <div class="wrap">
-        <div class="sec-head reveal">
-          <p class="eyebrow">Range</p>
-          <h2 id="range-h">Yeah, it&rsquo;s all me.</h2>
-          <p class="prose">
-            Four codebases and two engines. Into Ember Depths doesn&rsquo;t even use an
-            engine. Here&rsquo;s what each tool is actually doing, and what I&rsquo;d tell
-            you about picking it if you asked.
-          </p>
-        </div>
-
-        <div class="stack-scroll reveal">
-          <table class="stack" aria-labelledby="range-h">
-            <thead>
-              <tr><th scope="col">Tool</th><th scope="col">Where</th><th scope="col">What I&rsquo;d tell you</th></tr>
-            </thead>
+        <!-- ================================================ RANGE -->
+        <section class="group" id="range" data-node="Range (Table)" data-props='{"Type":"Table","Codebases":"4","Engines":"2, and one game with none"}'>
+          <h2 class="phys" id="range-h">Yeah, it&rsquo;s all me.</h2>
+          <p class="prose phys" style="margin-top:16px">Four codebases and two engines. Into Ember Depths doesn&rsquo;t even use an engine. Here&rsquo;s what each tool is actually doing, and what I&rsquo;d tell you about picking it if you asked.</p>
+          <table class="stack phys" aria-labelledby="range-h">
+            <thead><tr><th scope="col">Tool</th><th scope="col">Where</th><th scope="col">What I&rsquo;d tell you</th></tr></thead>
             <tbody>
-              <tr>
-                <th scope="row">TypeScript + Phaser 3</th>
-                <td>Squish n Pops</td>
-                <td>The game logic never touches the artwork directly, so I can swap out the sprite art without changing any game code.</td>
-              </tr>
-              <tr>
-                <th scope="row">Electron</th>
-                <td>Into Ember Depths</td>
-                <td>It wraps the same code as the browser build, so one codebase ships to both. For an action game that costs you bundle size and memory. I knew that going in and took the trade anyway.</td>
-              </tr>
-              <tr>
-                <th scope="row">Canvas2D, no build step</th>
-                <td>Into Ember Depths</td>
-                <td>Plain ES modules, served exactly as they are. Nothing to compile means nothing sitting between making a change and seeing it.</td>
-              </tr>
-              <tr>
-                <th scope="row">Node + WebSockets</th>
-                <td>Into Ember Depths</td>
-                <td>One server, and any mix of desktop and browser players on the same wire.</td>
-              </tr>
-              <tr>
-                <th scope="row">Godot 4 + GDScript</th>
-                <td>Rattlecup, Rollaway</td>
-                <td>Picked it for the scene and component model. Rollaway&rsquo;s levels get snapped together from a library of reusable parts instead of one-off scripts per level. Both games are on 4.7 now, and neither one moved until its whole test suite came back green on the new version.</td>
-              </tr>
-              <tr>
-                <th scope="row">Headless test suites</th>
-                <td>All of them</td>
-                <td>The game rules all get tested without a renderer. That&rsquo;s the only reason I can make balance changes fast and still trust them.</td>
-              </tr>
+              <tr><th scope="row">TypeScript + Phaser 3</th><td>Squish n Pops</td><td>The game logic never touches the artwork directly, so I can swap out the sprite art without changing any game code.</td></tr>
+              <tr><th scope="row">Electron</th><td>Into Ember Depths</td><td>It wraps the same code as the browser build, so one codebase ships to both. For an action game that costs you bundle size and memory. I knew that going in and took the trade anyway.</td></tr>
+              <tr><th scope="row">Canvas2D, no build step</th><td>Into Ember Depths</td><td>Plain ES modules, served exactly as they are. Nothing to compile means nothing sitting between making a change and seeing it.</td></tr>
+              <tr><th scope="row">Node + WebSockets</th><td>Into Ember Depths</td><td>One server, and any mix of desktop and browser players on the same wire.</td></tr>
+              <tr><th scope="row">Godot 4 + GDScript</th><td>Rattlecup, Rollaway</td><td>Picked it for the scene and component model. Rollaway&rsquo;s levels get snapped together from a library of reusable parts instead of one-off scripts per level. Both games are on 4.7 now, and neither one moved until its whole test suite came back green on the new version.</td></tr>
+              <tr><th scope="row">Headless test suites</th><td>All of them</td><td>The game rules all get tested without a renderer. That&rsquo;s the only reason I can make balance changes fast and still trust them.</td></tr>
             </tbody>
           </table>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <!-- ==================================================== SCORE -->
-    <section id="score" class="wrap">
-      <div class="sec-head reveal">
-        <p class="eyebrow">Score</p>
-        <h2>I do the music too.</h2>
-        <p class="prose">
-          Thirty-three original tracks for Into Ember Depths, one for every region,
-          dungeon and depth. Nobody ever hears this part, so I&rsquo;m really glad to
-          finally have somewhere to put it. Here are three, about 26 seconds each.
-          In the game the music never actually stops, it just keeps going for as
-          long as you&rsquo;re standing there.
-        </p>
-      </div>
-
-      <div class="tracks reveal">
-        <div class="track">
-          <button class="play" type="button" aria-pressed="false" data-src="assets/audio/ember-overworld.mp3" aria-label="Play Greenlands">
-            <svg class="ico-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 1.5v13l11-6.5z"/></svg>
-            <svg class="ico-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h3.5v12H3zM9.5 2H13v12H9.5z"/></svg>
-          </button>
-          <span><span class="t-name">Greenlands</span><br><span class="t-from">Overworld. The first ring past the beach.</span></span>
-          <span class="t-len">0:26</span>
-        </div>
-        <div class="track">
-          <button class="play" type="button" aria-pressed="false" data-src="assets/audio/ember-depths.mp3" aria-label="Play The Maw">
-            <svg class="ico-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 1.5v13l11-6.5z"/></svg>
-            <svg class="ico-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h3.5v12H3zM9.5 2H13v12H9.5z"/></svg>
-          </button>
-          <span><span class="t-name">The Maw</span><br><span class="t-from">The descent. One of twenty down there.</span></span>
-          <span class="t-len">0:26</span>
-        </div>
-        <div class="track">
-          <button class="play" type="button" aria-pressed="false" data-src="assets/audio/ember-sanctum.mp3" aria-label="Play Shattered Sanctum">
-            <svg class="ico-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 1.5v13l11-6.5z"/></svg>
-            <svg class="ico-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h3.5v12H3zM9.5 2H13v12H9.5z"/></svg>
-          </button>
-          <span><span class="t-name">Shattered Sanctum</span><br><span class="t-from">The endgame dungeon.</span></span>
-          <span class="t-len">0:26</span>
-        </div>
-      </div>
-      <p class="stage-cap" style="margin-top:14px">Plays one at a time, and nothing starts on its own.</p>
-    </section>
-  </main>
-
-  <!-- ==================================================== CONTACT -->
-  <footer id="contact" class="foot">
-    <div class="wrap">
-      <div class="foot-grid">
-        <div class="reveal">
-          <p class="eyebrow">Contact</p>
-          <h2 style="margin-top:14px">Say hi. I&rsquo;d love to hear from you.</h2>
-          <p class="prose" style="margin-top:18px">
-            Nothing&rsquo;s on a store yet. The Squish n Pops demo is done and the itch.io
-            page goes up soon, then Steam and mobile after that. Want a heads up when
-            it happens? Just say so and I&rsquo;ll send you one. And if you only want to
-            talk about any of this, honestly that&rsquo;s just as good. I read everything
-            that comes in.
-          </p>
-          <p style="margin-top:28px">
-            <a class="btn" href="mailto:eric@keerae.com">
-              eric@keerae.com
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg>
-            </a>
-          </p>
-        </div>
-
-        <div class="reveal">
-          <h3 class="eyebrow">Where all this will show up</h3>
-          <!-- TODO(eric): when a page goes live, turn that row into an <a class="channel"
-               href="..."> and change its .c-state text. Rows stay as plain text
-               until then. A dead link is worse than an honest "not yet". -->
-          <div class="channels">
-            <div class="channel">
-              <span class="c-name">itch.io</span>
-              <span class="c-state">Not yet live</span>
+        <!-- ================================================ SCORE -->
+        <section class="group" id="score" data-node="Score (AudioStreams)" data-props='{"Type":"AudioStreams","Tracks":"33 in the game, 3 here","Length":"0:26 each","Autoplay":"Never"}'>
+          <h2 class="phys">I do the music too.</h2>
+          <p class="prose phys" style="margin-top:16px">Thirty-three original tracks for Into Ember Depths, one for every region, dungeon and depth. Nobody ever hears this part, so I&rsquo;m really glad to finally have somewhere to put it. Here are three, about 26 seconds each. In the game the music never actually stops, it just keeps going for as long as you&rsquo;re standing there.</p>
+          <div class="tracks">
+            <div class="track phys">
+              <button class="play" type="button" aria-pressed="false" data-src="assets/audio/ember-overworld.mp3" aria-label="Play Greenlands"><svg class="ico-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 1.5v13l11-6.5z"/></svg><svg class="ico-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h3.5v12H3zM9.5 2H13v12H9.5z"/></svg></button>
+              <span><span class="t-name">Greenlands</span><span class="t-from">Overworld. The first ring past the beach.</span></span><span class="t-len">0:26</span>
             </div>
-            <div class="channel">
-              <span class="c-name">Steam</span>
-              <span class="c-state">Not yet live</span>
+            <div class="track phys">
+              <button class="play" type="button" aria-pressed="false" data-src="assets/audio/ember-depths.mp3" aria-label="Play The Maw"><svg class="ico-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 1.5v13l11-6.5z"/></svg><svg class="ico-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h3.5v12H3zM9.5 2H13v12H9.5z"/></svg></button>
+              <span><span class="t-name">The Maw</span><span class="t-from">The descent. One of twenty down there.</span></span><span class="t-len">0:26</span>
             </div>
-            <div class="channel">
-              <span class="c-name">GitHub</span>
-              <span class="c-state">Not yet live</span>
+            <div class="track phys">
+              <button class="play" type="button" aria-pressed="false" data-src="assets/audio/ember-sanctum.mp3" aria-label="Play Shattered Sanctum"><svg class="ico-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 1.5v13l11-6.5z"/></svg><svg class="ico-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h3.5v12H3zM9.5 2H13v12H9.5z"/></svg></button>
+              <span><span class="t-name">Shattered Sanctum</span><span class="t-from">The endgame dungeon.</span></span><span class="t-len">0:26</span>
             </div>
           </div>
-          <p class="stage-cap" style="margin-top:16px">
-            These are placeholders on purpose. The second any of them actually
-            exists, it turns into a real link.
-          </p>
-        </div>
-      </div>
+          <p class="cap">Plays one at a time, and nothing starts on its own.</p>
+        </section>
 
-      <div class="colophon">
-        <span>&copy; <span id="year">2026</span> KEERAE</span>
-        <span>No trackers, and nothing on this page phones home.</span>
+        <!-- ================================================ SAY HI -->
+        <section class="group" id="contact" data-node="Say hi (Group)" data-props='{"Type":"Group","Email":"eric@keerae.com","Reads":"Everything that comes in"}'>
+          <div class="contact-grid">
+            <div>
+              <h2 class="phys">Say hi. I&rsquo;d love to hear from you.</h2>
+              <p class="prose phys" style="margin-top:18px">
+                Nothing&rsquo;s on a store yet. The Squish n Pops demo is done and the itch.io
+                page goes up soon, then Steam and mobile after that. Want a heads up when
+                it happens? Just say so and I&rsquo;ll send you one. And if you only want to
+                talk about any of this, honestly that&rsquo;s just as good. I read everything
+                that comes in.
+              </p>
+              <a class="mail phys" href="mailto:eric@keerae.com">eric@keerae.com
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a>
+            </div>
+            <div class="phys">
+              <h3 style="font-size:20px">Where all this will show up</h3>
+              <!-- TODO(eric): when a page goes live, turn its row into
+                   <a class="channel" href="..."> and change the state text. -->
+              <div class="channels">
+                <div class="channel"><span>itch.io</span><span class="c-state">Not yet live</span></div>
+                <div class="channel"><span>Steam</span><span class="c-state">Not yet live</span></div>
+                <div class="channel"><span>GitHub</span><span class="c-state">Not yet live</span></div>
+              </div>
+              <p class="cap">These are placeholders on purpose. The second any of them actually exists, it turns into a real link.</p>
+            </div>
+          </div>
+          <div class="colophon phys">
+            <span>&copy; <span id="year">2026</span> KEERAE</span>
+            <span>No trackers, and nothing on this page phones home.</span>
+          </div>
+        </section>
       </div>
-    </div>
-  </footer>
+    </main>
+
+    <!-- ======================================================== inspector (the machine voice) -->
+    <aside class="insp" id="insp" aria-label="Inspector">
+      <h2 class="dock-h">Inspector <span id="insp-name">KEERAE</span></h2>
+      <dl class="props" id="props"></dl>
+      <p class="said" id="said" hidden></p>
+      <p class="tip">Click anything in the scene and it&rsquo;ll tell you what it is.</p>
+    </aside>
+
+    <!-- ======================================================== build log -->
+    <section class="out" aria-label="Build log">
+      <h2 class="sr-only">Build log</h2>
+      <ol class="log" id="log"></ol>
+    </section>
+  </div>
+
+  <canvas id="fx" aria-hidden="true"></canvas>
 
   <script>
   (function () {
     'use strict';
+    var root = document.documentElement;
+    var view = document.getElementById('main');
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var K = window.KEERAE = { view: view, reduce: reduce, tilt: { x: 0, y: 1, on: false } };
 
-    // ---- Reveal on scroll -------------------------------------------------
-    // Runs FIRST and defensively. Content is only ever hidden after we have
-    // successfully installed the machinery that shows it again, and a failsafe
-    // timer un-hides everything no matter what happens afterwards.
-    try {
-      var reveals = document.querySelectorAll('.reveal');
-      var root = document.documentElement;
-      var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // ---------------------------------------------------------- year
+    try { document.getElementById('year').textContent = String(new Date().getFullYear()); } catch (e) {}
 
-      var showAll = function () {
-        root.classList.remove('js-reveal');
-        for (var i = 0; i < reveals.length; i++) reveals[i].classList.add('in');
-      };
+    // ---------------------------------------------------------- build log
+    var logEl = document.getElementById('log'), t0 = performance.now();
+    K.log = function (kind, msg) {
+      if (!logEl) return;
+      var li = document.createElement('li'); li.className = kind;
+      var t = document.createElement('time'); t.textContent = ((performance.now() - t0) / 1000).toFixed(2).padStart(6, '0');
+      li.appendChild(t); li.appendChild(document.createTextNode(msg));
+      logEl.appendChild(li);
+      while (logEl.children.length > 120) logEl.removeChild(logEl.firstChild);
+      var box = logEl.parentNode; box.scrollTop = box.scrollHeight;
+    };
 
-      if (reveals.length && !reduced && 'IntersectionObserver' in window) {
-        root.classList.add('js-reveal');
+    // ---------------------------------------------------------- mode switch
+    var themeMeta = document.getElementById('theme-color');
+    function stamp() {
+      var edit = root.getAttribute('data-mode') === 'edit';
+      var dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+      themeMeta.setAttribute('content', edit ? '#1E1D25' : (dark ? '#131217' : '#F7F6F3'));
+    }
+    function setMode(m) {
+      if (K.running && K.stop) K.stop();
+      root.setAttribute('data-mode', m);
+      try { localStorage.setItem('keerae-mode', m); } catch (e) {}
+      root.classList.remove('show-tree', 'show-insp');
+      clearMarks(); stamp();
+      if (m === 'edit') { view.scrollTop = 0; } else { window.scrollTo(0, 0); }
+    }
+    [].forEach.call(document.querySelectorAll('[data-set-mode]'), function (b) {
+      b.addEventListener('click', function () { setMode(b.getAttribute('data-set-mode')); });
+    });
+    stamp();
 
-        // The observer has to PROVE it works. If it has not fired once by the
-        // time this runs out (background tab, blocked script, an engine that
-        // reports support but never delivers), everything is shown outright.
-        // This timer is never cancelled by anything other than that proof.
-        var observerFired = false;
-        setTimeout(function () { if (!observerFired) showAll(); }, 2000);
-
-        var io = new IntersectionObserver(function (entries) {
-          observerFired = true;
-          for (var i = 0; i < entries.length; i++) {
-            if (entries[i].isIntersecting) {
-              entries[i].target.classList.add('in');
-              io.unobserve(entries[i].target);
-            }
-          }
-        }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
-
-        for (var j = 0; j < reveals.length; j++) io.observe(reveals[j]);
-      } else {
-        showAll();
+    // ---------------------------------------------------------- inspector + selection
+    var propsEl = document.getElementById('props'), saidEl = document.getElementById('said'), nameEl = document.getElementById('insp-name');
+    var rootInfo = { Type: 'Studio', Name: 'KEERAE', People: '1', Games: '7 (4 shown, 3 hidden)', Does: 'Code, art, music', Trackers: 'None', 'Phones home': 'Never' };
+    var hiddenInfo = {
+      hidden1: { Type: 'Game', Name: 'Untitled 5', Visible: 'false', Why: 'Only just started. Nothing worth showing yet.' },
+      hidden2: { Type: 'Game', Name: 'Untitled 6', Visible: 'false', Why: 'Same. Ask me in a few months.' },
+      hidden3: { Type: 'Game', Name: 'Untitled 7', Visible: 'false', Why: 'Barely has a name. Untitled 7 is generous.' }
+    };
+    function inspect(info, name, said, el) {
+      if (!propsEl) return;
+      propsEl.textContent = '';
+      nameEl.textContent = name || 'KEERAE';
+      Object.keys(info).forEach(function (k) {
+        var d = document.createElement('div'), dt = document.createElement('dt'), dd = document.createElement('dd');
+        dt.textContent = k; dd.textContent = info[k]; d.appendChild(dt); d.appendChild(dd); propsEl.appendChild(d);
+      });
+      if (el) {
+        var r = el.getBoundingClientRect(), d2 = document.createElement('div');
+        d2.innerHTML = '<dt>Size</dt><dd>' + Math.round(r.width) + ' × ' + Math.round(r.height) + ' px</dd>';
+        propsEl.appendChild(d2);
       }
-    } catch (e) {
-      document.documentElement.classList.remove('js-reveal');
+      saidEl.hidden = !said; saidEl.textContent = said || '';
+    }
+    inspect(rootInfo, 'KEERAE', 'I make games, or at least I try. Click anything in the scene and it tells you what it is.');
+
+    // One floating tag and one set of handles, moved to whatever is hovered or selected.
+    var tag = document.createElement('span'); tag.className = 'tagline'; tag.hidden = true;
+    var handles = document.createElement('span'); handles.className = 'handles'; handles.innerHTML = '<i></i><i></i><i></i><i></i>'; handles.hidden = true;
+    var scene = document.getElementById('scene');
+    scene.appendChild(tag); scene.appendChild(handles);
+    var hovered = null, selected = null;
+    function placeTag(el, isSel) {
+      var s = scene.getBoundingClientRect(), r = el.getBoundingClientRect();
+      tag.textContent = el.getAttribute('data-node'); tag.hidden = false; tag.classList.toggle('is-sel', !!isSel);
+      tag.style.left = (r.left - s.left - 4) + 'px'; tag.style.top = (r.top - s.top - 6) + 'px';
+      if (isSel) {
+        handles.hidden = false;
+        handles.style.left = (r.left - s.left - 4) + 'px'; handles.style.top = (r.top - s.top - 4) + 'px';
+        handles.style.width = (r.width + 8) + 'px'; handles.style.height = (r.height + 8) + 'px';
+      }
+    }
+    function clearMarks() {
+      if (hovered) hovered.classList.remove('hov'); if (selected) selected.classList.remove('sel');
+      hovered = selected = null; tag.hidden = true; handles.hidden = true;
+    }
+    function nodeFrom(t) { var n = t && t.closest ? t.closest('[data-node]') : null; return n && scene.contains(n) ? n : null; }
+    function editing() { return root.getAttribute('data-mode') === 'edit' && !K.running; }
+
+    view.addEventListener('pointermove', function (e) {
+      if (!editing() || e.pointerType === 'touch') return;
+      var n = nodeFrom(e.target);
+      if (n === hovered) return;
+      if (hovered) hovered.classList.remove('hov');
+      hovered = n === selected ? null : n;
+      if (hovered) { hovered.classList.add('hov'); placeTag(hovered, false); }
+      else if (selected) placeTag(selected, true); else tag.hidden = true;
+    });
+    view.addEventListener('pointerleave', function () {
+      if (hovered) hovered.classList.remove('hov'); hovered = null;
+      if (selected) placeTag(selected, true); else tag.hidden = true;
+    });
+    function select(n, quiet) {
+      if (selected) selected.classList.remove('sel');
+      if (hovered) { hovered.classList.remove('hov'); hovered = null; }
+      selected = n; handles.hidden = true;
+      if (!n) { tag.hidden = true; return; }
+      n.classList.add('sel'); placeTag(n, true);
+      var info = {}; try { info = JSON.parse(n.getAttribute('data-props') || '{}'); } catch (e) {}
+      var said = n.classList.contains('note') ? n.textContent.replace(/\s+/g, ' ').trim() : '';
+      inspect(info, n.getAttribute('data-node').replace(/ \(.*\)$/, ''), said, n);
+      if (!quiet) K.log('info', 'selected ' + n.getAttribute('data-node'));
+    }
+    view.addEventListener('click', function (e) {
+      if (!editing()) return;
+      if (e.target.closest('a, button, input, audio')) return;
+      var n = nodeFrom(e.target);
+      if (n) select(n); else { select(null); inspect(rootInfo, 'KEERAE', 'I make games, or at least I try.'); }
+    });
+    view.addEventListener('scroll', function () { if (selected) placeTag(selected, true); }, { passive: true });
+    addEventListener('resize', function () { if (selected) placeTag(selected, true); });
+
+    // ---------------------------------------------------------- scene tree
+    var treeLinks = document.querySelectorAll('.tree a[data-pick]');
+    [].forEach.call(treeLinks, function (a) {
+      a.addEventListener('click', function (e) {
+        if (root.getAttribute('data-mode') !== 'edit') return;
+        e.preventDefault();
+        if (K.running && K.stop) K.stop();
+        [].forEach.call(treeLinks, function (x) { x.setAttribute('aria-current', 'false'); });
+        a.setAttribute('aria-current', 'true');
+        root.classList.remove('show-tree');
+        var pick = a.getAttribute('data-pick');
+        if (hiddenInfo[pick]) {
+          select(null); inspect(hiddenInfo[pick], hiddenInfo[pick].Name);
+          K.log('warn', hiddenInfo[pick].Name + ' is hidden. Not ready yet.');
+          return;
+        }
+        if (pick === 'top') { select(null); inspect(rootInfo, 'KEERAE', 'I make games, or at least I try.'); view.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); return; }
+        var el = pick === 'hero' ? document.getElementById('top') : document.getElementById(pick);
+        if (!el) return;
+        var top = el.getBoundingClientRect().top - view.getBoundingClientRect().top + view.scrollTop - 48;
+        view.scrollTo({ top: Math.max(0, top), behavior: reduce ? 'auto' : 'smooth' });
+        select(el, true);
+      });
+    });
+    // In the editor the viewport scrolls, not the page, so in-page links scroll it too.
+    view.addEventListener('click', function (e) {
+      var a = e.target.closest('a[href^="#"]');
+      if (!a || root.getAttribute('data-mode') !== 'edit') return;
+      var el = document.getElementById(a.getAttribute('href').slice(1)); if (!el) return;
+      e.preventDefault();
+      var top = el.getBoundingClientRect().top - view.getBoundingClientRect().top + view.scrollTop - 48;
+      view.scrollTo({ top: Math.max(0, top), behavior: reduce ? 'auto' : 'smooth' });
+    });
+    [].forEach.call(document.querySelectorAll('.bar a[href^="#"]'), function (a) {
+      a.addEventListener('click', function (e) {
+        if (root.getAttribute('data-mode') !== 'edit') return;
+        var el = document.getElementById(a.getAttribute('href').slice(1)); if (!el) return;
+        e.preventDefault(); if (K.running && K.stop) K.stop();
+        var top = el.getBoundingClientRect().top - view.getBoundingClientRect().top + view.scrollTop - 48;
+        view.scrollTo({ top: Math.max(0, top), behavior: reduce ? 'auto' : 'smooth' });
+      });
+    });
+
+    // drawers on small screens
+    function drawer(which, btn) {
+      var other = which === 'show-tree' ? 'show-insp' : 'show-tree';
+      root.classList.remove(other);
+      var on = root.classList.toggle(which);
+      document.getElementById('tgl-tree').setAttribute('aria-expanded', String(root.classList.contains('show-tree')));
+      document.getElementById('tgl-insp').setAttribute('aria-expanded', String(root.classList.contains('show-insp')));
+      if (on) { var first = document.querySelector(which === 'show-tree' ? '.tree a' : '.insp'); if (first && first.focus) first.focus({ preventScroll: true }); }
+    }
+    document.getElementById('tgl-tree').addEventListener('click', function () { drawer('show-tree'); });
+    document.getElementById('tgl-insp').addEventListener('click', function () { drawer('show-insp'); });
+    addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      if (K.running && K.stop) { K.stop(); return; }
+      root.classList.remove('show-tree', 'show-insp');
+    });
+
+    // ---------------------------------------------------------- the three not yet
+    [].forEach.call(document.querySelectorAll('.sealed'), function (b) {
+      b.addEventListener('click', function () {
+        b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
+        var id = b.getAttribute('data-pick-id'), info = hiddenInfo[id];
+        if (info) { inspect(info, info.Name); K.log('warn', info.Name + ': not yet.'); }
+        if (K.sfx) K.sfx('tick');
+      });
+    });
+
+    // ---------------------------------------------------------- sound effects, off until asked for
+    var ac = null, sndOn = false, sndBtn = document.getElementById('snd');
+    function ctx() {
+      if (!ac) { var A = window.AudioContext || window.webkitAudioContext; if (!A) return null; ac = new A(); }
+      if (ac.state === 'suspended') ac.resume();
+      return ac;
+    }
+    K.sfx = function (name, amt) {
+      if (!sndOn) return;
+      var a = ctx(); if (!a) return;
+      var t = a.currentTime, o = a.createOscillator(), g = a.createGain();
+      amt = amt == null ? 1 : Math.max(.15, Math.min(1, amt));
+      var spec = {
+        pop:   ['sine', 900, 280, .09, .16],
+        pew:   ['square', 1250, 520, .07, .035],
+        clack: ['triangle', 520, 300, .05, .11],
+        thud:  ['sine', 150, 55, .14, .2],
+        tick:  ['triangle', 1400, 1100, .03, .06]
+      }[name] || ['sine', 600, 300, .06, .08];
+      o.type = spec[0];
+      o.frequency.setValueAtTime(spec[1] * (name === 'pop' ? (1.25 - amt * .5) : 1), t);
+      o.frequency.exponentialRampToValueAtTime(spec[2], t + spec[3]);
+      g.gain.setValueAtTime(spec[4] * amt, t);
+      g.gain.exponentialRampToValueAtTime(.0001, t + spec[3] + .06);
+      o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + spec[3] + .08);
+    };
+    sndBtn.addEventListener('click', function () {
+      sndOn = !sndOn;
+      sndBtn.setAttribute('aria-pressed', String(sndOn));
+      sndBtn.querySelector('.lbl-long').textContent = sndOn ? 'Sound on' : 'Sound off';
+      if (sndOn) { ctx(); K.sfx('tick'); }
+      K.log('info', 'sound effects ' + (sndOn ? 'on' : 'off'));
+    });
+
+    // ---------------------------------------------------------- tilt, asked for from inside the Run tap
+    function askTilt() {
+      var D = window.DeviceOrientationEvent;
+      if (!D || !('ontouchstart' in window)) return;
+      var listen = function () {
+        if (K.tilt.listening) return; K.tilt.listening = true;
+        addEventListener('deviceorientation', function (e) {
+          if (e.beta == null) return;
+          var rad = Math.PI / 180, b = Math.max(-80, Math.min(80, e.beta)), gm = Math.max(-80, Math.min(80, e.gamma || 0));
+          // Portrait: gamma tips sideways, beta tips toward you. Landscape swaps them.
+          var ang = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
+          var x = Math.sin(gm * rad), y = Math.sin(b * rad);
+          if (ang === 90) { x = Math.sin(b * rad); y = -Math.sin(gm * rad); }
+          else if (ang === -90 || ang === 270) { x = -Math.sin(b * rad); y = Math.sin(gm * rad); }
+          K.tilt.x = x; K.tilt.y = Math.max(.15, y + .35); K.tilt.on = true;
+        });
+        addEventListener('devicemotion', function (e) {
+          var a = e.acceleration; if (!a) return;
+          var up = Math.max(Math.abs(a.y || 0), Math.abs(a.z || 0));
+          if (up > 13 && K.onFlick) K.onFlick();
+        });
+      };
+      if (typeof D.requestPermission === 'function') {
+        D.requestPermission().then(function (s) {
+          if (s === 'granted') { listen(); K.log('ok', 'tilt: on. Tip the phone.'); }
+          else K.log('info', 'tilt: no thanks. Dragging works too.');
+        }).catch(function () {});
+      } else { listen(); }
     }
 
-    // ---- Theme toggle -----------------------------------------------------
-    // A choice is remembered. With no choice stored the page follows the system
-    // setting, including if that setting changes while the page is open.
-    try {
-      var root = document.documentElement;
-      var toggle = document.querySelector('.theme-toggle');
-      var darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+    // ---------------------------------------------------------- run / stop
+    var runBtn = document.getElementById('run'), stopBtn = document.getElementById('stop'), fpsEl = document.getElementById('fps');
+    function load(src) {
+      return new Promise(function (res, rej) { var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+    }
+    K.fps = function (v) { fpsEl.textContent = v; };
+    K.setRunning = function (on) {
+      K.running = on; root.classList.toggle('running', on);
+      runBtn.disabled = on; stopBtn.disabled = !on;
+      if (!on) fpsEl.textContent = 'idle';
+      if (on) clearMarks();
+    };
+    runBtn.addEventListener('click', function () {
+      if (K.running) return;
+      askTilt(); // has to happen inside this tap, before anything async
+      if (sndOn) ctx();
+      runBtn.disabled = true;
+      var need = window.Matter ? Promise.resolve() : (K.log('run', 'run: loading physics'), load('js/matter.min.js'));
+      need.then(function () { return window.KEERAE_RUN ? 0 : load('js/run.js'); })
+        .then(function () { K.stop = window.KEERAE_RUN.stop; window.KEERAE_RUN.start(); })
+        .catch(function () { runBtn.disabled = false; K.log('warn', 'run: physics didn’t load. The page is fine without it.'); });
+    });
+    stopBtn.addEventListener('click', function () { if (K.stop) K.stop(); });
 
-      var resolved = function () {
-        var picked = root.getAttribute('data-theme');
-        if (picked === 'light' || picked === 'dark') return picked;
-        return darkQuery && darkQuery.matches ? 'dark' : 'light';
-      };
-
-      // A theme-color without a media attribute beats the two that have one,
-      // so long as it comes first in the head.
-      var stamp = function () {
-        var m = document.getElementById('theme-color-now');
-        if (!m) {
-          m = document.createElement('meta');
-          m.setAttribute('name', 'theme-color');
-          m.id = 'theme-color-now';
-          document.head.insertBefore(m, document.head.firstChild);
-        }
-        m.setAttribute('content', resolved() === 'dark' ? '#131217' : '#F7F6F3');
-      };
-
-      var relabel = function () {
-        if (!toggle) return;
-        var next = resolved() === 'dark' ? 'light' : 'dark';
-        var label = 'Switch to ' + next + ' theme';
-        toggle.setAttribute('aria-label', label);
-        toggle.setAttribute('title', label);
-      };
-
-      if (toggle) {
-        toggle.addEventListener('click', function () {
-          var next = resolved() === 'dark' ? 'light' : 'dark';
-          root.setAttribute('data-theme', next);
-          try { localStorage.setItem('keerae-theme', next); } catch (e) {}
-          relabel();
-          stamp();
-        });
-      }
-
-      if (darkQuery) {
-        var onSystemChange = function () { relabel(); stamp(); };
-        if (darkQuery.addEventListener) darkQuery.addEventListener('change', onSystemChange);
-        else if (darkQuery.addListener) darkQuery.addListener(onSystemChange);
-      }
-
-      relabel();
-      if (root.getAttribute('data-theme')) stamp();
-    } catch (e) { /* the page is readable in either theme without this */ }
-
-    // ---- Audio: one track at a time, nothing autoplays --------------------
+    // ---------------------------------------------------------- audio: one track at a time, nothing autoplays
     try {
       var buttons = document.querySelectorAll('.play');
-      if (buttons.length) {
-        var audio = new Audio();
-        audio.preload = 'none';
-        var current = null;
-        // Every play request gets a number. A request that fails after a newer
-        // one has started (switching tracks mid-load) must not reset the newer one.
-        var gen = 0;
-        var failed = function (my) {
-          return function () { if (my === gen) { reset(); current = null; } };
-        };
+      var audio = new Audio(); audio.preload = 'none';
+      var current = null, gen = 0;
+      var reset = function () { [].forEach.call(buttons, function (b) { b.setAttribute('aria-pressed', 'false'); }); };
+      var failed = function (my) { return function () { if (my === gen) { reset(); current = null; } }; };
+      audio.addEventListener('ended', function () { reset(); current = null; });
+      audio.addEventListener('error', function () { reset(); current = null; });
+      audio.addEventListener('pause', function () { if (current) current.setAttribute('aria-pressed', 'false'); });
+      audio.addEventListener('play', function () { if (current) current.setAttribute('aria-pressed', 'true'); });
+      [].forEach.call(buttons, function (btn) {
+        btn.addEventListener('click', function () {
+          if (current === btn) {
+            if (audio.paused) { btn.setAttribute('aria-pressed', 'true'); audio.play().catch(failed(++gen)); }
+            else { gen++; audio.pause(); btn.setAttribute('aria-pressed', 'false'); }
+            return;
+          }
+          reset(); current = btn; btn.setAttribute('aria-pressed', 'true');
+          audio.src = btn.getAttribute('data-src');
+          audio.play().then(function () { K.log('info', 'playing ' + btn.getAttribute('aria-label').replace('Play ', '')); }).catch(failed(++gen));
+        });
+      });
+    } catch (e) { /* the music is an extra; the page is fine without it */ }
 
-        var reset = function () {
-          for (var i = 0; i < buttons.length; i++) buttons[i].setAttribute('aria-pressed', 'false');
-        };
-
-        audio.addEventListener('ended', function () { reset(); current = null; });
-        audio.addEventListener('error', function () { reset(); current = null; });
-        // The phone can pause or resume without a tap here (lock screen, a call,
-        // headphones out), so the button follows the element, not just clicks.
-        audio.addEventListener('pause', function () { if (current) current.setAttribute('aria-pressed', 'false'); });
-        audio.addEventListener('play', function () { if (current) current.setAttribute('aria-pressed', 'true'); });
-
-        for (var k = 0; k < buttons.length; k++) {
-          (function (btn) {
-            btn.addEventListener('click', function () {
-              if (current === btn) {
-                if (audio.paused) {
-                  btn.setAttribute('aria-pressed', 'true');
-                  audio.play().catch(failed(++gen));
-                } else {
-                  gen++; // a pause mid-load is not a failure
-                  audio.pause();
-                  btn.setAttribute('aria-pressed', 'false');
-                }
-                return;
-              }
-              // Pressed straight away, so a slow load still shows it took the tap.
-              reset();
-              current = btn;
-              btn.setAttribute('aria-pressed', 'true');
-              audio.src = btn.getAttribute('data-src');
-              audio.play().catch(failed(++gen));
-            });
-          })(buttons[k]);
-        }
-      }
-    } catch (e) { /* audio is an enhancement; the page is fine without it */ }
-
-    // ---- Year -------------------------------------------------------------
-    try {
-      var y = document.getElementById('year');
-      if (y) y.textContent = String(new Date().getFullYear());
-    } catch (e) {}
+    // ---------------------------------------------------------- boot log
+    K.log('ok', 'index.scene loaded');
+    K.log('ok', 'Squish n Pops: 400 levels, demo built, store page not up yet');
+    K.log('ok', 'Into Ember Depths: 33 bosses, 384 sprites, 33 tracks');
+    K.log('ok', 'Rattlecup: vertical slice, signed .ipa and .apk');
+    K.log('warn', 'Rollaway: no screenshot yet');
+    K.log('info', '3 scenes hidden. Not ready to show.');
+    K.log('info', 'trackers: 0. requests to other sites: 0.');
+    K.log('hint', 'Hit Run. Each game does its own thing.');
+    logEl.setAttribute('role', 'log'); logEl.setAttribute('aria-live', 'polite');
   })();
   </script>
 </body>
