@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('keerae-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rollaway privacy policy. KEERAE</title>
+  <meta name="description" content="Rollaway does not collect, send, sell or share any personal data.">
+  <link rel="canonical" href="https://keerae.com/rollaway/privacy/">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#F7F6F3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#131217" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316151A'/%3E%3Cpath d='M10 8v16M22 8l-9.5 8L22 24' stroke='%23F7F6F3' stroke-width='2.6' stroke-linecap='square' fill='none'/%3E%3C/svg%3E">
+  <style>
+    @font-face {
+      font-family: 'Space Grotesk';
+      font-style: normal;
+      font-weight: 400 700;
+      font-display: swap;
+      src: url('../../fonts/space-grotesk-latin.woff2') format('woff2');
+    }
+    :root {
+      color-scheme: light;
+      --paper: #F7F6F3; --paper-2: #EFEDE7;
+      --ink: #16151A; --ink-2: #46444E; --ink-3: #656271;
+      --rule: #DEDBD4;
+      --sans: 'Space Grotesk', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
+      --acc-ink: #55627E;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --paper: #131217; --paper-2: #1B1A21;
+        --ink: #F2F0EC; --ink-2: #B6B2BE; --ink-3: #8A8694;
+        --rule: #2C2A33; --acc-ink: #A9B5D0;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --paper: #131217; --paper-2: #1B1A21;
+      --ink: #F2F0EC; --ink-2: #B6B2BE; --ink-3: #8A8694;
+      --rule: #2C2A33; --acc-ink: #A9B5D0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--paper); color: var(--ink-2);
+      font: 400 17px/1.6 var(--sans);
+      -webkit-text-size-adjust: 100%;
+    }
+    main { max-width: 62ch; margin: 0 auto; padding: 48px 20px 96px; }
+    .home { font-weight: 700; letter-spacing: .08em; color: var(--ink); text-decoration: none; font-size: 15px; }
+    .home:hover { text-decoration: underline; }
+    h1 { color: var(--ink); font-size: clamp(30px, 6vw, 44px); line-height: 1.1; margin: 40px 0 8px; font-weight: 700; }
+    .lede { color: var(--ink-3); margin: 0 0 32px; }
+    h2 { color: var(--ink); font-size: 21px; margin: 40px 0 8px; padding-top: 24px; border-top: 1px solid var(--rule); }
+    strong { color: var(--ink); }
+    a { color: var(--acc-ink); text-underline-offset: 3px; }
+    ul { padding-left: 1.2em; }
+    li { margin: 8px 0; }
+    code { font-size: .92em; background: var(--paper-2); padding: 1px 5px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="home" href="/">KEERAE</a>
+    <h1>Rollaway Privacy Policy</h1>
+    <p class="lede">Rollaway, for iPhone and Android.</p>
+<p><strong>Effective date:</strong> 1 October 2026</p>
+<p>Rollaway is a tilt-controlled game for iPhone and Android made by Mister Dinguz. This policy explains what the game does with information about you. In short, <strong>Rollaway does not collect, send, sell or share any personal data.</strong> It has no accounts, no analytics, no advertising, no crash reporting, and it does not need an internet connection.</p>
+<h2>What stays on your device</h2>
+<p>Rollaway saves a few things so the game can continue where you left off. These are stored only in the app's own private storage on your device:</p>
+<ul>
+  <li><strong>Game progress:</strong> which stages you have completed, your ratings, the collectibles you have found and your best results.</li>
+  <li><strong>Lives:</strong> how many lives you have and, while you are below the maximum, one reading of your device's clock: when the current wait for your next life began. That is normally the moment you lost a life with all your lives still left, or the time the game was opened if the device's clock had been turned back. The game uses it only to work out when your next life is due. It is a single value that is moved on as lives come back and deleted once your lives are full again; the game keeps no history of when or how long you play.</li>
+  <li><strong>Settings:</strong> volume levels, control options such as tilt sensitivity and the on-screen jump button, vibration on or off.</li>
+  <li><strong>Tilt calibration:</strong> the "neutral" angle you hold your phone at.</li>
+  <li><strong>Damaged save files:</strong> if the game ever finds its save file damaged, it keeps a copy of the damaged file, named with the time it was found (up to three of them), next to your save, so that nothing is thrown away. These copies never leave the device either.</li>
+</ul>
+<p>None of this is sent anywhere. Uninstalling Rollaway deletes it. On Android the game opts out of Android's cloud backup. On iPhone, your saved progress may be included in the backups your device makes to iCloud or to your computer. Those backups are controlled by you and Apple, and Rollaway cannot read them.</p>
+<h2>Motion sensors</h2>
+<p>You steer by tilting your phone, so while you play Rollaway reads your device's motion sensors (accelerometer, gravity and gyroscope). The readings are used on the device to move the ball and are then discarded. They are not recorded or sent anywhere. The only thing saved is the neutral holding angle described above.</p>
+<h2>Permissions</h2>
+<ul>
+  <li><strong>Android:</strong> the only permission Rollaway asks for is <strong>vibration</strong>, for haptic feedback. Store builds do not request internet access.</li>
+  <li><strong>iPhone:</strong> Rollaway never shows a permission prompt. Apple requires every app to describe camera, microphone and photo-library access if the app's code could use them. The game engine Rollaway is built with contains that code, so the app includes those descriptions, and each one says that Rollaway never uses that feature. Rollaway never asks for any of them.</li>
+</ul>
+<h2>Advertising</h2>
+<p>This version of Rollaway contains <strong>no advertising and no advertising software</strong>. If a future version adds optional ads, this policy will be updated before that version is released, to say which ad provider is used and what that provider collects.</p>
+<h2>Third parties</h2>
+<p>Rollaway does not include any third-party analytics, advertising or tracking services. It is built with the open-source Godot Engine, which does not send any data from the game.</p>
+<h2>Children</h2>
+<p>Rollaway does not collect personal information from anyone, including children under 13.</p>
+<h2>Changes to this policy</h2>
+<p>If this policy changes, the new version will be posted at this address with a new effective date.</p>
+<h2>Contact</h2>
+<p>Questions about this policy: <a href="mailto:help@keerae.com">help@keerae.com</a></p>
+  </main>
+</body>
+</html>
