@@ -6,7 +6,7 @@
 <title>Not here. KEERAE</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#D7C7F4" id="theme-color">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
 <script>
   // Same sky as the front page: it follows the visitor's clock.
   (function () { var d = new Date(), h = d.getHours() + d.getMinutes() / 60;
@@ -29,7 +29,7 @@
   main { max-width: 34rem; }
   .bub { position: relative; width: 210px; height: 210px; margin: 0 auto 26px; animation: float 7s cubic-bezier(.45, .05, .35, 1) infinite; }
   .bub > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-  .bub .sq { position: absolute; left: 50%; top: 52%; width: 44%; transform: translate(-50%, -50%) rotate(-8deg); }
+  .bub .sq { position: absolute; left: 50%; top: 52%; width: 50%; transform: translate(-50%, -50%) rotate(-8deg); }
   @keyframes float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-12px) rotate(1.5deg); } }
   h1 {
     margin: 0 0 12px; font: 700 clamp(38px, 7vw, 60px)/1.05 "DynaPuff", "Fredoka", sans-serif; color: var(--cream);
@@ -63,15 +63,17 @@
       <path d="M44 84Q52 54 82 42" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
       <circle cx="112" cy="40" r="6" fill="#fff"/>
     </svg>
-    <svg class="sq" viewBox="0 0 120 132">
-      <path d="M16 58C16 27 35 9 60 9S104 27 104 58V106C104 116 97 122 87 122H33C23 122 16 116 16 106Z" fill="#FFF6E5"/>
-      <path d="M86 16C97 26 104 41 104 58V106C104 116 97 122 87 122H79C88 117 93 109 93 99V58C93 41 91 27 86 16Z" fill="#E7DDF4"/>
-      <path d="M29 43C30 30 40 20 53 17" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/>
-      <ellipse cx="33" cy="80" rx="7" ry="4" fill="#F6A6BE"/><ellipse cx="87" cy="80" rx="7" ry="4" fill="#F6A6BE"/>
-      <ellipse cx="45" cy="65" rx="8" ry="10.5" fill="#4B3A5A"/><ellipse cx="75" cy="65" rx="8" ry="10.5" fill="#4B3A5A"/>
-      <circle cx="42" cy="60.5" r="3.4" fill="#fff"/><circle cx="72" cy="60.5" r="3.4" fill="#fff"/>
-      <ellipse cx="60" cy="84.5" rx="3.4" ry="4" fill="#7A4A5E" stroke="#4B3A5A" stroke-width="2"/>
-      <path d="M16 58C16 27 35 9 60 9S104 27 104 58V106C104 116 97 122 87 122H33C23 122 16 116 16 106Z" fill="none" stroke="#4B3A5A" stroke-width="5" stroke-linejoin="round"/>
+    <svg class="sq" viewBox="8 7 112 106">
+      <defs><clipPath id="sqc"><path d="M70.4 15.7C72.3 13.9 74 10.8 76.8 10.4C78.9 10.1 83.4 13 85.7 13.9C96.7 18.2 104.8 23.6 110.7 34.1C116 43.7 117.1 54.4 117 65.1C116.9 79.3 114.7 93.4 102.2 102.1C91.7 109.4 78.2 110 65.8 110C54.5 110 42.8 110.1 32.2 105.6C15.1 98.3 11.2 83.2 11 66C10.8 49.7 13.1 35.1 25.7 23.5C33.8 16.1 43.5 12.9 54.2 11.4C57.1 11 61.2 9.6 64 10.5C66.7 11.3 68.3 13.8 70.4 15.7Z"/></clipPath></defs>
+      <path d="M70.4 15.7C72.3 13.9 74 10.8 76.8 10.4C78.9 10.1 83.4 13 85.7 13.9C96.7 18.2 104.8 23.6 110.7 34.1C116 43.7 117.1 54.4 117 65.1C116.9 79.3 114.7 93.4 102.2 102.1C91.7 109.4 78.2 110 65.8 110C54.5 110 42.8 110.1 32.2 105.6C15.1 98.3 11.2 83.2 11 66C10.8 49.7 13.1 35.1 25.7 23.5C33.8 16.1 43.5 12.9 54.2 11.4C57.1 11 61.2 9.6 64 10.5C66.7 11.3 68.3 13.8 70.4 15.7Z" fill="#FFF6E5"/>
+      <g clip-path="url(#sqc)"><ellipse cx="120" cy="64" rx="17" ry="58" fill="#E7DDF4"/><ellipse cx="64" cy="119" rx="64" ry="13" fill="#EFE7F8"/></g>
+      <path d="M19.7 55.7C21.2 39.8 30.1 26.8 45.5 21.9" stroke="#fff" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+      <ellipse cx="26.5" cy="73" rx="9.5" ry="5.4" fill="#F6A6BE" opacity=".9"/><ellipse cx="101.5" cy="73" rx="9.5" ry="5.4" fill="#F6A6BE" opacity=".9"/>
+      <ellipse cx="42" cy="54" rx="9.5" ry="12.5" fill="#4B3A5A"/><ellipse cx="86" cy="54" rx="9.5" ry="12.5" fill="#4B3A5A"/>
+      <circle cx="38.4" cy="48.6" r="4" fill="#fff"/><circle cx="82.4" cy="48.6" r="4" fill="#fff"/>
+      <circle cx="45.6" cy="60.4" r="1.7" fill="#fff"/><circle cx="89.6" cy="60.4" r="1.7" fill="#fff"/>
+      <ellipse cx="64" cy="77" rx="4.2" ry="5" fill="#7A4A5E" stroke="#4B3A5A" stroke-width="2.4"/>
+      <path d="M70.4 15.7C72.3 13.9 74 10.8 76.8 10.4C78.9 10.1 83.4 13 85.7 13.9C96.7 18.2 104.8 23.6 110.7 34.1C116 43.7 117.1 54.4 117 65.1C116.9 79.3 114.7 93.4 102.2 102.1C91.7 109.4 78.2 110 65.8 110C54.5 110 42.8 110.1 32.2 105.6C15.1 98.3 11.2 83.2 11 66C10.8 49.7 13.1 35.1 25.7 23.5C33.8 16.1 43.5 12.9 54.2 11.4C57.1 11 61.2 9.6 64 10.5C66.7 11.3 68.3 13.8 70.4 15.7Z" fill="none" stroke="#4B3A5A" stroke-width="5" stroke-linejoin="round"/>
     </svg>
   </div>
   <h1>This dream doesn&rsquo;t exist.</h1>

@@ -152,59 +152,68 @@
   };
 
   // ---------------------------------------------------------- Squish
-  // The marshmallow from Squish n Pops and Rollaway, drawn to match the game art.
-  // Moods: awake, drowsy, asleep, happy, yawn, surprised, dizzy.
-  var SQ = '' +
-    '<ellipse class="sq-shadow" cx="60" cy="126" rx="38" ry="4.5" fill="rgba(51,38,63,.2)"/>' +
+  // The marshmallow from Squish n Pops and Rollaway, drawn to match the game's cover: a round
+  // bun with a little parted tuft on top, and a big face. viewBox 0 0 128 122, and the body
+  // spans x 11..117, y 10..110. Moods: awake, drowsy, asleep, happy, yawn, surprised, dizzy.
+  // toys.js draws the same outline and face on canvas from K.SQ.
+  var SQ_BODY = 'M70.4 15.7C72.3 13.9 74 10.8 76.8 10.4C78.9 10.1 83.4 13 85.7 13.9C96.7 18.2 104.8 23.6 110.7 34.1C116 43.7 117.1 54.4 117 65.1C116.9 79.3 114.7 93.4 102.2 102.1C91.7 109.4 78.2 110 65.8 110C54.5 110 42.8 110.1 32.2 105.6C15.1 98.3 11.2 83.2 11 66C10.8 49.7 13.1 35.1 25.7 23.5C33.8 16.1 43.5 12.9 54.2 11.4C57.1 11 61.2 9.6 64 10.5C66.7 11.3 68.3 13.8 70.4 15.7Z';
+  K.SQ = { body: SQ_BODY, hi: 'M19.7 55.7C21.2 39.8 30.1 26.8 45.5 21.9' };
+  var sqN = 0;
+  function sqSVG() {
+    var id = 'sqc' + (++sqN);
+    return '' +
+    '<ellipse class="sq-shadow" cx="64" cy="114.5" rx="42" ry="4.5" fill="rgba(51,38,63,.2)"/>' +
     '<g class="sq-body-g">' +
-      '<path d="M16 58C16 27 35 9 60 9S104 27 104 58V106C104 116 97 122 87 122H33C23 122 16 116 16 106Z" fill="#FFF6E5"/>' +
-      '<path d="M86 16C97 26 104 41 104 58V106C104 116 97 122 87 122H79C88 117 93 109 93 99V58C93 41 91 27 86 16Z" fill="#E7DDF4"/>' +
-      '<path d="M29 43C30 30 40 20 53 17" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/>' +
-      '<ellipse cx="33" cy="80" rx="7" ry="4" fill="#F6A6BE" opacity=".9"/><ellipse cx="87" cy="80" rx="7" ry="4" fill="#F6A6BE" opacity=".9"/>' +
+      '<defs><clipPath id="' + id + '"><path d="' + SQ_BODY + '"/></clipPath></defs>' +
+      '<path d="' + SQ_BODY + '" fill="#FFF6E5"/>' +
+      '<g clip-path="url(#' + id + ')"><ellipse cx="120" cy="64" rx="17" ry="58" fill="#E7DDF4"/><ellipse cx="64" cy="119" rx="64" ry="13" fill="#EFE7F8"/></g>' +
+      '<path d="' + K.SQ.hi + '" stroke="#fff" stroke-width="5.5" stroke-linecap="round" fill="none"/>' +
+      '<ellipse cx="26.5" cy="73" rx="9.5" ry="5.4" fill="#F6A6BE" opacity=".9"/><ellipse cx="101.5" cy="73" rx="9.5" ry="5.4" fill="#F6A6BE" opacity=".9"/>' +
       '<g class="sq-face" stroke-linecap="round" stroke-linejoin="round">' +
         '<g class="sq-awake"><g class="sq-blink"><g class="sq-pupils">' +
-          '<ellipse cx="45" cy="66" rx="7" ry="9.5" fill="#4B3A5A"/><ellipse cx="75" cy="66" rx="7" ry="9.5" fill="#4B3A5A"/>' +
-          '<circle cx="42.4" cy="62" r="2.9" fill="#fff"/><circle cx="72.4" cy="62" r="2.9" fill="#fff"/>' +
-          '<circle cx="47.6" cy="70.3" r="1.2" fill="#fff"/><circle cx="77.6" cy="70.3" r="1.2" fill="#fff"/>' +
-        '</g></g><path d="M55 80Q60 85.5 65 80" stroke="#4B3A5A" stroke-width="3" fill="none"/></g>' +
+          '<ellipse cx="42" cy="55" rx="8.5" ry="11" fill="#4B3A5A"/><ellipse cx="86" cy="55" rx="8.5" ry="11" fill="#4B3A5A"/>' +
+          '<circle cx="38.8" cy="50.4" r="3.5" fill="#fff"/><circle cx="82.8" cy="50.4" r="3.5" fill="#fff"/>' +
+          '<circle cx="45" cy="60" r="1.5" fill="#fff"/><circle cx="89" cy="60" r="1.5" fill="#fff"/>' +
+        '</g></g><path d="M56.5 73Q64 80.5 71.5 73" stroke="#4B3A5A" stroke-width="3.4" fill="none"/></g>' +
         '<g class="sq-drowsy"><g class="sq-blink">' +
-          '<ellipse cx="45" cy="68" rx="7" ry="8" fill="#4B3A5A"/><ellipse cx="75" cy="68" rx="7" ry="8" fill="#4B3A5A"/>' +
-          '<circle cx="42.8" cy="72.6" r="1.6" fill="#fff"/><circle cx="72.8" cy="72.6" r="1.6" fill="#fff"/>' +
-          '<path d="M36 58H54V69.5Q45 72.5 36 69.5Z" fill="#FFF6E5"/><path d="M66 58H84V69.5Q75 72.5 66 69.5Z" fill="#FFF6E5"/>' +
-          '<path d="M37 69.6Q45 72.6 53 69.6M67 69.6Q75 72.6 83 69.6" stroke="#4B3A5A" stroke-width="3" fill="none"/>' +
-        '</g><ellipse cx="60" cy="83.2" rx="2.5" ry="2.9" fill="#7A4A5E"/></g>' +
+          '<ellipse cx="42" cy="56" rx="8.5" ry="10" fill="#4B3A5A"/><ellipse cx="86" cy="56" rx="8.5" ry="10" fill="#4B3A5A"/>' +
+          '<circle cx="39.5" cy="61.2" r="1.9" fill="#fff"/><circle cx="83.5" cy="61.2" r="1.9" fill="#fff"/>' +
+          '<path d="M31 44H53V57.5Q42 61 31 57.5Z" fill="#FFF6E5"/><path d="M75 44H97V57.5Q86 61 75 57.5Z" fill="#FFF6E5"/>' +
+          '<path d="M32 57.6Q42 61.2 52 57.6M76 57.6Q86 61.2 96 57.6" stroke="#4B3A5A" stroke-width="3.4" fill="none"/>' +
+        '</g><ellipse cx="64" cy="75" rx="2.8" ry="3.3" fill="#7A4A5E"/></g>' +
         '<g class="sq-asleep">' +
-          '<path d="M38 67Q45 72.5 52 67M68 67Q75 72.5 82 67" stroke="#4B3A5A" stroke-width="3.2" fill="none"/>' +
-          '<ellipse cx="59" cy="82.5" rx="2.4" ry="2.8" fill="#7A4A5E"/>' +
-          '<g class="sq-nose"><circle cx="71" cy="85" r="8.5" fill="rgba(206,236,255,.62)" stroke="#4B3A5A" stroke-width="1.6"/><circle cx="68" cy="82" r="1.9" fill="#fff"/></g>' +
+          '<path d="M32 55Q42 63 52 55M76 55Q86 63 96 55" stroke="#4B3A5A" stroke-width="3.8" fill="none"/>' +
+          '<ellipse cx="64" cy="74" rx="2.9" ry="3.4" fill="#7A4A5E"/>' +
+          '<g class="sq-nose"><circle cx="77" cy="76" r="9" fill="rgba(206,236,255,.62)" stroke="#4B3A5A" stroke-width="1.7"/><circle cx="74" cy="72.8" r="2" fill="#fff"/></g>' +
         '</g>' +
-        '<g class="sq-happy"><path d="M38 69Q45 61 52 69M68 69Q75 61 82 69" stroke="#4B3A5A" stroke-width="3.2" fill="none"/>' +
-          '<path d="M53.5 79Q60 90 66.5 79Z" fill="#7A4A5E" stroke="#4B3A5A" stroke-width="2.4"/></g>' +
-        '<g class="sq-yawn"><path d="M39 62.5L49.5 67L39 71.5M81 62.5L70.5 67L81 71.5" stroke="#4B3A5A" stroke-width="3" fill="none"/>' +
-          '<ellipse cx="60" cy="86" rx="6.2" ry="8" fill="#7A4A5E" stroke="#4B3A5A" stroke-width="2.4"/><ellipse cx="60" cy="90.5" rx="3.6" ry="2.4" fill="#F6A6BE"/></g>' +
+        '<g class="sq-happy"><path d="M32 58Q42 47 52 58M76 58Q86 47 96 58" stroke="#4B3A5A" stroke-width="3.8" fill="none"/>' +
+          '<path d="M53 68Q64 88 75 68Z" fill="#7A4A5E" stroke="#4B3A5A" stroke-width="2.8"/><path d="M58.5 78.5Q64 74.5 69.5 78.5Q64 82.5 58.5 78.5Z" fill="#F6A6BE"/></g>' +
+        '<g class="sq-yawn"><path d="M33 48L47 55L33 62M95 48L81 55L95 62" stroke="#4B3A5A" stroke-width="3.6" fill="none"/>' +
+          '<ellipse cx="64" cy="78" rx="7.5" ry="9.5" fill="#7A4A5E" stroke="#4B3A5A" stroke-width="2.8"/><ellipse cx="64" cy="83.5" rx="4.4" ry="2.8" fill="#F6A6BE"/></g>' +
         '<g class="sq-surprised"><g class="sq-pupils">' +
-          '<ellipse cx="45" cy="65" rx="8" ry="10.5" fill="#4B3A5A"/><ellipse cx="75" cy="65" rx="8" ry="10.5" fill="#4B3A5A"/>' +
-          '<circle cx="42" cy="60.5" r="3.4" fill="#fff"/><circle cx="72" cy="60.5" r="3.4" fill="#fff"/>' +
-          '<circle cx="48.2" cy="70.6" r="1.4" fill="#fff"/><circle cx="78.2" cy="70.6" r="1.4" fill="#fff"/>' +
-        '</g><ellipse cx="60" cy="84.5" rx="3.4" ry="4" fill="#7A4A5E" stroke="#4B3A5A" stroke-width="2"/></g>' +
-        '<g class="sq-dizzy"><path d="M40 61L50 71M50 61L40 71M70 61L80 71M80 61L70 71" stroke="#4B3A5A" stroke-width="3" fill="none"/>' +
-          '<path d="M51 84Q55.5 79.5 60 84T69 84" stroke="#4B3A5A" stroke-width="2.8" fill="none"/></g>' +
+          '<ellipse cx="42" cy="54" rx="9.5" ry="12.5" fill="#4B3A5A"/><ellipse cx="86" cy="54" rx="9.5" ry="12.5" fill="#4B3A5A"/>' +
+          '<circle cx="38.4" cy="48.6" r="4" fill="#fff"/><circle cx="82.4" cy="48.6" r="4" fill="#fff"/>' +
+          '<circle cx="45.6" cy="60.4" r="1.7" fill="#fff"/><circle cx="89.6" cy="60.4" r="1.7" fill="#fff"/>' +
+        '</g><ellipse cx="64" cy="77" rx="4.2" ry="5" fill="#7A4A5E" stroke="#4B3A5A" stroke-width="2.4"/></g>' +
+        '<g class="sq-dizzy"><path d="M35 48L49 62M49 48L35 62M79 48L93 62M93 48L79 62" stroke="#4B3A5A" stroke-width="3.6" fill="none"/>' +
+          '<path d="M53 76Q58.5 70.5 64 76T75 76" stroke="#4B3A5A" stroke-width="3.2" fill="none"/></g>' +
       '</g>' +
-      '<path d="M16 58C16 27 35 9 60 9S104 27 104 58V106C104 116 97 122 87 122H33C23 122 16 116 16 106Z" fill="none" stroke="#4B3A5A" stroke-width="5" stroke-linejoin="round"/>' +
+      '<path d="' + SQ_BODY + '" fill="none" stroke="#4B3A5A" stroke-width="5" stroke-linejoin="round"/>' +
     '</g>' +
     '<g class="sq-zs" fill="currentColor" font-family="DynaPuff, Fredoka, sans-serif" font-weight="700">' +
-      '<text class="sq-z sq-z1" x="98" y="34" font-size="17">z</text><text class="sq-z sq-z2" x="98" y="34" font-size="13">z</text><text class="sq-z sq-z3" x="98" y="34" font-size="10">z</text>' +
+      '<text class="sq-z sq-z1" x="106" y="24" font-size="17">z</text><text class="sq-z sq-z2" x="106" y="24" font-size="13">z</text><text class="sq-z sq-z3" x="106" y="24" font-size="10">z</text>' +
     '</g>';
+  }
   var POKE_DAY = ['Mm? I was resting my eyes.', 'Oh! Hi. I was totally awake.', 'Five more minutes…', 'I was dreaming about bubbles.', 'Is it lunch? It feels like lunch.', 'Boop. Okay. Back to sleep.'];
   var POKE_NIGHT = ['It’s the middle of the night…', 'Shh. The stars are sleeping too.', 'Zzz… huh? Oh. Hi.', 'Come back in the morning.', 'I was having the nicest dream.'];
   K.squish = function (opts) {
     opts = opts || {};
     var ns = 'http://www.w3.org/2000/svg';
     var svg = doc.createElementNS(ns, 'svg');
-    svg.setAttribute('viewBox', '0 0 120 132');
+    svg.setAttribute('viewBox', '0 0 128 122');
     svg.setAttribute('class', 'k-squish breathe' + (opts.cls ? ' ' + opts.cls : ''));
     svg.setAttribute('aria-hidden', 'true');
-    svg.innerHTML = SQ;
+    svg.innerHTML = sqSVG();
     var cur = '', timers = [], alive = true, busy = false;
     var me = { el: svg };
     function later(fn, ms) { var t = setTimeout(function () { timers.splice(timers.indexOf(t), 1); if (alive) fn(); }, ms); timers.push(t); return t; }
@@ -302,13 +311,13 @@
     box.innerHTML =
       '<button class="k-normal" type="button" data-k-normal><span class="k-track" aria-hidden="true"><span class="k-knob"></span></span>Make it normal</button>' +
       '<button class="k-sound" type="button" aria-pressed="' + K.sound.on + '"><svg viewBox="0 0 34 34" aria-hidden="true">' +
-        '<path d="M5 22C5 12 10 6 17 6S29 12 29 22C29 27 25 30 17 30S5 27 5 22Z" fill="#FFF6E5" stroke="#4B3A5A" stroke-width="2.4"/>' +
-        '<ellipse cx="9.5" cy="22" rx="2.6" ry="1.6" fill="#F6A6BE"/><ellipse cx="24.5" cy="22" rx="2.6" ry="1.6" fill="#F6A6BE"/>' +
-        '<g class="k-s-off" stroke="#4B3A5A" stroke-width="2" stroke-linecap="round" fill="none"><path d="M10.5 18.5Q13 20.5 15.5 18.5M18.5 18.5Q21 20.5 23.5 18.5"/><path d="M15.5 24.5H18.5"/>' +
-          '<text class="k-zz" x="25" y="9" font-size="9" font-family="DynaPuff, sans-serif" font-weight="700" fill="#4B3A5A" stroke="none">z</text></g>' +
-        '<g class="k-s-on"><ellipse cx="13" cy="18.5" rx="1.9" ry="2.5" fill="#4B3A5A"/><ellipse cx="21" cy="18.5" rx="1.9" ry="2.5" fill="#4B3A5A"/>' +
-          '<ellipse cx="17" cy="24.5" rx="2.4" ry="2.8" fill="#7A4A5E" stroke="#4B3A5A" stroke-width="1.4"/>' +
-          '<g class="k-note" fill="#4B3A5A"><circle cx="28" cy="10" r="2.2"/><path d="M29.6 10V2.5" stroke="#4B3A5A" stroke-width="1.6"/></g>' +
+        '<path d="M18.6 7.4C19 7 19.5 6.2 20.1 6.1C20.7 6 21.8 6.7 22.3 7C25 8 27 9.3 28.5 11.9C29.8 14.3 30 16.9 30 19.5C30 23 29.4 26.5 26.4 28.6C23.8 30.4 20.5 30.5 17.4 30.5C14.7 30.5 11.8 30.6 9.2 29.5C5 27.7 4 24 4 19.7C4 15.7 4.5 12.2 7.6 9.3C9.6 7.5 12 6.7 14.6 6.3C15.3 6.2 16.3 5.9 17 6.1C17.7 6.3 18.1 6.9 18.6 7.4Z" fill="#FFF6E5" stroke="#4B3A5A" stroke-width="2.4" stroke-linejoin="round"/>' +
+        '<ellipse cx="7.9" cy="21.4" rx="2.5" ry="1.5" fill="#F6A6BE"/><ellipse cx="26.1" cy="21.4" rx="2.5" ry="1.5" fill="#F6A6BE"/>' +
+        '<g class="k-s-off" stroke="#4B3A5A" stroke-width="2" stroke-linecap="round" fill="none"><path d="M9.2 17.4Q11.6 19.6 14 17.4M20 17.4Q22.4 19.6 24.8 17.4"/><path d="M15.7 22.8H18.3"/>' +
+          '<text class="k-zz" x="26" y="7.5" font-size="9" font-family="DynaPuff, sans-serif" font-weight="700" fill="#4B3A5A" stroke="none">z</text></g>' +
+        '<g class="k-s-on"><ellipse cx="11.6" cy="17.2" rx="2.1" ry="2.7" fill="#4B3A5A"/><ellipse cx="22.4" cy="17.2" rx="2.1" ry="2.7" fill="#4B3A5A"/>' +
+          '<ellipse cx="17" cy="23" rx="2.2" ry="2.6" fill="#7A4A5E" stroke="#4B3A5A" stroke-width="1.4"/>' +
+          '<g class="k-note" fill="#4B3A5A"><circle cx="29" cy="8.5" r="2.2"/><path d="M30.6 8.5V1" stroke="#4B3A5A" stroke-width="1.6"/></g>' +
           '<g class="k-note" fill="#4B3A5A"><circle cx="3.5" cy="11" r="1.8"/><path d="M4.9 11V4.5" stroke="#4B3A5A" stroke-width="1.4"/></g></g>' +
       '</svg><span class="k-label">' + (K.sound.on ? 'Sound on' : 'Sound off') + '</span></button>';
     (o.parent || doc.body).appendChild(box);

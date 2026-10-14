@@ -56,43 +56,53 @@
   }
 
   // ------------------------------------------------- shared drawing
-  // Squish in canvas form. (x, y) is the bottom centre, or the centre when o.center.
+  // Squish in canvas form: the same outline and face as the SVG in kit.js, drawn in its
+  // viewBox units. (x, y) is the bottom centre, or the centre when o.center. h is the body's
+  // height in px (it is a touch wider than tall).
+  var SQP;
+  function sqPaths() {
+    if (SQP) return SQP;
+    var P = function (d) { return new Path2D(d); };
+    return (SQP = {
+      body: P(K.SQ.body), hi: P(K.SQ.hi),
+      smile: P('M56.5 73Q64 80.5 71.5 73'),
+      lids: P('M32 57.6Q42 61.2 52 57.6M76 57.6Q86 61.2 96 57.6'), lidFill: P('M31 44H53V57.5Q42 61 31 57.5ZM75 44H97V57.5Q86 61 75 57.5Z'),
+      shut: P('M32 55Q42 63 52 55M76 55Q86 63 96 55'),
+      joy: P('M32 58Q42 47 52 58M76 58Q86 47 96 58'), grin: P('M53 68Q64 88 75 68Z'), tongue: P('M58.5 78.5Q64 74.5 69.5 78.5Q64 82.5 58.5 78.5Z'),
+      squint: P('M33 48L47 55L33 62M95 48L81 55L95 62'),
+      xs: P('M35 48L49 62M49 48L35 62M79 48L93 62M93 48L79 62'), wave: P('M53 76Q58.5 70.5 64 76T75 76')
+    });
+  }
+  function oval(g, x, y, rx, ry, fill) { g.fillStyle = fill; g.beginPath(); g.ellipse(x, y, rx, ry, 0, 0, TAU); g.fill(); }
   function drawSquish(g, x, y, h, o) {
     o = o || {};
-    var w = h * .78, mood = o.mood || 'awake';
-    g.save(); g.translate(x, y); if (o.rot) g.rotate(o.rot); g.scale(o.sx || 1, o.sy || 1);
-    var top = o.center ? -h / 2 : -h, bot = o.center ? h / 2 : 0, l = -w / 2, r = w / 2, k = w * .15, dome = w * .56;
-    g.beginPath();
-    g.moveTo(l, top + dome);
-    g.bezierCurveTo(l, top + dome * .1, l + w * .2, top, 0, top);
-    g.bezierCurveTo(r - w * .2, top, r, top + dome * .1, r, top + dome);
-    g.lineTo(r, bot - k); g.quadraticCurveTo(r, bot, r - k, bot);
-    g.lineTo(l + k, bot); g.quadraticCurveTo(l, bot, l, bot - k); g.closePath();
-    g.fillStyle = CREAM; g.fill();
-    g.save(); g.clip(); g.fillStyle = '#E7DDF4'; g.fillRect(r - w * .15, top, w * .2, h); g.restore();
-    g.lineWidth = Math.max(1.5, h * .045); g.strokeStyle = PLUM; g.lineJoin = 'round'; g.stroke();
-    var fy = top + h * .5, ex = w * .17, ey = h * .075;
-    g.fillStyle = '#F6A6BE';
-    g.beginPath(); g.ellipse(-w * .31, fy + h * .11, w * .085, h * .032, 0, 0, TAU); g.fill();
-    g.beginPath(); g.ellipse(w * .31, fy + h * .11, w * .085, h * .032, 0, 0, TAU); g.fill();
-    g.strokeStyle = PLUM; g.fillStyle = PLUM; g.lineCap = 'round'; g.lineWidth = Math.max(1.2, h * .028);
-    if (mood === 'asleep' || mood === 'happy') {
-      var dir = mood === 'asleep' ? 1 : -1;
-      for (var s = -1; s <= 1; s += 2) { g.beginPath(); g.moveTo(s * ex - w * .08, fy - dir * h * .01); g.quadraticCurveTo(s * ex, fy + dir * h * .05, s * ex + w * .08, fy - dir * h * .01); g.stroke(); }
-    } else if (mood === 'dizzy') {
-      for (var d = -1; d <= 1; d += 2) { var cx = d * ex, q = w * .065; g.beginPath(); g.moveTo(cx - q, fy - q); g.lineTo(cx + q, fy + q); g.moveTo(cx + q, fy - q); g.lineTo(cx - q, fy + q); g.stroke(); }
-    } else {
-      var big = mood === 'surprised' ? 1.15 : 1, lx = o.look ? o.look * w * .03 : 0;
-      for (var e = -1; e <= 1; e += 2) {
-        g.fillStyle = PLUM; g.beginPath(); g.ellipse(e * ex + lx, fy, w * .075 * big, ey * big, 0, 0, TAU); g.fill();
-        if (h > 26) { g.fillStyle = '#fff'; g.beginPath(); g.arc(e * ex + lx - w * .028, fy - ey * .42, w * .03 * big, 0, TAU); g.fill(); }
+    var mood = o.mood || 'awake', s = h / 100, P = sqPaths(), px = 1 / s, MOUTH = '#7A4A5E';
+    g.save(); g.translate(x, y); if (o.rot) g.rotate(o.rot); g.scale((o.sx || 1) * s, (o.sy || 1) * s);
+    g.translate(-64, o.center ? -60 : -110);
+    g.fillStyle = CREAM; g.fill(P.body);
+    g.save(); g.clip(P.body); oval(g, 120, 64, 17, 58, '#E7DDF4'); oval(g, 64, 119, 64, 13, '#EFE7F8'); g.restore();
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    if (h > 30) { g.strokeStyle = '#fff'; g.lineWidth = 5.5; g.stroke(P.hi); }
+    oval(g, 26.5, 73, 9.5, 5.4, 'rgba(246,166,190,.9)'); oval(g, 101.5, 73, 9.5, 5.4, 'rgba(246,166,190,.9)');
+    g.strokeStyle = PLUM; g.lineWidth = Math.max(3.6, 1.2 * px);
+    if (mood === 'asleep') { g.stroke(P.shut); oval(g, 64, 74, 2.9, 3.4, MOUTH); }
+    else if (mood === 'happy') { g.stroke(P.joy); g.fillStyle = MOUTH; g.fill(P.grin); g.lineWidth = Math.max(2.8, px); g.stroke(P.grin); g.fillStyle = '#F6A6BE'; g.fill(P.tongue); }
+    else if (mood === 'yawn') { g.stroke(P.squint); oval(g, 64, 78, 7.5, 9.5, MOUTH); g.lineWidth = Math.max(2.8, px); g.stroke(); oval(g, 64, 83.5, 4.4, 2.8, '#F6A6BE'); }
+    else if (mood === 'dizzy') { g.stroke(P.xs); g.lineWidth = Math.max(3.2, px); g.stroke(P.wave); }
+    else {
+      var sur = mood === 'surprised', dr = mood === 'drowsy', lx = (o.look || 0) * 3, ey = sur ? 54 : dr ? 56 : 55, rx = sur ? 9.5 : 8.5, ry = sur ? 12.5 : dr ? 10 : 11;
+      g.save(); g.translate(lx, 0);
+      for (var e = 42; e <= 86; e += 44) {
+        oval(g, e, ey, rx, ry, PLUM);
+        if (h > 26 && dr) oval(g, e - 2.5, 61.2, 1.9, 1.9, '#fff');
+        else if (h > 26) { oval(g, e - (sur ? 3.6 : 3.2), ey - (sur ? 5.4 : 4.6), sur ? 4 : 3.5, sur ? 4 : 3.5, '#fff'); if (h > 60) oval(g, e + (sur ? 3.6 : 3), ey + (sur ? 6.4 : 5), 1.6, 1.6, '#fff'); }
       }
+      g.restore();
+      if (dr) { g.fillStyle = CREAM; g.fill(P.lidFill); g.stroke(P.lids); oval(g, 64, 75, 2.8, 3.3, MOUTH); }
+      else if (sur) { oval(g, 64, 77, 4.2, 5, MOUTH); g.lineWidth = Math.max(2.4, px); g.stroke(); }
+      else { g.lineWidth = Math.max(3.4, 1.1 * px); g.stroke(P.smile); }
     }
-    g.lineWidth = Math.max(1.2, h * .026);
-    if (mood === 'surprised') { g.fillStyle = '#7A4A5E'; g.beginPath(); g.ellipse(0, fy + h * .15, w * .04, h * .035, 0, 0, TAU); g.fill(); }
-    else if (mood === 'dizzy') { g.beginPath(); g.moveTo(-w * .08, fy + h * .15); g.quadraticCurveTo(-w * .04, fy + h * .11, 0, fy + h * .15); g.quadraticCurveTo(w * .04, fy + h * .19, w * .08, fy + h * .15); g.stroke(); }
-    else if (mood === 'asleep') { g.fillStyle = '#7A4A5E'; g.beginPath(); g.ellipse(0, fy + h * .14, w * .025, h * .022, 0, 0, TAU); g.fill(); }
-    else { g.beginPath(); g.arc(0, fy + h * .1, w * .06, .15 * Math.PI, .85 * Math.PI); g.stroke(); }
+    g.lineWidth = Math.max(5, 1.5 * px); g.stroke(P.body);
     g.restore();
   }
   K.drawSquish = drawSquish;

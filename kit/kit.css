@@ -144,18 +144,18 @@ button { font: inherit; color: inherit; }
 .k-squish { display: block; overflow: visible; }
 .k-squish:focus { outline: none; }
 .k-squish:focus-visible { outline: 3px solid var(--plum); outline-offset: 4px; border-radius: 30px; }
-.k-squish .sq-body-g { transform-origin: 60px 124px; transform-box: view-box; }
+.k-squish .sq-body-g { transform-origin: 64px 110px; transform-box: view-box; }
 .k-squish.breathe .sq-body-g { animation: sq-breathe 3.8s var(--floaty) infinite; }
 .k-squish.asleep .sq-body-g { animation-duration: 4.6s; }
 @keyframes sq-breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.025, .975); } }
 .k-squish .sq-face > g { display: none; }
 .k-squish.m-awake .sq-awake, .k-squish.m-drowsy .sq-drowsy, .k-squish.m-asleep .sq-asleep,
 .k-squish.m-happy .sq-happy, .k-squish.m-yawn .sq-yawn, .k-squish.m-surprised .sq-surprised, .k-squish.m-dizzy .sq-dizzy { display: inline; }
-.k-squish .sq-blink { transform-origin: 60px 66px; transform-box: view-box; }
+.k-squish .sq-blink { transform-origin: 64px 55px; transform-box: view-box; }
 .k-squish.m-awake .sq-blink, .k-squish.m-drowsy .sq-blink { animation: sq-blink 5.5s infinite; }
 @keyframes sq-blink { 0%, 93%, 100% { transform: scaleY(1); } 95.5% { transform: scaleY(.08); } }
 .k-squish .sq-pupils { transition: transform .35s ease-out; }
-.k-squish .sq-nose { transform-origin: 63px 85px; transform-box: view-box; animation: sq-nose 4.6s var(--floaty) infinite; }
+.k-squish .sq-nose { transform-origin: 68.5px 76px; transform-box: view-box; animation: sq-nose 4.6s var(--floaty) infinite; }
 @keyframes sq-nose { 0%, 100% { transform: scale(.35); } 50% { transform: scale(1); } }
 .k-squish .sq-z { opacity: 0; }
 .k-squish.m-asleep .sq-z { animation: sq-z 3.6s ease-out infinite; }
