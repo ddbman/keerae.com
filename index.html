@@ -257,6 +257,12 @@
 .hi-mail:active { transform: translateY(4px) scale(1.08, .88); box-shadow: 0 1px 0 var(--plum); transition-duration: .08s; }
 .hi-mail:focus-visible { outline-offset: 5px; border-radius: 999px; }
 
+.dream-link { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; margin-top: 4px; padding: 9px 16px 10px; border-radius: 999px;
+  font: 700 16px/1.2 var(--ui); color: var(--plum); text-decoration: none; background: var(--cream); border: 2.5px solid var(--plum); box-shadow: 0 3px 0 var(--plum); transition: transform .45s var(--squishy); }
+.dream-link::after { content: "\2192"; }
+.dream-link:hover { transform: translateY(-1px) scale(1.03); }
+.dream-link:active { transform: translateY(2px) scale(1.05, .92); transition-duration: .08s; }
+.dream-link:focus-visible { outline-offset: 4px; border-radius: 999px; }
 .foot { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 22px; width: var(--wrap); margin: 0 auto; padding: 80px 0 96px; font: 500 15px/1.4 var(--ui); color: var(--ink-2); }
 .foot-normal { padding: 6px 4px; border: 0; background: none; color: var(--ink); font: 600 15px/1.2 var(--ui); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: pointer; }
 .foot-normal:hover { text-decoration-color: var(--pink); }
@@ -367,7 +373,7 @@
         <p>Seven of them going at once right now, on phones and desktops and in a browser. Four are far enough along that I&rsquo;m happy to put them in front of you. The other three really aren&rsquo;t, so I left them out.</p>
         <p>The bubble game and the bullet hell look nothing like each other, and that&rsquo;s deliberate. I&rsquo;d rather each game just look like itself.</p>
         <ul class="n-index">
-          <li><a href="#n-squish" style="--c:#A6E9C6"><span class="dot"></span><span><span class="nm">Squish n Pops</span><span class="kd">Mobile browser arcade, 400 levels</span></span><span class="k-chip">Demo ready</span></a></li>
+          <li><a href="#n-squish" style="--c:#A6E9C6"><span class="dot"></span><span><span class="nm">Squish n Pops</span><span class="kd">Mobile browser arcade, 400 levels</span></span><span class="k-chip">Free demo</span></a></li>
           <li><a href="#n-ember" style="--c:#FFB37A"><span class="dot"></span><span><span class="nm">Into Ember Depths</span><span class="kd">Online bullet-hell action RPG</span></span><span class="k-chip">In development</span></a></li>
           <li><a href="#n-rattlecup" style="--c:#E9C46A"><span class="dot"></span><span><span class="nm">Rattlecup</span><span class="kd">Liar&rsquo;s dice roguelike, iOS and Android</span></span><span class="k-chip">Vertical slice</span></a></li>
           <li><a href="#n-rollaway" style="--c:#9FD98A"><span class="dot"></span><span><span class="nm">Rollaway</span><span class="kd">3D tilt platformer, iOS and Android</span></span><span class="k-chip">Builds running</span></a></li>
@@ -378,9 +384,9 @@
     </section>
 
     <section class="n-game" id="n-squish" style="--c:#A6E9C6">
-      <div class="n-head"><h2>Squish n Pops</h2><span class="n-st"><b>400 levels.</b> The demo&rsquo;s done, the page isn&rsquo;t up yet.</span></div>
+      <div class="n-head"><h2>Squish n Pops</h2><span class="n-st"><b>The free demo&rsquo;s out.</b> Ten levels on itch.io, and the rest of the 400 are on the way.</span></div>
       <p>Hold your phone sideways. Tilt to steer, tap to fire. Every hit splits a bubble into two smaller ones, so a good shot basically hands you two new problems. Clear the screen and you&rsquo;re out.</p>
-      <div class="n-callout"><b>The demo is done. Ten levels, free, no ads.</b><p>The first seven teach you the basics. The last three skip ahead to where the weird bubbles start showing up. It runs right in your phone browser. No account, nothing to install. The itch.io page isn&rsquo;t live yet. The second it is, the link goes right here.</p></div>
+      <div class="n-callout"><b>The demo&rsquo;s out. Ten levels, free, no ads.</b><p>The first seven teach you the basics. The last three skip ahead to where the weird bubbles start showing up. It runs right in your phone browser. No account, nothing to install.</p><a class="n-mail n-play" href="https://misterdinguz.itch.io/squish-n-pops">Play it on itch.io</a></div>
       <div class="n-shots"><img src="img/squish-play-1.webp" width="1200" height="554" loading="lazy" alt="Squish n Pops gameplay: two green bubbles with lit fuses drift above four smaller pink bubbles, with the marshmallow player below a floating shelf."></div>
       <p class="n-cap">This is SHORT FUSE, the last one in the demo. Set one bomb off and the chain pretty much plays the level for you.</p>
       <div class="n-shots two"><img src="img/squish-play-2.webp" width="800" height="370" loading="lazy" alt="HARD CANDY. A green bubble inside a riveted metal ring that eats your first hit."><img src="img/squish-levels.webp" width="800" height="370" loading="lazy" alt="The demo&rsquo;s level select screen, showing all ten levels by name."></div>
@@ -395,7 +401,7 @@
           <div><dt>Vocabulary</dt><dd>Nineteen bubble traits, and they start stacking in the late acts. Plus eight powerups.</dd></div>
           <div><dt>Controls</dt><dd>Tilt, touch or keyboard. Whatever angle you&rsquo;re holding it at when you start becomes neutral, so you can play lying down.</dd></div>
           <div><dt>Co-op</dt><dd>Two phones over local Wi-Fi. Shared field, separate scores and lives.</dd></div>
-          <div><dt>Next</dt><dd>itch.io demo first, then Steam and mobile.</dd></div>
+          <div><dt>Next</dt><dd>The itch.io demo&rsquo;s out. Steam and mobile are next.</dd></div>
         </dl>
       </div>
     </section>
@@ -498,12 +504,12 @@
     <section class="n-contact" id="n-hi">
       <div>
         <h2>Say hi. I&rsquo;d love to hear from you.</h2>
-        <p>Nothing&rsquo;s on a store yet. The Squish n Pops demo is done and the itch.io page goes up soon, then Steam and mobile after that. Want a heads up when it happens? Just say so. And if you only want to talk about any of this, that&rsquo;s just as good. I read everything that comes in.</p>
+        <p>The Squish n Pops demo is up on itch.io now. Steam and mobile come after that. Want a heads up when they happen? Just say so. And if you only want to talk about any of this, that&rsquo;s just as good. I read everything that comes in.</p>
         <a class="n-mail" href="mailto:eric@keerae.com">eric@keerae.com</a>
       </div>
       <div>
         <h3>Where all this will show up</h3>
-        <div class="n-chan"><span>itch.io</span><span>Not yet live</span></div>
+        <a class="n-chan" href="https://misterdinguz.itch.io/"><span>itch.io</span><span>Live, with the Squish n Pops demo</span></a>
         <div class="n-chan"><span>Steam</span><span>Not yet live</span></div>
         <div class="n-chan"><span>GitHub</span><span>Not yet live</span></div>
       </div>
@@ -1055,6 +1061,7 @@ KIT.ready(function () {
     var sc = SCENES[g.id]; sc.init(d); d.bg = sc.bg; d.fg = sc.fg; d.over = sc.over; d.needs = sc.needs; d.nightBg = !!sc.night;
     var btn = K.makePlay(g.id), act = K.$('.dream-act', sec);
     act.insertBefore(btn, act.firstChild);
+    if (g.link) { var ln = doc.createElement('a'); ln.className = 'dream-link'; ln.href = g.link; ln.textContent = g.linkText; act.appendChild(ln); }
     d.btn = btn;
     K.bindPlay(btn, g.id, d.host, {
       bg: true,

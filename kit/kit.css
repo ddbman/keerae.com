@@ -249,6 +249,10 @@ button { font: inherit; color: inherit; }
 #normal .n-mail { display: inline-block; margin-top: 16px; padding: 12px 20px; border-radius: 999px; background: var(--pink); border: 2.5px solid var(--plum); box-shadow: 0 4px 0 var(--plum); font: 700 20px/1 var(--ui); text-decoration: none !important; }
 #normal .n-chan { display: flex; justify-content: space-between; padding: 12px 16px; border-radius: 14px; background: #fff; margin-top: 8px; font: 600 16px/1.2 var(--ui); }
 #normal .n-chan span + span { opacity: .7; font-weight: 500; }
+#normal a.n-chan { text-decoration: none; border: 2px solid var(--plum); }
+#normal a.n-chan span:first-child { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+#normal a.n-chan span + span { opacity: 1; }
+#normal .n-play { font-size: 18px; padding: 11px 18px; background: var(--mint); }
 #normal .n-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; padding: 26px 0 70px; font-size: 15px; opacity: .8; border-top: 2px solid rgba(75, 58, 90, .12); }
 @media (max-width: 760px) {
   #normal { font-size: 17px; }

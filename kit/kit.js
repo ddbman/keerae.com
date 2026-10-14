@@ -31,8 +31,9 @@
   K.EMAIL = 'eric@keerae.com';
   K.GAMES = [
     { id: 'squish', name: 'Squish n Pops', kind: 'Bubble-splitting arcade, right in your phone browser',
-      status: '<b>400 levels.</b> The demo’s done, the page isn’t up yet.', statusText: '400 levels. The demo’s done, the page isn’t up yet.',
-      short: 'Demo ready', hint: 'Tap a bubble. It splits in two.', color: '#A6E9C6', deep: '#171A2E' },
+      status: '<b>The free demo’s out.</b> Ten levels on itch.io, and the rest of the 400 are on the way.', statusText: 'The free demo’s out. Ten levels on itch.io, and the rest of the 400 are on the way.',
+      short: 'Free demo', hint: 'Tap a bubble. It splits in two.', color: '#A6E9C6', deep: '#171A2E',
+      link: 'https://misterdinguz.itch.io/squish-n-pops', linkText: 'Play the real demo on itch.io' },
     { id: 'ember', name: 'Into Ember Depths', kind: 'Online bullet-hell action RPG',
       status: '<b>In development.</b> Desktop and browser.', statusText: 'In development. Desktop and browser.',
       short: 'In development', hint: 'The bosses wake up. Click one.', color: '#FFB37A', deep: '#0A0812' },
