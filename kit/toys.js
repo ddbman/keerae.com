@@ -332,7 +332,7 @@
   // The Vigil: one candle, five bone dice, and a claim lit up above them.
   var PIPS = { 1: [[0, 0]], 2: [[-1, -1], [1, 1]], 3: [[-1, -1], [0, 0], [1, 1]], 4: [[-1, -1], [1, -1], [-1, 1], [1, 1]], 5: [[-1, -1], [1, -1], [0, 0], [-1, 1], [1, 1]], 6: [[-1, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [1, 1]] };
   var WORD = ['', 'One', 'Two', 'Three', 'Four', 'Five'], FACE = ['', 'ones', 'twos', 'threes', 'fours', 'fives', 'sixes'];
-  var REPLY = ['The Rook calls it.', 'The Owl lets it go.', 'The Peacock raises.', 'The Rook squints at you.', 'The Owl believes you. For now.'];
+  var REPLY = ['The Rock calls it.', 'The Owl lets it go.', 'The Peacock raises.', 'The Rock squints at you.', 'The Owl believes you. For now.'];
   function drawDie(g, x, y, D, ang, v, glow) {
     g.save(); g.translate(x, y); g.rotate(ang);
     var r = D * .2, h = D / 2;
