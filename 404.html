@@ -1,51 +1,85 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-time="day">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Not here. KEERAE</title>
-  <meta name="robots" content="noindex">
-  <meta name="theme-color" content="#1E1D25">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231E1D25'/%3E%3Cpath d='M10 8v16M22 8l-9.5 8L22 24' stroke='%23FF6A13' stroke-width='2.8' stroke-linecap='square' fill='none'/%3E%3C/svg%3E">
-  <style>
-    /* Absolute paths: this page gets served at whatever address was wrong. */
-    @font-face { font-family: "Bricolage"; src: url("/fonts/bricolage-display.woff2") format("woff2"); font-weight: 700 800; font-stretch: 75% 100%; font-display: swap; }
-    @font-face { font-family: "Atkinson"; src: url("/fonts/atkinson.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
-    @font-face { font-family: "Martian"; src: url("/fonts/martian-mono.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body { margin: 0; display: grid; grid-template-rows: 50px 1fr 40px; background: #1E1D25; color: #15141B; font: 18px/1.6 "Atkinson", system-ui, sans-serif; }
-    .bar { display: flex; align-items: center; gap: 14px; padding: 0 16px; color: #D6D4E0; font: 500 13px "Martian", ui-monospace, monospace; border-bottom: 1px solid #3A3946; }
-    .bar b { font: 800 17px "Bricolage", sans-serif; letter-spacing: .1em; color: #fff; }
-    .view {
-      display: grid; place-items: center; padding: 32px 20px;
-      background:
-        linear-gradient(#E5484D, #E5484D) 0 64px / 100% 1.5px no-repeat,
-        linear-gradient(#3B9C55, #3B9C55) 40px 0 / 1.5px 100% no-repeat,
-        linear-gradient(to right, #CDCED9 1px, transparent 1px) 40px 0 / 32px 32px,
-        linear-gradient(to bottom, #CDCED9 1px, transparent 1px) 0 64px / 32px 32px,
-        #DCDDE6;
-    }
-    main { max-width: 34rem; }
-    h1 { margin: 0 0 14px; font: 800 clamp(44px, 8vw, 84px)/.92 "Bricolage", sans-serif; font-stretch: 75%; }
-    p { margin: 0 0 26px; color: #44424F; }
-    a { display: inline-block; background: #FF6A13; color: #1A0A00; font-weight: 700; text-decoration: none; padding: 13px 20px; border-radius: 8px; }
-    a:focus-visible { outline: 3px solid #15141B; outline-offset: 3px; }
-    .out { display: flex; align-items: center; padding: 0 16px; background: #26252E; color: #F2C14E; font: 400 12.5px "Martian", ui-monospace, monospace; border-top: 1px solid #3A3946; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not here. KEERAE</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#D7C7F4" id="theme-color">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>
+  // Same sky as the front page: it follows the visitor's clock.
+  (function () { var d = new Date(), h = d.getHours() + d.getMinutes() / 60;
+    if (h >= 19.5 || h < 6.5) { document.documentElement.setAttribute('data-time', 'night'); document.getElementById('theme-color').setAttribute('content', '#0E1027'); } })();
+</script>
+<style>
+  /* Absolute paths: GitHub serves this page at whatever address was wrong. */
+  @font-face { font-family: "DynaPuff"; src: url("/fonts/dynapuff.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
+  @font-face { font-family: "Fredoka"; src: url("/fonts/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+  :root { --plum: #4B3A5A; --cream: #FFF6E5; --ink: var(--plum); }
+  :root[data-time="night"] { --ink: var(--cream); }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; display: grid; place-items: center; padding: 32px 20px; text-align: center;
+    font: 500 18px/1.5 "Fredoka", ui-rounded, system-ui, sans-serif; color: var(--ink);
+    background: linear-gradient(180deg, #D7C7F4 0%, #F7DBEA 100%);
+  }
+  :root[data-time="night"] body { background: linear-gradient(180deg, #0D0F26 0%, #2D1C48 100%); }
+  main { max-width: 34rem; }
+  .bub { position: relative; width: 210px; height: 210px; margin: 0 auto 26px; animation: float 7s cubic-bezier(.45, .05, .35, 1) infinite; }
+  .bub > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .bub .sq { position: absolute; left: 50%; top: 52%; width: 44%; transform: translate(-50%, -50%) rotate(-8deg); }
+  @keyframes float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-12px) rotate(1.5deg); } }
+  h1 {
+    margin: 0 0 12px; font: 700 clamp(38px, 7vw, 60px)/1.05 "DynaPuff", "Fredoka", sans-serif; color: var(--cream);
+    paint-order: stroke fill; -webkit-text-stroke: .14em var(--plum); letter-spacing: .01em;
+  }
+  p { margin: 0 0 28px; }
+  code { font: 600 .92em "Fredoka", sans-serif; word-break: break-all; }
+  a {
+    display: inline-flex; align-items: center; gap: .45em; padding: 13px 24px 14px; border-radius: 999px;
+    font: 700 21px/1 "DynaPuff", "Fredoka", sans-serif; color: var(--plum); text-decoration: none;
+    background: #A6E9C6; border: 3px solid var(--plum);
+    box-shadow: 0 5px 0 var(--plum), inset 0 -6px 0 rgba(75, 58, 90, .14), inset 0 4px 0 rgba(255, 255, 255, .55);
+    transition: transform .45s cubic-bezier(.34, 1.56, .64, 1);
+  }
+  a:hover { transform: translateY(-2px) scale(1.04, .97); }
+  a:active { transform: translateY(4px) scale(1.1, .86); box-shadow: 0 1px 0 var(--plum); transition-duration: .08s; }
+  a:focus-visible { outline: 3px solid var(--ink); outline-offset: 5px; }
+  @media (prefers-reduced-motion: reduce) { .bub { animation: none; } a { transition: none; } }
+</style>
 </head>
 <body>
-  <div class="bar"><b>KEERAE</b><span>404.scene</span></div>
-  <div class="view">
-    <main>
-      <h1>Nothing at this path.</h1>
-      <p>Could be a typo, could be me moving something around. Either way, the front page is still where it was.</p>
-      <a href="/">Back to the scene</a>
-    </main>
+<main>
+  <div class="bub" aria-hidden="true">
+    <svg viewBox="0 0 200 200">
+      <defs>
+        <radialGradient id="f" cx=".38" cy=".34" r=".7"><stop offset="0" stop-color="#F2FBFF" stop-opacity=".35"/><stop offset=".7" stop-color="#CEECFF" stop-opacity=".5"/><stop offset="1" stop-color="#E7DBFF" stop-opacity=".85"/></radialGradient>
+        <linearGradient id="r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A6E9C6"/><stop offset=".5" stop-color="#C9B8F0"/><stop offset="1" stop-color="#F6A6BE"/></linearGradient>
+      </defs>
+      <circle cx="100" cy="100" r="94" fill="url(#f)" stroke="#4B3A5A" stroke-width="4"/>
+      <circle cx="100" cy="100" r="86" fill="none" stroke="url(#r)" stroke-width="7" opacity=".75"/>
+      <path d="M44 84Q52 54 82 42" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="112" cy="40" r="6" fill="#fff"/>
+    </svg>
+    <svg class="sq" viewBox="0 0 120 132">
+      <path d="M16 58C16 27 35 9 60 9S104 27 104 58V106C104 116 97 122 87 122H33C23 122 16 116 16 106Z" fill="#FFF6E5"/>
+      <path d="M86 16C97 26 104 41 104 58V106C104 116 97 122 87 122H79C88 117 93 109 93 99V58C93 41 91 27 86 16Z" fill="#E7DDF4"/>
+      <path d="M29 43C30 30 40 20 53 17" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <ellipse cx="33" cy="80" rx="7" ry="4" fill="#F6A6BE"/><ellipse cx="87" cy="80" rx="7" ry="4" fill="#F6A6BE"/>
+      <ellipse cx="45" cy="65" rx="8" ry="10.5" fill="#4B3A5A"/><ellipse cx="75" cy="65" rx="8" ry="10.5" fill="#4B3A5A"/>
+      <circle cx="42" cy="60.5" r="3.4" fill="#fff"/><circle cx="72" cy="60.5" r="3.4" fill="#fff"/>
+      <ellipse cx="60" cy="84.5" rx="3.4" ry="4" fill="#7A4A5E" stroke="#4B3A5A" stroke-width="2"/>
+      <path d="M16 58C16 27 35 9 60 9S104 27 104 58V106C104 116 97 122 87 122H33C23 122 16 116 16 106Z" fill="none" stroke="#4B3A5A" stroke-width="5" stroke-linejoin="round"/>
+    </svg>
   </div>
-  <div class="out" id="out">warn: no node at this path</div>
-  <script>
-    try { document.getElementById('out').textContent = 'warn: no node at ' + decodeURIComponent(location.pathname); } catch (e) {}
-  </script>
+  <h1>This dream doesn&rsquo;t exist.</h1>
+  <p id="why">Could be a typo, could be me moving something around. The front page is still where it was.</p>
+  <a href="/">Back to the dreams</a>
+</main>
+<script>
+  try { var p = decodeURIComponent(location.pathname); if (p && p !== '/') { var w = document.getElementById('why'); w.textContent = 'Nothing lives at '; var c = document.createElement('code'); c.textContent = p; w.appendChild(c); w.appendChild(document.createTextNode('. Could be a typo, could be me moving something around.')); } } catch (e) {}
+</script>
 </body>
 </html>
