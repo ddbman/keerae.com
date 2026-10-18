@@ -32,18 +32,18 @@
   K.GAMES = [
     { id: 'squish', name: 'Squish n Pops', kind: 'Bubble-splitting arcade, right in your phone browser',
       status: '<b>The free demo’s out.</b> Ten levels on itch.io, and the rest of the 400 are on the way.', statusText: 'The free demo’s out. Ten levels on itch.io, and the rest of the 400 are on the way.',
-      short: 'Free demo', hint: 'Tap a bubble. It splits in two.', color: '#A6E9C6', deep: '#171A2E',
+      short: 'Free demo', hint: 'Tap a bubble. It splits in two. Pop every last one.', color: '#A6E9C6', deep: '#171A2E',
       link: 'https://misterdinguz.itch.io/squish-n-pops', linkText: 'Play the real demo on itch.io' },
     { id: 'ember', name: 'Into Ember Depths', kind: 'Online bullet-hell action RPG',
       status: '<b>Playable in your browser.</b> Still in development.', statusText: 'Playable in your browser. Still in development.',
-      short: 'Playable in browser', hint: 'The bosses wake up. Click one.', color: '#FFB37A', deep: '#0A0812',
+      short: 'Playable in browser', hint: 'The bosses wake up. Click one. Or just don\u2019t get hit.', color: '#FFB37A', deep: '#0A0812',
       link: 'https://emberdepths.keerae.com/', linkText: 'Play it in your browser' },
     { id: 'rattlecup', name: 'Rattlecup', kind: 'Liar’s dice roguelike for phones',
       status: '<b>Vertical slice,</b> building for iOS and Android. Working title.', statusText: 'Vertical slice, building for iOS and Android. Working title.',
-      short: 'Vertical slice', hint: 'A candle and five dice. Tap them to throw again.', color: '#E9C46A', deep: '#0E0A06' },
-    { id: 'rollaway', name: 'Rollaway', kind: '3D tilt platformer for phones',
-      status: '<b>Running on real phones.</b> The art just landed. Working title.', statusText: 'Running on real phones. The art just landed. Working title.',
-      short: 'Builds running', hint: 'Tilt, or use the arrow keys. Tap Squish to hop.', color: '#9FD98A', deep: '#7D6BC9' }
+      short: 'Vertical slice', hint: 'A candle and five dice. Tap them to throw again. Ones are wild.', color: '#E9C46A', deep: '#0E0A06' },
+    { id: 'rollaway', name: 'Squish on a Roll', kind: '3D tilt platformer for phones', anchor: 'n-squish-on-a-roll',
+      status: '<b>Running on real phones.</b> The art just landed.', statusText: 'Running on real phones. The art just landed.',
+      short: 'Builds running', hint: 'Tilt, or use the arrow keys. Tap Squish to hop. Try not to fall.', color: '#9FD98A', deep: '#7D6BC9' }
   ];
   K.game = function (id) { for (var i = 0; i < K.GAMES.length; i++) if (K.GAMES[i].id === id) return K.GAMES[i]; return null; };
   K.SEALED = [
@@ -101,11 +101,11 @@
     applyMode(m); window.scrollTo(0, 0);
     focusOn(m === 'normal' ? K.$('#normal h1') : K.$('.world [data-k-start]') || K.$('.world h1'));
   };
-  // "More info" on a dream: the plain page, scrolled to that game. from is the link pressed.
-  K.showInfo = function (id, from) {
-    var el = doc.getElementById('n-' + id); if (!el) return;
+  // "More info" on a dream: the plain page, scrolled to that game's section. from is the link pressed.
+  K.showInfo = function (sid, from) {
+    var el = doc.getElementById(sid); if (!el) return;
     if (K.mode === 'weird') { cameFrom = { y: window.scrollY, el: from || null }; borrowed = true; }
-    history.pushState({ kInfo: id }, '', '#n-' + id);
+    history.pushState({ kInfo: sid }, '', '#' + sid);
     showSection(el);
   };
   window.addEventListener('popstate', function () {
@@ -153,7 +153,8 @@
     whoosh: function () { noise(.7, .35, 300, 2600, .7); },
     blip: function () { tone('sine', 620, 760, .07, .22); },
     sneeze: function () { tone('sine', 300, 620, .45, .18, 0, 4); noise(.38, .7, 3200, 500, .6, .48); tone('sine', 520, 140, .25, .3, .48); },
-    hum: function () { tone('sine', 392, 392, .5, .12); tone('sine', 494, 494, .5, .1, .12); }
+    hum: function () { tone('sine', 392, 392, .5, .12); tone('sine', 494, 494, .5, .1, .12); },
+    secret: function () { [1047, 1319, 1568, 2093].forEach(function (f, i) { tone('sine', f, f, .34, .17, i * .08); tone('triangle', f * 2, f * 2, .2, .035, i * .08 + .02); }); }
   };
   K.sfx = function (name, a) {
     if (!K.sound.on || !SFX[name]) return;
@@ -189,7 +190,7 @@
   };
 
   // ---------------------------------------------------------- Squish
-  // The marshmallow from Squish n Pops and Rollaway, drawn to match the game's cover: a round
+  // The marshmallow from Squish n Pops and Squish on a Roll, drawn to match the game's cover: a round
   // bun with a little parted tuft on top, and a big face. viewBox 0 0 128 122, and the body
   // spans x 11..117, y 10..110. Moods: awake, drowsy, asleep, happy, yawn, surprised, dizzy.
   // toys.js draws the same outline and face on canvas from K.SQ.
@@ -373,14 +374,14 @@
   var INFO_SVG = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.7" fill="none" stroke="currentColor" stroke-width="2.3"/>' +
                  '<circle cx="10" cy="6.3" r="1.5" fill="currentColor"/><path d="M10 9.4V14.1" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>';
   K.makeMore = function (id) {
-    var g = K.game(id), a = doc.createElement('a');
-    a.className = 'k-more'; a.href = '#n-' + id; a.setAttribute('data-game', id);
+    var g = K.game(id), a = doc.createElement('a'), sid = g.anchor || 'n-' + id;
+    a.className = 'k-more'; a.href = '#' + sid; a.setAttribute('data-game', id);
     a.style.setProperty('--c', g.color);
     a.setAttribute('aria-label', 'More info about ' + g.name);
     a.innerHTML = INFO_SVG + '<span>More info</span>';
     a.addEventListener('click', function (e) {
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0) return; // a new tab opens the plain page there
-      e.preventDefault(); K.showInfo(id, a);
+      e.preventDefault(); K.showInfo(sid, a);
     });
     return a;
   };
@@ -411,6 +412,28 @@
     return toy;
   };
   K.running = function () { return running; };
+
+  // ------------------------------------------------------------ secrets
+  // One hidden thing in each toy. Which ones were found stays in this browser only.
+  // Finding all four earns Squish a party at the top of the page (keerae-party: due, then done).
+  K.SECRETS = { squish: 'Clean sweep', ember: 'Untouchable', rattlecup: 'Five of a kind', rollaway: 'Ten in a row' };
+  var SECRET_IDS = ['squish', 'ember', 'rattlecup', 'rollaway'];
+  var found = (function () {
+    try { var a = JSON.parse(store('local', 'keerae-secrets') || '[]'); return Array.isArray(a) ? a.filter(function (id) { return SECRET_IDS.indexOf(id) > -1; }) : []; }
+    catch (e) { return []; }
+  })();
+  var party = store('local', 'keerae-party') || (found.length === SECRET_IDS.length ? 'due' : '');
+  K.found = function (id) { return id ? found.indexOf(id) > -1 : found.slice(); };
+  K.party = function (v) { if (v) { party = v; store('local', 'keerae-party', v); } return party; };
+  K.findSecret = function (id) {
+    var fresh = found.indexOf(id) < 0;
+    if (fresh) { found.push(id); store('local', 'keerae-secrets', JSON.stringify(found)); }
+    var r = { id: id, fresh: fresh, n: found.length, total: SECRET_IDS.length, all: found.length === SECRET_IDS.length };
+    if (fresh && r.all) K.party('due');
+    K.sfx('secret');
+    K.emit('k:secret', r);
+    return r;
+  };
   doc.addEventListener('keydown', function (e) { if (e.key === 'Escape' && running) K.stopToy(); });
 
 

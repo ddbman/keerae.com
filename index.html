@@ -25,9 +25,9 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="preload" href="fonts/dynapuff.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/fredoka.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="kit/kit.css?v=2026-10-18b">
-<script src="kit/kit.js?v=2026-10-18b"></script>
-<script src="kit/toys.js?v=2026-10-18b"></script>
+<link rel="stylesheet" href="kit/kit.css?v=2026-10-18c">
+<script src="kit/kit.js?v=2026-10-18c"></script>
+<script src="kit/toys.js?v=2026-10-18c"></script>
 <style>
 /* ===================================================================
    Dream Bubbles. Squish is asleep up top, and every game is a dream
@@ -196,6 +196,18 @@
 .dream-status { margin: 0 0 26px; font-size: 19px; line-height: 1.42; color: var(--ink); max-width: 25em; text-wrap: pretty; }
 .dream-act { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 16px; }
 .dream-hint { margin: 18px 0 0; max-width: 30em; font-size: 15px; color: var(--ink); opacity: .9; }
+
+/* a found secret: a little gold star on the dream's rim */
+.dream-star { position: absolute; z-index: 3; right: 9.5%; top: 9.5%; width: 13%; aspect-ratio: 1; pointer-events: none; transition: opacity .2s; }
+.dream-star svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #FFD45E; stroke: var(--plum); stroke-width: 1.7; stroke-linejoin: round; filter: drop-shadow(0 0 10px rgba(255, 214, 110, .75)); animation: star-twinkle 3.6s var(--floaty) infinite; }
+.dream-star.is-new svg { animation: star-pop .8s var(--squishy) both, star-twinkle 3.6s var(--floaty) .8s infinite; }
+.dream.is-bursting .dream-star, .dream.is-popped .dream-star { opacity: 0; }
+@keyframes star-twinkle { 0%, 100% { transform: rotate(-8deg) scale(1); } 50% { transform: rotate(8deg) scale(1.08); } }
+@keyframes star-pop { from { transform: scale(0) rotate(-120deg); } to { transform: scale(1) rotate(0); } }
+.sq-hat { transform-box: fill-box; transform-origin: 50% 100%; }
+.sq-hat.is-new { animation: hat-pop .7s var(--squishy) both; }
+@keyframes hat-pop { from { transform: translateY(-30px) scale(0); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .dream-star svg, .dream-star.is-new svg, .sq-hat.is-new { animation: none; } }
 
 /* the bubble itself is the button that pops it */
 .dream-try { position: absolute; z-index: 2; inset: 2.25%; margin: 0; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
@@ -378,7 +390,7 @@
   <header class="n-top">
     <div class="n-wrap">
       <span class="k-wordmark" aria-label="KEERAE"><span>K</span><span>E</span><span>E</span><span>R</span><span>A</span><span>E</span></span>
-      <nav aria-label="Sections"><a href="#n-squish">Squish n Pops</a><a href="#n-ember">Into Ember Depths</a><a href="#n-rattlecup">Rattlecup</a><a href="#n-rollaway">Rollaway</a><a href="#n-hi">Say hi</a></nav>
+      <nav aria-label="Sections"><a href="#n-squish">Squish n Pops</a><a href="#n-ember">Into Ember Depths</a><a href="#n-rattlecup">Rattlecup</a><a href="#n-squish-on-a-roll">Squish on a Roll</a><a href="#n-hi">Say hi</a></nav>
       <button class="n-weird" type="button">Make it weird again</button>
     </div>
   </header>
@@ -392,7 +404,7 @@
           <li><a href="#n-squish" style="--c:#A6E9C6"><span class="dot"></span><span><span class="nm">Squish n Pops</span><span class="kd">Mobile browser arcade, 400 levels</span></span><span class="k-chip">Free demo</span></a></li>
           <li><a href="#n-ember" style="--c:#FFB37A"><span class="dot"></span><span><span class="nm">Into Ember Depths</span><span class="kd">Online bullet-hell action RPG</span></span><span class="k-chip">Playable in browser</span></a></li>
           <li><a href="#n-rattlecup" style="--c:#E9C46A"><span class="dot"></span><span><span class="nm">Rattlecup</span><span class="kd">Liar&rsquo;s dice roguelike, iOS and Android</span></span><span class="k-chip">Vertical slice</span></a></li>
-          <li><a href="#n-rollaway" style="--c:#9FD98A"><span class="dot"></span><span><span class="nm">Rollaway</span><span class="kd">3D tilt platformer, iOS and Android</span></span><span class="k-chip">Builds running</span></a></li>
+          <li><a href="#n-squish-on-a-roll" style="--c:#9FD98A"><span class="dot"></span><span><span class="nm">Squish on a Roll</span><span class="kd">3D tilt platformer, iOS and Android</span></span><span class="k-chip">Builds running</span></a></li>
         </ul>
         <p style="margin-top:18px">Or skip all this and just say hi. <a href="mailto:eric@keerae.com">eric@keerae.com</a></p>
       </div>
@@ -467,10 +479,11 @@
       </div>
     </section>
 
-    <section class="n-game" id="n-rollaway" style="--c:#9FD98A">
-      <div class="n-head"><h2>Rollaway</h2><span class="n-st"><b>Running on real phones.</b> The art just landed. Working title.</span></div>
+    <span id="n-rollaway" style="display:block"></span><!-- the working title, so links from before the name still land on it -->
+    <section class="n-game" id="n-squish-on-a-roll" style="--c:#9FD98A">
+      <div class="n-head"><h2>Squish on a Roll</h2><span class="n-st"><b>Running on real phones.</b> The art just landed.</span></div>
       <p>A physics-based 3D tilt platformer for phones. Tilt to roll, flick the phone upward to jump.</p>
-      <div class="n-shots"><img src="img/rollaway-feature.webp" width="1400" height="684" loading="lazy" alt="Rollaway: the marshmallow rolls across grassy floating islands above a sea of clouds, past a cross red cube and a stack of stone bricks."></div>
+      <div class="n-shots"><img src="img/rollaway-feature.webp" width="1400" height="684" loading="lazy" alt="Squish on a Roll: the marshmallow rolls across grassy floating islands above a sea of clouds, past a cross red cube and a stack of stone bricks."></div>
       <p class="n-cap">Store art, made in the game&rsquo;s own engine. Real screenshots are next.</p>
       <div class="n-body">
         <div>
@@ -501,7 +514,7 @@
           <tr><th scope="row">Electron</th><td>Into Ember Depths</td><td>It wraps the same code as the browser build, so one codebase ships to both. For an action game that costs you bundle size and memory. I took the trade anyway.</td></tr>
           <tr><th scope="row">Canvas2D, no build step</th><td>Into Ember Depths</td><td>Plain ES modules, served exactly as they are. Nothing to compile means nothing sitting between making a change and seeing it.</td></tr>
           <tr><th scope="row">Node + WebSockets</th><td>Into Ember Depths</td><td>One server, and any mix of desktop and browser players on the same wire.</td></tr>
-          <tr><th scope="row">Godot 4 + GDScript</th><td>Rattlecup, Rollaway</td><td>Picked it for the scene and component model. Both games are on 4.7 now, and neither one moved until its whole test suite came back green.</td></tr>
+          <tr><th scope="row">Godot 4 + GDScript</th><td>Rattlecup, Squish on a Roll</td><td>Picked it for the scene and component model. Both games are on 4.7 now, and neither one moved until its whole test suite came back green.</td></tr>
           <tr><th scope="row">Headless test suites</th><td>All of them</td><td>The game rules all get tested without a renderer. That&rsquo;s the only reason I can make balance changes fast and still trust them.</td></tr>
         </tbody>
       </table>
@@ -735,13 +748,46 @@ KIT.ready(function () {
   // Now and then it smiles in its sleep. It is having a nice dream.
   (function smileLater() {
     setTimeout(function () {
-      if (K.mode === 'weird' && Date.now() - lastPoke > 6000 && heroSq.el.classList.contains('m-asleep')) {
+      if (K.mode === 'weird' && !partyOn && Date.now() - lastPoke > 6000 && heroSq.el.classList.contains('m-asleep')) {
         heroSq.hold('happy');
-        setTimeout(function () { if (Date.now() - lastPoke > 4400) heroSq.release(); }, 1500);
+        setTimeout(function () { if (!partyOn && Date.now() - lastPoke > 4400) heroSq.release(); }, 1500);
       }
       smileLater();
     }, K.rnd(9000, 15000));
   })();
+
+  // All four secrets found: Squish wakes up for a tiny party and keeps the hat.
+  var HAT = '<g class="sq-hat">' +
+    '<path d="M47 15L55 -22L75 9Z" fill="#F6A6BE"/>' +
+    '<path d="M49.1 5.4L69.8 .9L67 -3.4L50.2 .2ZM51.6 -6.5L63.4 -9L61 -12.7L52.6 -10.9Z" fill="#FFE08A"/>' +
+    '<path d="M47 15L55 -22L75 9Z" fill="none" stroke="#4B3A5A" stroke-width="3.5" stroke-linejoin="round"/>' +
+    '<circle cx="55" cy="-23" r="5.5" fill="#A6E9C6" stroke="#4B3A5A" stroke-width="3"/></g>';
+  var partyOn = false;
+  function wearHat(isNew) {
+    var body = K.$('.sq-body-g', heroSq.el);
+    if (!body || K.$('.sq-hat', body)) return;
+    body.insertAdjacentHTML('beforeend', HAT);
+    if (isNew) K.$('.sq-hat', body).classList.add('is-new');
+  }
+  if (K.party() === 'done') wearHat(false);
+  function throwParty() {
+    if (partyOn || K.party() !== 'due' || K.mode !== 'weird') return;
+    partyOn = true; K.party('done');
+    popSleepBubble(); heroSq.hold('happy'); wearHat(true);
+    var w = bedEl.offsetWidth;
+    burst(bedEl, w * .5, w * .2, w * .1, 22, { min: 7, max: 15, d0: 50, d1: 150, fall: 90 });
+    setTimeout(function () {
+      burst(bedEl, w * .28, w * .26, w * .07, 14, { min: 6, max: 13, d0: 40, d1: 110, fall: 80 });
+      burst(bedEl, w * .72, w * .24, w * .07, 14, { min: 6, max: 13, d0: 40, d1: 110, fall: 80 });
+    }, 420);
+    shimmer(bedEl, w * .5, w * .28, w * .26, 8);
+    K.sfx('secret'); setTimeout(function () { K.sfx('chime'); }, 520);
+    K.say(heroSq.el, 'You found all four!', { small: 'A tiny party. Then back to sleep.', ms: 5200 });
+    setTimeout(function () { partyOn = false; heroSq.release(); }, 6000);
+  }
+  // It starts once Squish is on screen: right away, or when you scroll back up.
+  if (window.IntersectionObserver) new IntersectionObserver(function (es) { if (es[0].isIntersecting) throwParty(); }, { threshold: .4 }).observe(bedEl);
+  doc.addEventListener('k:secret', function (e) { if (e.detail.all) setTimeout(function () { var r = bedEl.getBoundingClientRect(); if (r.bottom > 0 && r.top < innerHeight) throwParty(); }, 60); });
 
   // ============================================================ scenes
   // Each dream is painted in two layers: a still layer cached once (sky, walls, portraits)
@@ -980,7 +1026,7 @@ KIT.ready(function () {
     }
   }
 
-  // ---- Rollaway: Squish on a floating island over a sea of clouds
+  // ---- Squish on a Roll (codename Rollaway): Squish on a floating island over a sea of clouds
   function initRoll(d) { var r = seeded(5), st = []; for (var i = 0; i < 44; i++) st.push({ x: r() * 2 - 1, y: r() * 1.3 - 1, r: .5 + r() * 1.2, a: .3 + r() * .55 }); d.s = { stars: st }; }
   function miniIsland(g, x, y, w, cube, night) {
     var th = w * .09, dh = w * .34;
@@ -1049,7 +1095,7 @@ KIT.ready(function () {
     squish: 'A dream of Squish n Pops. Smiling bubbles bounce under a crescent moon while Squish watches.',
     ember: 'A dream of Into Ember Depths. Pixel bosses float down a glowing shaft and fire rings of light.',
     rattlecup: 'A dream of Rattlecup. Three gilt portraits, one candle and five bone dice in the dark.',
-    rollaway: 'A dream of Rollaway. Squish on a floating grassy island above a sea of clouds.'
+    rollaway: 'A dream of Squish on a Roll. Squish on a floating grassy island above a sea of clouds.'
   };
 
   // ======================================================== the dreams
@@ -1096,6 +1142,7 @@ KIT.ready(function () {
       tryDream(d, !e.detail);
     });
     d.closeBtn.addEventListener('click', function (e) { e.stopPropagation(); K.stopToy(); });
+    if (K.found(g.id)) starBadge(d);
     dreams.push(d);
   });
 
@@ -1202,6 +1249,18 @@ KIT.ready(function () {
     o.globalAlpha = 1;
   }
 
+  // Each toy hides a secret. Once found, its dream keeps a little gold star.
+  function starBadge(d, isNew) {
+    if (K.$('.dream-star', d.stage)) return;
+    var b = doc.createElement('span');
+    b.className = 'dream-star' + (isNew ? ' is-new' : ''); b.setAttribute('role', 'img');
+    b.setAttribute('aria-label', 'Secret found'); b.title = 'Secret found';
+    b.innerHTML = '<svg viewBox="-12 -12 24 24" aria-hidden="true" focusable="false"><path d="' + STAR + '"/></svg>';
+    d.stage.appendChild(b);
+  }
+  doc.addEventListener('k:secret', function (e) {
+    dreams.forEach(function (d) { if (d.g.id === e.detail.id) starBadge(d, true); });
+  });
   function tryDream(d, keyboard) {
     K.startToy(d.g.id, d.host, {
       bg: true,

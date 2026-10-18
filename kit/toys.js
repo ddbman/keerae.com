@@ -51,7 +51,11 @@
     on(window, 'keyup', function (e) { if (game.key) game.key(e, false); });
     return {
       canvas: cv, state: S,
-      stop: function () { alive = false; cancelAnimationFrame(raf); if (ro) ro.disconnect(); if (io) io.disconnect(); offs.forEach(function (f) { f(); }); if (game.stop) game.stop(); cv.remove(); }
+      peek: function () { return game.peek ? game.peek() : null; },
+      stop: function () {
+        alive = false; cancelAnimationFrame(raf); if (ro) ro.disconnect(); if (io) io.disconnect(); offs.forEach(function (f) { f(); }); if (game.stop) game.stop(); cv.remove();
+        [].slice.call(host.querySelectorAll('.k-secret')).forEach(function (e) { e.remove(); });
+      }
     };
   }
 
@@ -131,10 +135,24 @@
     g.globalAlpha = 1;
   }
 
+  // A secret found: a little gold card drops into the toy for a few seconds.
+  var STAR_D = 'M0-11Q1.6-1.6 11 0Q1.6 1.6 0 11Q-1.6 1.6-11 0Q-1.6-1.6 0-11Z';
+  function secretCard(S, id, line) {
+    var r = K.findSecret(id), el = document.createElement('div');
+    el.className = 'k-secret'; el.setAttribute('role', 'status');
+    el.innerHTML = '<svg class="k-secret-star" viewBox="-12 -12 24 24" aria-hidden="true" focusable="false"><path d="' + STAR_D + '"/></svg><b></b><small></small>';
+    el.querySelector('b').textContent = K.SECRETS[id];
+    el.querySelector('small').textContent = !r.fresh ? line : r.all ? 'That\u2019s all four. Squish is throwing a party up top.' : 'Secret ' + r.n + ' of ' + r.total + '. ' + line;
+    var old = S.host.querySelector('.k-secret'); if (old) old.remove();
+    S.host.appendChild(el);
+    setTimeout(function () { el.classList.add('k-out'); setTimeout(function () { el.remove(); }, 450); }, r.fresh && r.all ? 7000 : 4500);
+    return r;
+  }
+
   // ===================================================== SQUISH N POPS
   // Bubbles bounce to the same height every time. Tap one and it splits in two.
-  function bubble(g, x, y, R, s, wob) {
-    var fill = s === 3 ? '#A6E9C6' : s === 2 ? '#FFE3A3' : '#F6A6BE';
+  function bubble(g, x, y, R, s, wob, gold) {
+    var fill = gold ? '#FFD45E' : s === 3 ? '#A6E9C6' : s === 2 ? '#FFE3A3' : '#F6A6BE';
     var sx = 1 + (wob || 0), sy = 1 - (wob || 0);
     g.save(); g.translate(x, y); g.scale(sx, sy);
     g.fillStyle = CREAM; g.beginPath(); g.arc(0, 0, R * 1.1, 0, TAU); g.fill();
@@ -143,7 +161,13 @@
     g.fillStyle = 'rgba(255,255,255,.75)'; g.beginPath(); g.ellipse(-R * .4, -R * .42, R * .26, R * .14, -.7, 0, TAU); g.fill();
     if (R >= 9) {
       g.fillStyle = PLUM;
-      if (s === 1) { // the little ones look cross about it
+      if (gold) { // the golden one is very pleased with itself
+        g.strokeStyle = PLUM; g.lineWidth = Math.max(1.4, R * .07); g.lineCap = 'round';
+        g.beginPath(); g.arc(-R * .28, R * .02, R * .13, 1.15 * Math.PI, 1.85 * Math.PI); g.stroke();
+        g.beginPath(); g.arc(R * .28, R * .02, R * .13, 1.15 * Math.PI, 1.85 * Math.PI); g.stroke();
+        g.fillStyle = 'rgba(246,166,190,.85)'; g.beginPath(); g.ellipse(-R * .5, R * .2, R * .12, R * .07, 0, 0, TAU); g.ellipse(R * .5, R * .2, R * .12, R * .07, 0, 0, TAU); g.fill();
+        g.fillStyle = '#7A4A5E'; g.beginPath(); g.moveTo(-R * .17, R * .17); g.quadraticCurveTo(0, R * .5, R * .17, R * .17); g.closePath(); g.fill(); g.stroke();
+      } else if (s === 1) { // the little ones look cross about it
         g.lineWidth = Math.max(1.2, R * .1); g.strokeStyle = PLUM; g.lineCap = 'round';
         g.beginPath(); g.moveTo(-R * .42, -R * .22); g.lineTo(-R * .14, -R * .1); g.moveTo(R * .42, -R * .22); g.lineTo(R * .14, -R * .1); g.stroke();
         g.beginPath(); g.arc(-R * .27, R * .05, R * .1, 0, TAU); g.arc(R * .27, R * .05, R * .1, 0, TAU); g.fill();
@@ -179,6 +203,12 @@
         bubbles.push({ x: S.W * .28, y: top + R[3] + 6, vx: VX[3], vy: 0, s: 3, w: 0 });
         bubbles.push({ x: S.W * .72, y: top + R[3] + 30, vx: -VX[3], vy: 0, s: 3, w: 0 });
       }
+      // The secret: clear the screen and a golden bubble drops in. Pop that too.
+      function goldBubble() {
+        var x = S.W * rnd(.35, .65);
+        bubbles.push({ x: x, y: top + R[3] + 6, vx: (Math.random() < .5 ? -1 : 1) * VX[3] * .8, vy: 0, s: 3, w: 0, gold: true });
+        burstBits(bits, x, top + R[3], 16, ['#FFD45E', '#FFF1C4', CREAM], 200); K.sfx('chime');
+      }
       spawn();
       return {
         resize: function () { dims(); bubbles.forEach(function (b) { b.x = clamp(b.x, R[b.s], S.W - R[b.s]); b.y = Math.min(b.y, floor - R[b.s]); }); },
@@ -205,6 +235,13 @@
             var b = bubbles[i], r = R[b.s] + (K.touch ? 12 : 5);
             if ((x - b.x) * (x - b.x) + (y - b.y) * (y - b.y) > r * r) continue;
             bubbles.splice(i, 1);
+            if (b.gold) {
+              for (var k = 0; k < 4; k++) burstBits(bits, b.x + rnd(-.5, .5) * R[3], b.y + rnd(-.5, .5) * R[3], 14, ['#FFD45E', '#FFF1C4', '#FFE08A', CREAM], 360);
+              K.sfx('pop', 1); hero.mood = 'happy'; hero.moodT = 2.4;
+              secretCard(S, 'squish', 'Every bubble, even the gold one.');
+              setTimeout(function () { if (!bubbles.length) spawn(); }, 1800);
+              return true;
+            }
             burstBits(bits, b.x, b.y, 8 + b.s * 5, [CREAM, '#A6E9C6', '#F6A6BE', PLUM, '#FFE3A3'], 260 + b.s * 40);
             K.sfx('pop', b.s / 3);
             if (b.s > 1) {
@@ -213,7 +250,7 @@
               bubbles.push({ x: b.x + R[b.s] * .3, y: b.y, vx: VX[b.s - 1], vy: hop, s: b.s - 1, w: .2 });
             }
             hero.mood = 'surprised'; hero.moodT = .35;
-            if (!bubbles.length) { cleared++; hero.mood = 'happy'; hero.moodT = 1.3; K.sfx('chime'); setTimeout(function () { if (!bubbles.length) spawn(); }, 1200); }
+            if (!bubbles.length) { cleared++; hero.mood = 'happy'; hero.moodT = 1.3; K.sfx('chime'); setTimeout(function () { if (!bubbles.length) goldBubble(); }, 1000); }
             return true;
           }
           return false;
@@ -231,10 +268,21 @@
             g.fillStyle = 'rgba(201,184,240,.5)'; g.fillRect(0, floor, S.W, 3);
             g.fillStyle = 'rgba(201,184,240,.18)'; g.fillRect(0, floor + 3, S.W, S.H - floor);
           }
-          for (var j = 0; j < bubbles.length; j++) bubble(g, bubbles[j].x, bubbles[j].y, R[bubbles[j].s], bubbles[j].s, bubbles[j].w);
+          for (var j = 0; j < bubbles.length; j++) {
+            var bb = bubbles[j];
+            if (bb.gold) { // a warm glow, and sparkles circling the golden one
+              var gg = g.createRadialGradient(bb.x, bb.y, R[3] * .8, bb.x, bb.y, R[3] * 2.1);
+              gg.addColorStop(0, 'rgba(255,212,94,.45)'); gg.addColorStop(1, 'rgba(255,212,94,0)');
+              g.fillStyle = gg; g.beginPath(); g.arc(bb.x, bb.y, R[3] * 2.1, 0, TAU); g.fill();
+              g.fillStyle = '#FFE08A';
+              for (var q = 0; q < 4; q++) { var qa = S.t * 1.4 + q * TAU / 4; star4(g, bb.x + Math.cos(qa) * R[3] * 1.55, bb.y + Math.sin(qa) * R[3] * 1.55, R[3] * (.3 + .1 * Math.sin(S.t * 5 + q)), S.t); }
+            }
+            bubble(g, bb.x, bb.y, R[bb.s], bb.s, bb.w, bb.gold);
+          }
           drawBits(g, bits);
           drawSquish(g, hero.x, floor + 1, clamp(R[3] * 1.6, 22, 60), { mood: hero.mood, look: hero.look });
-        }
+        },
+        peek: function () { return { bubbles: bubbles, R: R, cleared: cleared }; }
       };
     }, opts);
   }
@@ -244,6 +292,20 @@
   function ember(host, opts) {
     return runner(host, function (S) {
       var o = S.opts, sheet = K.img('ember-bosses-1x.png'), CELL = 69, shots = [], embers = [], bosses = [], wakeT = .7, lastPew = 0;
+      // The secret: the cursor (or a finger held down) is the player. Twenty seconds in the arena without a scratch.
+      var dodge = { t: 0, hit: 0, calm: 0 }, sparks = [];
+      S.cv.style.cursor = 'none';
+      function player() {
+        if (!S.pointer || (K.touch && !S.down)) return null;
+        return K.touch ? { x: S.pointer.x, y: Math.max(8, S.pointer.y - 44) } : S.pointer;
+      }
+      function untouchable() {
+        dodge.t = 0; dodge.calm = 4.5; wakeT = 4.5;
+        shots.forEach(function (q) { burstBits(sparks, q.x, q.y, 2, ['#FFB347', '#FF7A2F', '#FFE08A'], 70, 1.4); });
+        shots.length = 0;
+        bosses.forEach(function (b) { b.spiral = null; b.flash = .6; });
+        secretCard(S, 'ember', 'Twenty seconds without a scratch. They need a nap.');
+      }
       var COLS = ['#FF7A2F', '#FFB347', '#A06BFF', '#5FE0FF', '#FF4D6D'];
       var cells = []; for (var c = 0; c < 33; c++) cells.push(c);
       cells.sort(function () { return Math.random() - .5; });
@@ -264,7 +326,7 @@
         b.flash = .3; b.shake = .18;
         if (kind === 'ring') { var n = 16, off = Math.random() * TAU; for (var i = 0; i < n; i++) shoot(b.x, b.y, off + i * TAU / n, sp, col); }
         else if (kind === 'spiral') b.spiral = { left: 24, ang: Math.random() * TAU, every: .05, acc: 0, col: col };
-        else { var p = S.pointer || { x: S.W / 2, y: S.H * .92 }, a0 = Math.atan2(p.y - b.y, p.x - b.x); for (var j = -2; j <= 2; j++) shoot(b.x, b.y, a0 + j * .13, sp * 1.6, col); }
+        else { var p = player() || S.pointer || { x: S.W / 2, y: S.H * .92 }, a0 = Math.atan2(p.y - b.y, p.x - b.x); for (var j = -2; j <= 2; j++) shoot(b.x, b.y, a0 + j * .13, sp * 1.6, col); }
         var now = performance.now(); if (now - lastPew > 150) { K.sfx('pew'); lastPew = now; }
       }
       for (var e = 0; e < 26; e++) embers.push({ x: rnd(0, 1), y: rnd(0, 1), v: rnd(.02, .07), s: Math.random() < .3 ? 3 : 2 });
@@ -293,6 +355,19 @@
             if (s.life <= 0 || s.x < -20 || s.x > S.W + 20 || s.y < -20 || s.y > S.H + 20) shots.splice(j, 1);
           }
           embers.forEach(function (m) { m.y -= m.v * dt; if (m.y < -.02) { m.y = 1.02; m.x = Math.random(); } });
+          var pl = player();
+          dodge.hit = Math.max(0, dodge.hit - dt); dodge.calm = Math.max(0, dodge.calm - dt);
+          if (!pl || wakeT > 0 || dodge.calm > 0) dodge.t = 0;
+          else {
+            var hitR = K.touch ? 9 : 5, hit = false;
+            for (var h = shots.length - 1; h >= 0; h--) {
+              var q = shots[h], qx = q.x - pl.x, qy = q.y - pl.y, rr = q.r + hitR;
+              if (qx * qx + qy * qy < rr * rr) { hit = true; burstBits(sparks, q.x, q.y, 5, [q.c, '#FFF4E0'], 120, .8); shots.splice(h, 1); }
+            }
+            if (hit) { dodge.t = 0; dodge.hit = .45; K.sfx('blip'); }
+            else { dodge.t += dt; if (dodge.t >= 20) untouchable(); }
+          }
+          stepBits(sparks, dt, -50);
         },
         tap: function (x, y) {
           for (var i = 0; i < bosses.length; i++) {
@@ -332,8 +407,19 @@
             g.globalAlpha = 1; g.beginPath(); g.arc(s.x, s.y, s.r, 0, TAU); g.fill();
             g.fillStyle = '#FFF4E0'; g.beginPath(); g.arc(s.x, s.y, s.r * .45, 0, TAU); g.fill();
           }
+          drawBits(g, sparks);
           g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
-        }
+          var pl = player();
+          if (pl) { // you: a little cream heart of a dot, and a gold ring that fills as you last
+            var pr = K.touch ? 7 : 5;
+            if (dodge.hit > 0) { g.strokeStyle = 'rgba(255,77,109,' + Math.min(1, dodge.hit * 2.2).toFixed(2) + ')'; g.lineWidth = 3; g.beginPath(); g.arc(pl.x, pl.y, pr + (.45 - dodge.hit) * 50, 0, TAU); g.stroke(); }
+            g.fillStyle = 'rgba(255,246,229,.22)'; g.beginPath(); g.arc(pl.x, pl.y, pr * 2.2, 0, TAU); g.fill();
+            g.fillStyle = CREAM; g.beginPath(); g.arc(pl.x, pl.y, pr, 0, TAU); g.fill();
+            g.fillStyle = '#F6A6BE'; g.beginPath(); g.arc(pl.x, pl.y, pr * .55, 0, TAU); g.fill();
+            if (dodge.t > 2) { g.strokeStyle = '#FFE08A'; g.lineWidth = 2.5; g.lineCap = 'round'; g.beginPath(); g.arc(pl.x, pl.y, pr * 2.7, -Math.PI / 2, -Math.PI / 2 + TAU * Math.min(1, dodge.t / 20)); g.stroke(); }
+          }
+        },
+        peek: function () { return { shots: shots, bosses: bosses, dodge: dodge, wake: function () { return wakeT; } }; }
       };
     }, opts);
   }
@@ -358,25 +444,38 @@
   function rattlecup(host, opts) {
     return runner(host, function (S) {
       var o = S.opts, dice = [], D, floor, claim = null, claimT = 0, reply = '', settledOnce = false, flick = 0;
+      // The secret: five of a kind, ones wild. Until someone finds it, the dice get kinder the longer they keep throwing.
+      var throws = 0, five = false, sparks = [];
       function dims() { D = clamp(Math.min(S.W / 9.5, S.H / 5.2), 22, 62); floor = S.H * .84; }
       dims();
       for (var i = 0; i < 5; i++) dice.push({ x: S.W * (.3 + i * .1), y: floor - D / 2, vx: 0, vy: 0, a: 0, av: 0, v: 1 + Math.floor(Math.random() * 6), rest: true, flip: 0 });
       function cx() { return o.candleX != null ? o.candleX * S.W : S.W * .5; }
       function throwAll() {
-        claim = null; claimT = 0; settledOnce = false;
+        claim = null; claimT = 0; settledOnce = false; five = false; throws++;
+        var fin = null;
+        if (!K.found('rattlecup') && (throws >= 20 || Math.random() < Math.pow(clamp((throws - 5) / 15, 0, 1), 2))) {
+          var face = 2 + Math.floor(Math.random() * 5), wild = Math.floor(Math.random() * 3);
+          fin = []; for (var k = 0; k < 5; k++) fin.push(k < wild ? 1 : face);
+          fin.sort(function () { return Math.random() - .5; });
+        }
         dice.forEach(function (d, i) {
           d.rest = false; d.vy = -rnd(520, 760) * (S.H / 420); d.vx = rnd(-170, 170) + (S.W * (.28 + i * .11) - d.x) * 1.4;
-          d.av = rnd(-13, 13); d.flip = 0;
+          d.av = rnd(-13, 13); d.flip = 0; d.final = fin ? fin[i] : 0;
         });
         K.sfx('clack', .5);
       }
       setTimeout(throwAll, 180);
-      function makeClaim() {
-        var count = {}, best = 1, n = 0;
-        dice.forEach(function (d) { count[d.v] = (count[d.v] || 0) + 1; });
-        for (var f = 6; f >= 1; f--) if ((count[f] || 0) > n) { n = count[f]; best = f; }
+      function makeClaim() { // ones are wild, the way the game plays
+        var count = [0, 0, 0, 0, 0, 0, 0], best = 6, n = 0;
+        dice.forEach(function (d) { count[d.v]++; });
+        if (count[1] === 5) { best = 1; n = 5; }
+        else for (var f = 6; f >= 2; f--) if (count[f] + count[1] > n) { n = count[f] + count[1]; best = f; }
         claim = (n === 1 ? 'One ' + FACE[best].replace(/s$/, '') : WORD[n] + ' ' + FACE[best]).toUpperCase();
-        reply = K.pick(REPLY); claimT = 0;
+        claimT = 0;
+        if (n === 5) {
+          five = true; throws = 0; reply = 'The Blind King stands up.';
+          secretCard(S, 'rattlecup', 'Ones wild. The House noticed you.');
+        } else reply = K.pick(REPLY);
       }
       return {
         resize: function () { dims(); dice.forEach(function (d) { d.x = clamp(d.x, D, S.W - D); if (d.rest) d.y = floor - D / 2; }); },
@@ -393,7 +492,7 @@
             if (d.y > floor - D / 2) {
               d.y = floor - D / 2;
               if (Math.abs(d.vy) > 140) { K.sfx('clack', clamp(Math.abs(d.vy) / 900, 0, 1)); d.vy *= -.34; d.vx *= .72; d.av *= .6; }
-              else { d.vy = 0; d.vx *= .6; d.av *= .5; if (Math.abs(d.vx) < 18) { d.rest = true; d.vx = 0; d.a = Math.round(d.a / (Math.PI / 2)) * (Math.PI / 2) + rnd(-.1, .1); } }
+              else { d.vy = 0; d.vx *= .6; d.av *= .5; if (Math.abs(d.vx) < 18) { d.rest = true; d.vx = 0; d.a = Math.round(d.a / (Math.PI / 2)) * (Math.PI / 2) + rnd(-.1, .1); if (d.final) d.v = d.final; } }
             }
           });
           for (var i = 0; i < dice.length; i++) for (var j = i + 1; j < dice.length; j++) {
@@ -402,6 +501,8 @@
           }
           if (all && !settledOnce) { settledOnce = true; makeClaim(); }
           if (claim) claimT += dt;
+          if (five && Math.random() < dt * 14) burstBits(sparks, cx() + rnd(-6, 6), S.H * .3 - clamp(S.H * .17, 26, 74) * .5, 1, ['#FFE08A', '#FFF1C4', '#FFC861'], 70, 1.2);
+          stepBits(sparks, dt, -60);
         },
         tap: function () { throwAll(); return true; },
         key: function (e, down) { if (down && (e.key === ' ' || e.key === 'Enter') && e.target === document.body) { throwAll(); return true; } return false; },
@@ -420,7 +521,7 @@
           g.fillStyle = '#EADCC0'; g.beginPath(); g.roundRect ? g.roundRect(x0 - cw / 2, top, cw, ch, cw * .18) : g.rect(x0 - cw / 2, top, cw, ch); g.fill();
           g.fillStyle = '#F7EEDB'; g.beginPath(); g.ellipse(x0 - cw * .18, top + ch * .2, cw * .1, ch * .14, 0, 0, TAU); g.fill();
           g.strokeStyle = '#2A1E12'; g.lineWidth = 2; g.beginPath(); g.moveTo(x0, top); g.lineTo(x0, top - ch * .08); g.stroke();
-          var fh = ch * .5 * fl, fw = fh * .48, fy = top - ch * .08;
+          var fh = ch * .5 * fl * (five ? 1.5 : 1), fw = fh * .48, fy = top - ch * .08;
           var glow = g.createRadialGradient(x0, fy - fh * .5, 0, x0, fy - fh * .5, fh * 2.2);
           glow.addColorStop(0, 'rgba(255,220,140,.5)'); glow.addColorStop(1, 'rgba(255,200,120,0)');
           g.fillStyle = glow; g.beginPath(); g.arc(x0, fy - fh * .5, fh * 2.2, 0, TAU); g.fill();
@@ -430,34 +531,43 @@
             g.fillStyle = '#7A3E12'; var blink = (flick % 4.2) < .12 ? .25 : 1;
             g.beginPath(); g.ellipse(x0 - fw * .2, fy - fh * .3, fw * .06, fw * .08 * blink, 0, 0, TAU); g.ellipse(x0 + fw * .2, fy - fh * .3, fw * .06, fw * .08 * blink, 0, 0, TAU); g.fill();
           }
-          dice.forEach(function (d) { drawDie(g, d.x, d.y, D, d.a, d.v, false); });
+          drawBits(g, sparks);
+          if (five) dice.forEach(function (d) {
+            var gl = g.createRadialGradient(d.x, d.y, D * .2, d.x, d.y, D * 1.15);
+            gl.addColorStop(0, 'rgba(255,224,138,.75)'); gl.addColorStop(1, 'rgba(255,200,110,0)');
+            g.fillStyle = gl; g.beginPath(); g.arc(d.x, d.y, D * 1.15, 0, TAU); g.fill();
+          });
+          dice.forEach(function (d) { drawDie(g, d.x, d.y, D, d.a, d.v, five); });
           if (claim) {
             var a = clamp(claimT / .5, 0, 1), fs = clamp(S.W / 16, 18, 34);
             g.save(); g.globalAlpha = a; g.textAlign = 'center';
             g.font = '600 ' + fs + 'px Georgia, "Times New Roman", serif';
             if (g.letterSpacing !== undefined) g.letterSpacing = (fs * .14).toFixed(1) + 'px';
-            g.shadowColor = 'rgba(255,200,110,.8)'; g.shadowBlur = 14; g.fillStyle = '#F2D48A';
+            g.shadowColor = 'rgba(255,200,110,.8)'; g.shadowBlur = five ? 30 : 14; g.fillStyle = five ? '#FFE9A8' : '#F2D48A';
             g.fillText(claim, S.W / 2, floor - D * 1.35 - (1 - a) * 8);
             g.shadowBlur = 0;
             if (claimT > .9) {
               g.globalAlpha = clamp((claimT - .9) / .4, 0, 1) * .85;
               g.font = 'italic 500 ' + Math.round(fs * .52) + 'px Georgia, serif'; if (g.letterSpacing !== undefined) g.letterSpacing = '0px';
-              g.fillStyle = reply.indexOf('calls') > -1 ? '#FF7A6B' : '#D9C49A';
+              g.fillStyle = five ? '#FFE08A' : reply.indexOf('calls') > -1 ? '#FF7A6B' : '#D9C49A';
               g.fillText(reply, S.W / 2, floor - D * 1.35 + fs * .9);
             }
             g.restore();
           }
-        }
+        },
+        peek: function () { return { dice: dice, five: function () { return five; }, throws: function () { return throws; }, claim: function () { return claim; } }; }
       };
     }, opts);
   }
 
-  // ===================================================== ROLLAWAY
+  // ================================================ SQUISH ON A ROLL (codename Rollaway)
   // Squish on a floating island. Tilt it (or use the arrow keys) and it rolls. Tap Squish to hop.
   function rollaway(host, opts) {
     var t = runner(host, function (S) {
       S.cv.style.touchAction = 'none';
       var o = S.opts, keys = { l: 0, r: 0 }, tilt = 0, ang = 0, isl, sq, stars = [], bits = [], foe, got = 0, clouds = [], skyStars = [];
+      // The secret: ten stars in a row without falling off. A rainbow comes out.
+      var streak = 0, rainbow = 0;
       function dims() {
         var w = clamp(S.W * .62, 180, 560);
         isl = { cx: S.W / 2, y: S.H * .6, w: w, th: clamp(w * .05, 8, 20), dirt: clamp(w * .16, 26, 70) };
@@ -493,7 +603,7 @@
             if (sq.air) { sq.vh -= 1500 * dt; sq.h += sq.vh * dt; if (sq.h <= 0) { sq.h = 0; sq.air = false; sq.vh = 0; } }
             if (Math.abs(sq.u) > half + sq.size * .2) { // rolled off the edge
               var p = world(sq.u, sq.h + sq.size * .5);
-              sq.falling = true; sq.fx = p.x; sq.fy = p.y; sq.fvx = sq.v * Math.cos(ang); sq.fvy = sq.v * Math.sin(ang) - 60; sq.mood = 'surprised'; K.sfx('whoosh');
+              sq.falling = true; sq.fx = p.x; sq.fy = p.y; sq.fvx = sq.v * Math.cos(ang); sq.fvy = sq.v * Math.sin(ang) - 60; sq.mood = 'surprised'; K.sfx('whoosh'); streak = 0;
             }
             // the cross little cube
             foe.u += foe.dir * 40 * dt; if (Math.abs(foe.u) > half * .7) { foe.dir *= -1; foe.u = clamp(foe.u, -half * .7, half * .7); }
@@ -503,8 +613,14 @@
               if (!st.alive) { st.t -= dt; if (st.t <= 0) spawnStar(j); return; }
               var sx = st.u * isl.w, sy = sq.size * st.lift;
               if (Math.abs(sx - sq.u) < sq.size * .6 && Math.abs(sy - (sq.h + sq.size * .5)) < sq.size * .8) {
-                st.alive = false; st.t = 1.6; got++; var pp = world(sx, sy); burstBits(bits, pp.x, pp.y, 14, ['#FFE08A', '#FFF6E5', '#FFC861'], 240); K.sfx('chime');
+                st.alive = false; st.t = 1.6; got++; streak++; var pp = world(sx, sy); burstBits(bits, pp.x, pp.y, 14, ['#FFE08A', '#FFF6E5', '#FFC861'], 240); K.sfx('chime');
                 sq.mood = 'happy'; sq.moodT = .8;
+                if (streak === 10) {
+                  rainbow = 9; sq.moodT = 2.5;
+                  var sp = world(sq.u, sq.h + sq.size * .5);
+                  for (var k = 0; k < 3; k++) burstBits(bits, sp.x + rnd(-30, 30), sp.y - rnd(0, 30), 16, ['#F6A6BE', '#FFE08A', '#A6E9C6', '#BFD3F7', '#C9B8F0'], 300);
+                  secretCard(S, 'rollaway', 'Ten stars without falling once.');
+                }
               }
             });
           } else {
@@ -515,6 +631,7 @@
           if (sq.bubble && !sq.air) { sq.bubble = 0; var bp = world(sq.u, sq.size * .5); burstBits(bits, bp.x, bp.y, 12, ['#CFEAFF', '#FFF6E5'], 200); K.sfx('pop', .5); sq.mood = 'awake'; }
           sq.moodT -= dt; if (sq.moodT <= 0 && !sq.bubble && !sq.falling) sq.mood = 'awake';
           stepBits(bits, dt, 420);
+          rainbow = Math.max(0, rainbow - dt);
           clouds.forEach(function (c) { c.x += c.v * dt; if (c.x - c.r > S.W) c.x = -c.r; });
         },
         tap: function (x, y) {
@@ -538,6 +655,12 @@
             if (night) { g.fillStyle = '#FFF6E5'; skyStars.forEach(function (s) { g.globalAlpha = .4 + .4 * Math.sin(S.t * 1.5 + s.p); g.beginPath(); g.arc(s.x, s.y, s.r, 0, TAU); g.fill(); }); g.globalAlpha = 1; }
             g.fillStyle = night ? 'rgba(200,190,240,.35)' : 'rgba(255,255,255,.9)';
             clouds.forEach(function (c) { g.beginPath(); g.arc(c.x, c.y, c.r, 0, TAU); g.arc(c.x + c.r * .9, c.y + c.r * .15, c.r * .75, 0, TAU); g.arc(c.x - c.r * .9, c.y + c.r * .2, c.r * .65, 0, TAU); g.fill(); });
+          }
+          if (rainbow > 0) { // the secret's rainbow, arched over the island
+            var RC = ['#F6A6BE', '#FFC9A3', '#FFE08A', '#A6E9C6', '#BFD3F7', '#C9B8F0'], bw = clamp(isl.w * .035, 5, 14), r0 = isl.w * .64;
+            g.save(); g.globalAlpha = Math.min(1, (9 - rainbow) / .8, rainbow / 1.2) * .85; g.lineWidth = bw;
+            for (var rc = 0; rc < RC.length; rc++) { g.strokeStyle = RC[rc]; g.beginPath(); g.arc(isl.cx, isl.y + isl.th, r0 - rc * bw, Math.PI, TAU); g.stroke(); }
+            g.restore();
           }
           // island
           g.save(); g.translate(isl.cx, isl.y); g.rotate(ang);
@@ -568,8 +691,9 @@
           g.restore();
           if (sq.falling) drawSquish(g, sq.fx, sq.fy, sq.size, { center: true, rot: sq.rot, mood: 'surprised' });
           drawBits(g, bits);
-          if (got) { g.font = '700 ' + clamp(S.W / 30, 13, 18) + 'px Fredoka, sans-serif'; g.fillStyle = night ? '#FFF6E5' : PLUM; g.textAlign = 'right'; g.fillText('★ ' + got, S.W - 12, 24); g.textAlign = 'left'; }
-        }
+          if (streak) { g.font = '700 ' + clamp(S.W / 30, 13, 18) + 'px Fredoka, sans-serif'; g.fillStyle = night ? '#FFF6E5' : PLUM; g.textAlign = 'left'; g.fillText('★ ' + streak, 16, 26); }
+        },
+        peek: function () { return { sq: sq, stars: stars, isl: isl, streak: function () { return streak; }, rainbow: function () { return rainbow; } }; }
       };
     }, opts);
     return t;
