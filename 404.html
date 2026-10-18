@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en" data-time="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not here. KEERAE</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#D7C7F4" id="theme-color">
+<link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+<script>
+  // Same sky as the front page: it follows the visitor's clock.
+  (function () { var d = new Date(), h = d.getHours() + d.getMinutes() / 60;
+    if (h >= 19.5 || h < 6.5) { document.documentElement.setAttribute('data-time', 'night'); document.getElementById('theme-color').setAttribute('content', '#0E1027'); } })();
+</script>
+<style>
+  /* Absolute paths: GitHub serves this page at whatever address was wrong. */
+  @font-face { font-family: "DynaPuff"; src: url("/fonts/dynapuff.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
+  @font-face { font-family: "Fredoka"; src: url("/fonts/fredoka.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+  :root { --plum: #4B3A5A; --cream: #FFF6E5; --ink: var(--plum); }
+  :root[data-time="night"] { --ink: var(--cream); }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; display: grid; place-items: center; padding: 32px 20px; text-align: center;
+    font: 500 18px/1.5 "Fredoka", ui-rounded, system-ui, sans-serif; color: var(--ink);
+    background: linear-gradient(180deg, #D7C7F4 0%, #F7DBEA 100%);
+  }
+  :root[data-time="night"] body { background: linear-gradient(180deg, #0D0F26 0%, #2D1C48 100%); }
+  main { max-width: 34rem; }
+  .bub { position: relative; width: 210px; height: 210px; margin: 0 auto 26px; animation: float 7s cubic-bezier(.45, .05, .35, 1) infinite; }
+  .bub > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .bub .sq { position: absolute; left: 50%; top: 52%; width: 50%; transform: translate(-50%, -50%) rotate(-8deg); }
+  @keyframes float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-12px) rotate(1.5deg); } }
+  h1 {
+    margin: 0 0 12px; font: 700 clamp(38px, 7vw, 60px)/1.05 "DynaPuff", "Fredoka", sans-serif; color: var(--cream);
+    paint-order: stroke fill; -webkit-text-stroke: .14em var(--plum); letter-spacing: .01em;
+  }
+  p { margin: 0 0 28px; }
+  code { font: 600 .92em "Fredoka", sans-serif; word-break: break-all; }
+  a {
+    display: inline-flex; align-items: center; gap: .45em; padding: 13px 24px 14px; border-radius: 999px;
+    font: 700 21px/1 "DynaPuff", "Fredoka", sans-serif; color: var(--plum); text-decoration: none;
+    background: #A6E9C6; border: 3px solid var(--plum);
+    box-shadow: 0 5px 0 var(--plum), inset 0 -6px 0 rgba(75, 58, 90, .14), inset 0 4px 0 rgba(255, 255, 255, .55);
+    transition: transform .45s cubic-bezier(.34, 1.56, .64, 1);
+  }
+  a:hover { transform: translateY(-2px) scale(1.04, .97); }
+  a:active { transform: translateY(4px) scale(1.1, .86); box-shadow: 0 1px 0 var(--plum); transition-duration: .08s; }
+  a:focus-visible { outline: 3px solid var(--ink); outline-offset: 5px; }
+  @media (prefers-reduced-motion: reduce) { .bub { animation: none; } a { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="bub" aria-hidden="true">
+    <svg viewBox="0 0 200 200">
+      <defs>
+        <radialGradient id="f" cx=".38" cy=".34" r=".7"><stop offset="0" stop-color="#F2FBFF" stop-opacity=".35"/><stop offset=".7" stop-color="#CEECFF" stop-opacity=".5"/><stop offset="1" stop-color="#E7DBFF" stop-opacity=".85"/></radialGradient>
+        <linearGradient id="r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A6E9C6"/><stop offset=".5" stop-color="#C9B8F0"/><stop offset="1" stop-color="#F6A6BE"/></linearGradient>
+      </defs>
+      <circle cx="100" cy="100" r="94" fill="url(#f)" stroke="#4B3A5A" stroke-width="4"/>
+      <circle cx="100" cy="100" r="86" fill="none" stroke="url(#r)" stroke-width="7" opacity=".75"/>
+      <path d="M44 84Q52 54 82 42" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="112" cy="40" r="6" fill="#fff"/>
+    </svg>
+    <svg class="sq" viewBox="8 7 112 106">
+      <defs><clipPath id="sqc"><path d="M70.4 15.7C72.3 13.9 74 10.8 76.8 10.4C78.9 10.1 83.4 13 85.7 13.9C96.7 18.2 104.8 23.6 110.7 34.1C116 43.7 117.1 54.4 117 65.1C116.9 79.3 114.7 93.4 102.2 102.1C91.7 109.4 78.2 110 65.8 110C54.5 110 42.8 110.1 32.2 105.6C15.1 98.3 11.2 83.2 11 66C10.8 49.7 13.1 35.1 25.7 23.5C33.8 16.1 43.5 12.9 54.2 11.4C57.1 11 61.2 9.6 64 10.5C66.7 11.3 68.3 13.8 70.4 15.7Z"/></clipPath></defs>
+      <path d="M70.4 15.7C72.3 13.9 74 10.8 76.8 10.4C78.9 10.1 83.4 13 85.7 13.9C96.7 18.2 104.8 23.6 110.7 34.1C116 43.7 117.1 54.4 117 65.1C116.9 79.3 114.7 93.4 102.2 102.1C91.7 109.4 78.2 110 65.8 110C54.5 110 42.8 110.1 32.2 105.6C15.1 98.3 11.2 83.2 11 66C10.8 49.7 13.1 35.1 25.7 23.5C33.8 16.1 43.5 12.9 54.2 11.4C57.1 11 61.2 9.6 64 10.5C66.7 11.3 68.3 13.8 70.4 15.7Z" fill="#FFF6E5"/>
+      <g clip-path="url(#sqc)"><ellipse cx="120" cy="64" rx="17" ry="58" fill="#E7DDF4"/><ellipse cx="64" cy="119" rx="64" ry="13" fill="#EFE7F8"/></g>
+      <path d="M19.7 55.7C21.2 39.8 30.1 26.8 45.5 21.9" stroke="#fff" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+      <ellipse cx="26.5" cy="73" rx="9.5" ry="5.4" fill="#F6A6BE" opacity=".9"/><ellipse cx="101.5" cy="73" rx="9.5" ry="5.4" fill="#F6A6BE" opacity=".9"/>
+      <ellipse cx="42" cy="54" rx="9.5" ry="12.5" fill="#4B3A5A"/><ellipse cx="86" cy="54" rx="9.5" ry="12.5" fill="#4B3A5A"/>
+      <circle cx="38.4" cy="48.6" r="4" fill="#fff"/><circle cx="82.4" cy="48.6" r="4" fill="#fff"/>
+      <circle cx="45.6" cy="60.4" r="1.7" fill="#fff"/><circle cx="89.6" cy="60.4" r="1.7" fill="#fff"/>
+      <ellipse cx="64" cy="77" rx="4.2" ry="5" fill="#7A4A5E" stroke="#4B3A5A" stroke-width="2.4"/>
+      <path d="M70.4 15.7C72.3 13.9 74 10.8 76.8 10.4C78.9 10.1 83.4 13 85.7 13.9C96.7 18.2 104.8 23.6 110.7 34.1C116 43.7 117.1 54.4 117 65.1C116.9 79.3 114.7 93.4 102.2 102.1C91.7 109.4 78.2 110 65.8 110C54.5 110 42.8 110.1 32.2 105.6C15.1 98.3 11.2 83.2 11 66C10.8 49.7 13.1 35.1 25.7 23.5C33.8 16.1 43.5 12.9 54.2 11.4C57.1 11 61.2 9.6 64 10.5C66.7 11.3 68.3 13.8 70.4 15.7Z" fill="none" stroke="#4B3A5A" stroke-width="5" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <h1>This dream doesn&rsquo;t exist.</h1>
+  <p id="why">Could be a typo, could be me moving something around. The front page is still where it was.</p>
+  <a href="/">Back to the dreams</a>
+</main>
+<script>
+  try { var p = decodeURIComponent(location.pathname); if (p && p !== '/') { var w = document.getElementById('why'); w.textContent = 'Nothing lives at '; var c = document.createElement('code'); c.textContent = p; w.appendChild(c); w.appendChild(document.createTextNode('. Could be a typo, could be me moving something around.')); } } catch (e) {}
+</script>
+</body>
+</html>

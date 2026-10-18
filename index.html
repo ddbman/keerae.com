@@ -1,0 +1,1542 @@
+<!doctype html>
+<html lang="en" class="no-js" data-mode="normal">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KEERAE. I make games.</title>
+<meta name="description" content="I make games, or at least I try. Seven going at once. Four you can poke right here, three still asleep. The code, the art and the music, all mine.">
+<link rel="canonical" href="https://keerae.com/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://keerae.com/">
+<meta property="og:site_name" content="KEERAE">
+<meta property="og:title" content="KEERAE. I make games.">
+<meta property="og:description" content="Seven going at once. The code, the art and the music, all mine.">
+<meta property="og:image" content="https://keerae.com/img/share.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="KEERAE. I make games, or at least I try :D. Squish the marshmallow is fast asleep on a cloud under a pink blanket, blowing a sleep bubble.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="KEERAE. I make games.">
+<meta name="twitter:description" content="Seven going at once. The code, the art and the music, all mine.">
+<meta name="twitter:image" content="https://keerae.com/img/share.png?v=2">
+<meta name="twitter:image:alt" content="KEERAE. I make games, or at least I try :D. Squish the marshmallow is fast asleep on a cloud under a pink blanket, blowing a sleep bubble.">
+<meta name="theme-color" content="#D7C7F4" id="theme-color">
+<link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+<link rel="preload" href="fonts/dynapuff.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/fredoka.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit/kit.css?v=2026-10-18c">
+<script src="kit/kit.js?v=2026-10-18c"></script>
+<script src="kit/toys.js?v=2026-10-18c"></script>
+<style>
+/* ===================================================================
+   Dream Bubbles. Squish is asleep up top, and every game is a dream
+   floating out of its head. Scroll down through the dreams. Tap one and
+   it pops into a tiny toy of that game; More info opens the game's part
+   of the plain page. At the bottom, Squish wakes up and says hi.
+   =================================================================== */
+@property --rim { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+.world {
+  --ink: var(--plum);
+  --ink-2: rgba(75, 58, 90, .86);
+  --D: clamp(520px, 42vw, 640px);
+  --wrap: min(1240px, calc(100% - 64px));
+  position: relative; color: var(--ink); overflow-x: clip;
+}
+:root[data-time="night"] .world { --ink: var(--cream); --ink-2: rgba(255, 246, 229, .88); }
+
+/* ------------------------------------------------------- the dream sky */
+.sky, .stars, .drift { position: fixed; inset: 0; pointer-events: none; }
+.sky { z-index: 0; background: #DCCDF6; }
+.sky i { position: absolute; inset: 0; opacity: 0; will-change: opacity; }
+.sky i:first-child { opacity: 1; }
+.sky i:nth-child(1) { background: linear-gradient(180deg, #D7C7F4 0%, #EDE3FA 100%); }
+.sky i:nth-child(2) { background: linear-gradient(180deg, #E2CFF4 0%, #F7DBEA 100%); }
+.sky i:nth-child(3) { background: linear-gradient(180deg, #F8D2E1 0%, #FFDFD0 100%); }
+.sky i:nth-child(4) { background: linear-gradient(180deg, #FFDCC6 0%, #FFEACB 100%); }
+.sky i:nth-child(5) { background: linear-gradient(180deg, #CDEEDF 0%, #DCE6FA 100%); }
+.sky i:nth-child(6) { background: linear-gradient(180deg, #D9D8F6 0%, #EEE2F8 100%); }
+.sky i:nth-child(7) { background: linear-gradient(180deg, #FFE5BF 0%, #FFF3DC 100%); }
+:root[data-time="night"] .sky { background: #0E1027; }
+:root[data-time="night"] .sky i:nth-child(1) { background: linear-gradient(180deg, #0D0F26 0%, #1D1B42 100%); }
+:root[data-time="night"] .sky i:nth-child(2) { background: linear-gradient(180deg, #10132B 0%, #23204B 100%); }
+:root[data-time="night"] .sky i:nth-child(3) { background: linear-gradient(180deg, #170F2B 0%, #2D1C48 100%); }
+:root[data-time="night"] .sky i:nth-child(4) { background: linear-gradient(180deg, #1A1330 0%, #31223F 100%); }
+:root[data-time="night"] .sky i:nth-child(5) { background: linear-gradient(180deg, #0E1934 0%, #1E2B52 100%); }
+:root[data-time="night"] .sky i:nth-child(6) { background: linear-gradient(180deg, #12142F 0%, #28224F 100%); }
+:root[data-time="night"] .sky i:nth-child(7) { background: linear-gradient(180deg, #1C1944 0%, #3A2C63 100%); }
+
+.stars { z-index: 0; display: none; }
+:root[data-time="night"] .stars { display: block; }
+.stars svg { width: 100%; height: 100%; display: block; fill: #FFF6E5; }
+.stars .tw { animation: k-tw 4.2s ease-in-out infinite; }
+@keyframes k-tw { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+
+.drift { z-index: 0; overflow: hidden; }
+.cloud { position: absolute; left: 0; opacity: var(--op, .7); transform: translateX(var(--x, 20vw)); animation: cloud-drift 140s linear infinite; }
+.cloud svg { display: block; width: 100%; height: auto; fill: #fff; }
+:root[data-time="night"] .cloud { opacity: calc(var(--op, .7) * .28); }
+:root[data-time="night"] .cloud svg { fill: #9C93DD; }
+@keyframes cloud-drift { from { transform: translateX(-38vw); } to { transform: translateX(104vw); } }
+.sparks { position: absolute; left: 0; top: 0; width: 100%; height: 200%; will-change: transform; }
+.spk { position: absolute; display: block; overflow: visible; animation: twinkle 4s ease-in-out infinite; }
+.spk path { fill: #fff; stroke: rgba(75, 58, 90, .4); stroke-width: 1.3; vector-effect: non-scaling-stroke; }
+.spk.t1 path { fill: #FFE9A8; }
+.spk.t2 path { fill: #FFE4EF; }
+:root[data-time="night"] .spk path { fill: #FFF6E5; stroke: none; }
+:root[data-time="night"] .spk.t1 path { fill: #FFE08A; }
+:root[data-time="night"] .spk.t2 path { fill: #C9B8F0; }
+@keyframes twinkle { 0%, 100% { transform: scale(.3) rotate(0deg); opacity: .2; } 50% { transform: scale(1) rotate(30deg); opacity: 1; } }
+
+/* ------------------------------------------- the trail of dream bubbles */
+.trail { position: absolute; left: 0; top: 0; width: 100%; height: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.trail svg { position: absolute; left: 0; top: 0; overflow: visible; }
+.trail path { fill: none; stroke: rgba(75, 58, 90, .2); stroke-width: 3.5; stroke-linecap: round; stroke-dasharray: 0 15; }
+:root[data-time="night"] .trail path { stroke: rgba(255, 246, 229, .2); }
+.tb {
+  position: absolute; left: 0; top: 0; border-radius: 50%; will-change: transform;
+  border: 2px solid rgba(75, 58, 90, .72);
+  background: radial-gradient(circle at 33% 30%, #fff 0 13%, rgba(255, 255, 255, .55) 21%, rgba(201, 184, 240, .3) 58%, rgba(166, 233, 198, .5) 100%);
+}
+:root[data-time="night"] .tb { border-color: rgba(255, 246, 229, .72); background: radial-gradient(circle at 33% 30%, #fff 0 13%, rgba(255, 255, 255, .35) 21%, rgba(201, 184, 240, .22) 58%, rgba(166, 233, 198, .38) 100%); }
+
+/* ---------------------------------------------------------------- hero */
+.hero, .dreams, .sealed, .wake, .foot { position: relative; z-index: 2; }
+.hero {
+  width: var(--wrap); margin: 0 auto; min-height: max(680px, 100svh);
+  display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(0, 1fr);
+  grid-template-areas: "title bed" "hint bed"; align-content: center; column-gap: 24px;
+  padding: 104px 0 84px;
+}
+.hero-title { grid-area: title; align-self: end; will-change: transform; }
+.title-float { animation: t-float 8s var(--floaty) infinite; }
+.head-float { animation: t-float 9.5s var(--floaty) -3.2s infinite; }
+@keyframes t-float { 0%, 100% { transform: translate3d(0, 0, 0) rotate(-.5deg); } 50% { transform: translate3d(0, -9px, 0) rotate(.6deg); } }
+.hero h1 { font-size: clamp(64px, 9.3vw, 148px); margin: 0 0 0 -.04em; }
+.headline { font-size: clamp(25px, 2.85vw, 44px); margin: .38em 0 0; }
+.scroll-hint {
+  grid-area: hint; align-self: start; display: inline-flex; align-items: center; gap: 12px;
+  margin: 38px 0 0; font: 600 17px/1.2 var(--ui); color: var(--ink);
+}
+.hint-bub { position: relative; width: 22px; height: 40px; flex: none; }
+.hint-bub i { position: absolute; left: 50%; border-radius: 50%; border: 2px solid currentColor; background: rgba(255, 255, 255, .55); animation: hint-fall 2.4s var(--floaty) infinite; }
+.hint-bub i:nth-child(1) { width: 7px; height: 7px; margin-left: -3.5px; top: 0; }
+.hint-bub i:nth-child(2) { width: 10px; height: 10px; margin-left: -5px; top: 11px; animation-delay: .25s; }
+.hint-bub i:nth-child(3) { width: 15px; height: 15px; margin-left: -7.5px; top: 24px; animation-delay: .5s; }
+@keyframes hint-fall { 0%, 100% { transform: translateY(-3px); opacity: .55; } 50% { transform: translateY(4px); opacity: 1; } }
+.hero-bed { grid-area: bed; display: flex; justify-content: center; align-items: center; }
+.bed-float { animation: bed-bob 7.5s var(--floaty) infinite; }
+@keyframes bed-bob { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -11px, 0); } }
+.hero-moon { position: absolute; display: none; left: 47%; top: 15%; width: 64px; height: 64px; overflow: visible; }
+:root[data-time="night"] .hero-moon { display: block; }
+
+/* the bed: a cloud, a pillow, Squish, a blanket */
+.bed { position: relative; width: clamp(340px, 37vw, 540px); aspect-ratio: 460 / 330; }
+.bed-back, .bed-front { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.bed-back { z-index: 1; }
+.sq-wrap { position: absolute; z-index: 2; left: 30.31%; top: 17.38%; width: 39.37%; transform-origin: 50% 100%; }
+.sq-wrap .k-squish { width: 100%; height: auto; color: var(--plum); }
+:root[data-time="night"] .sq-wrap .k-squish { color: var(--cream); }
+.bed-front { z-index: 3; }
+.bed--hero .sq-nose { display: none; }
+.sleep-bubble {
+  position: absolute; z-index: 4; left: 49.87%; top: 44.6%; width: 15.65%; aspect-ratio: 1;
+  padding: 0; border: 0; background: none; border-radius: 50%; pointer-events: none;
+}
+.sleep-bubble svg { display: block; width: 100%; height: 100%; overflow: visible; transform-origin: 6.7% 25%; animation: sb-breathe 9.2s var(--floaty) infinite; }
+.sleep-bubble .sb-hit { pointer-events: all; cursor: pointer; }
+.sleep-bubble.popped svg { animation: none; transform: scale(0); opacity: 0; }
+.sleep-bubble.popped .sb-hit { pointer-events: none; }
+.sleep-bubble:focus-visible { outline-offset: 2px; border-radius: 50%; }
+@keyframes sb-breathe { 0%, 100% { transform: scale(.2); } 46%, 54% { transform: scale(1); } }
+
+/* ----------------------------------------------------------- the dreams */
+.dreams { width: var(--wrap); margin: 0 auto; padding: 24px 0 0; }
+.dream { display: grid; grid-template-columns: var(--D) minmax(0, 1fr); column-gap: clamp(56px, 7vw, 120px); align-items: center; }
+.dream + .dream { margin-top: clamp(70px, 9vw, 150px); }
+.dream--flip { grid-template-columns: minmax(0, 1fr) var(--D); }
+.dream--flip .dream-wrap { order: 2; }
+.dream--flip .dream-text { justify-self: end; }
+.dream-wrap { position: relative; width: var(--D); will-change: transform; }
+.dream-float { animation: dream-bob 8.4s var(--floaty) infinite; }
+.dream.is-popped .dream-float, .dream.is-bursting .dream-float { animation-play-state: paused; }
+@keyframes dream-bob { 0%, 100% { transform: translate3d(0, 0, 0); } 30% { transform: translate3d(5px, -9px, 0); } 65% { transform: translate3d(-4px, -14px, 0); } }
+.dream-stage { position: relative; width: 100%; aspect-ratio: 1; }
+.dream-bubble { position: absolute; inset: 0; transition: transform .8s var(--squishy), opacity .3s ease-out; }
+.dream-bubble canvas { position: absolute; display: block; pointer-events: none; }
+.dream-bubble::before { content: ""; position: absolute; inset: -17%; border-radius: 50%; pointer-events: none; background: radial-gradient(circle closest-side, var(--glow) 0, var(--glow) 69%, transparent 100%); }
+.dream.is-bursting .dream-bubble { transform: scale(1.05, .96); transition: transform .1s ease-out; }
+.dream.is-popped .dream-bubble { opacity: 0; transform: scale(1.16); transition: transform .2s ease-out, opacity .16s ease-out; }
+.dream.is-reform .dream-bubble { opacity: 0; transform: scale(.2); transition: none; }
+
+/* the dream, running: a soft, very round frame where the bubble was */
+.dream-frame {
+  position: absolute; left: -2%; right: -2%; top: 50%; height: clamp(260px, 64%, 420px);
+  padding: 7px; border-radius: 56px;
+  background: conic-gradient(from var(--rim), #A6E9C6, #BFD3F7, #C9B8F0, #F6A6BE, #FFE08A, #A6E9C6);
+  box-shadow: 0 0 0 3px var(--plum), 0 0 0 7px rgba(255, 246, 229, .85), 0 20px 80px 12px var(--glow);
+  opacity: 0; visibility: hidden; transform: translateY(-50%) scale(.8);
+  transition: opacity .3s ease-in, transform .4s ease-in, visibility 0s linear .4s;
+}
+.dream.is-popped .dream-frame {
+  opacity: 1; visibility: visible; transform: translateY(-50%) scale(1);
+  transition: opacity .3s ease-out .05s, transform .7s var(--squishy) .05s, visibility 0s;
+  animation: rim-turn 7s linear infinite;
+}
+@keyframes rim-turn { to { --rim: 360deg; } }
+.dream-toy { position: relative; width: 100%; height: 100%; border-radius: 49px; overflow: hidden; background: var(--deep); }
+.dream[data-game="rollaway"] .dream-toy { background: #AFC8F5; }
+:root[data-time="night"] .dream[data-game="rollaway"] .dream-toy { background: #1B1E3A; }
+.dream-toy::after { content: ""; position: absolute; inset: 0; z-index: 3; border-radius: inherit; pointer-events: none; box-shadow: inset 0 0 28px 6px rgba(255, 255, 255, .2), inset 0 0 0 2px rgba(75, 58, 90, .45); }
+.toy-ghost { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; }
+
+.dream-text { position: relative; max-width: 450px; }
+.dream-name { margin: 0 0 16px; font-size: clamp(42px, 4.3vw, 64px); color: var(--c); text-wrap: balance; }
+.dream-status { margin: 0 0 26px; font-size: 19px; line-height: 1.42; color: var(--ink); max-width: 25em; text-wrap: pretty; }
+.dream-act { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 16px; }
+.dream-hint { margin: 18px 0 0; max-width: 30em; font-size: 15px; color: var(--ink); opacity: .9; }
+
+/* a found secret: a little gold star on the dream's rim */
+.dream-star { position: absolute; z-index: 3; right: 9.5%; top: 9.5%; width: 13%; aspect-ratio: 1; pointer-events: none; transition: opacity .2s; }
+.dream-star svg { display: block; width: 100%; height: 100%; overflow: visible; fill: #FFD45E; stroke: var(--plum); stroke-width: 1.7; stroke-linejoin: round; filter: drop-shadow(0 0 10px rgba(255, 214, 110, .75)); animation: star-twinkle 3.6s var(--floaty) infinite; }
+.dream-star.is-new svg { animation: star-pop .8s var(--squishy) both, star-twinkle 3.6s var(--floaty) .8s infinite; }
+.dream.is-bursting .dream-star, .dream.is-popped .dream-star { opacity: 0; }
+@keyframes star-twinkle { 0%, 100% { transform: rotate(-8deg) scale(1); } 50% { transform: rotate(8deg) scale(1.08); } }
+@keyframes star-pop { from { transform: scale(0) rotate(-120deg); } to { transform: scale(1) rotate(0); } }
+.sq-hat { transform-box: fill-box; transform-origin: 50% 100%; }
+.sq-hat.is-new { animation: hat-pop .7s var(--squishy) both; }
+@keyframes hat-pop { from { transform: translateY(-30px) scale(0); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .dream-star svg, .dream-star.is-new svg, .sq-hat.is-new { animation: none; } }
+
+/* the bubble itself is the button that pops it */
+.dream-try { position: absolute; z-index: 2; inset: 2.25%; margin: 0; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.dream-try:focus-visible { outline: 3px solid var(--ink); outline-offset: 8px; border-radius: 50%; }
+.dream.is-bursting .dream-try, .dream.is-popped .dream-try { visibility: hidden; }
+.dream-close {
+  position: absolute; z-index: 6; top: -15px; right: -15px; display: grid; place-items: center;
+  width: 46px; height: 46px; margin: 0; padding: 0; border: 3px solid var(--plum); border-radius: 50%;
+  background: var(--cream); color: var(--plum); box-shadow: 0 3px 0 var(--plum); cursor: pointer;
+  transition: transform .45s var(--squishy);
+}
+.dream-close svg { width: 20px; height: 20px; }
+.dream-close:hover { transform: scale(1.08) rotate(8deg); }
+.dream-close:active { transform: translateY(2px) scale(.92); transition-duration: .08s; }
+.dream-close:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; border-radius: 50%; }
+
+/* burst bits */
+.drop { position: absolute; z-index: 6; border-radius: 50%; pointer-events: none; border: 2px solid var(--plum); background: radial-gradient(circle at 34% 30%, #fff 0 22%, var(--dc) 62%); }
+.shimmer { position: absolute; z-index: 5; border-radius: 50%; pointer-events: none;
+  background: conic-gradient(from 30deg, #A6E9C6, #BFD3F7, #C9B8F0, #F6A6BE, #FFE08A, #A6E9C6);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 12px), #000 calc(100% - 11px), #000 calc(100% - 2px), transparent 100%);
+  mask: radial-gradient(closest-side, transparent calc(100% - 12px), #000 calc(100% - 11px), #000 calc(100% - 2px), transparent 100%); }
+.spk-pop { position: absolute; z-index: 7; pointer-events: none; overflow: visible; }
+.spk-pop path { fill: #FFF6E5; stroke: var(--plum); stroke-width: 1.6; stroke-linejoin: round; }
+
+/* ------------------------------------------------- the sealed, blurry dreams */
+.sealed { width: var(--wrap); margin: 0 auto; padding: clamp(110px, 13vw, 190px) 0 20px; text-align: center; }
+.sealed-h { margin: 0 0 30px; font: 700 clamp(25px, 2.6vw, 34px)/1.15 var(--display); color: var(--ink); text-wrap: balance; }
+.fuzz { display: flex; justify-content: center; align-items: flex-start; gap: clamp(8px, 4vw, 54px); }
+.fz { animation: fz-drift 9s var(--floaty) infinite; }
+.fz:nth-child(1) { margin-top: 56px; animation-duration: 10.5s; }
+.fz:nth-child(2) { animation-delay: -3s; }
+.fz:nth-child(3) { margin-top: 84px; animation-duration: 11.5s; animation-delay: -6s; }
+@keyframes fz-drift { 0%, 100% { transform: translate3d(0, 0, 0); } 33% { transform: translate3d(6px, -10px, 0); } 66% { transform: translate3d(-6px, -4px, 0); } }
+.fuzzy {
+  display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px 8px 10px;
+  border: 0; border-radius: 28px; background: none; color: var(--ink); cursor: pointer;
+}
+.fuzzy-art { display: block; width: var(--s); height: var(--s); filter: blur(6px) saturate(.45); opacity: .9; transition: filter .5s ease, opacity .5s ease; }
+.fuzzy-art svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.fuzzy:hover .fuzzy-art { filter: blur(4px) saturate(.6); }
+.fuzzy.is-focus .fuzzy-art { filter: blur(1.4px) saturate(.85); opacity: 1; transition-duration: .35s; }
+.fuzzy-name { font: 600 17px/1 var(--ui); }
+
+/* --------------------------------------------------------- waking up */
+.wake { width: var(--wrap); margin: 0 auto; padding: clamp(110px, 12vw, 180px) 0 0; text-align: center; }
+.wake-scene { position: relative; width: clamp(320px, 38vw, 500px); margin: 0 auto; }
+.wake-scene .bed { width: 100%; }
+.sun { position: absolute; z-index: 0; left: 3%; top: -9%; width: 27%; aspect-ratio: 1; }
+.sun::before { content: ""; position: absolute; inset: -42%; border-radius: 50%; background: repeating-conic-gradient(from 0deg, rgba(255, 224, 138, .55) 0deg 9deg, rgba(255, 224, 138, 0) 9deg 30deg); -webkit-mask: radial-gradient(closest-side, transparent 52%, #000 56%, transparent 98%); mask: radial-gradient(closest-side, transparent 52%, #000 56%, transparent 98%); animation: sun-turn 60s linear infinite; }
+.sun::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 38% 34%, #FFF4C9 0 24%, #FFE08A 58%, #FFD26A 100%); border: 3px solid var(--plum); box-shadow: 0 0 60px 18px rgba(255, 224, 138, .6); }
+@keyframes sun-turn { to { transform: rotate(360deg); } }
+.wake-moon { position: absolute; z-index: 0; display: none; right: 4%; top: -8%; width: 22%; height: auto; overflow: visible; filter: drop-shadow(0 0 22px rgba(255, 233, 184, .45)); }
+:root[data-time="night"] .sun { display: none; }
+:root[data-time="night"] .wake-moon { display: block; }
+.wake-scene .bed { z-index: 1; }
+.bed--wake .sq-wrap { transition: transform .8s var(--squishy); }
+.bed--wake.is-stir .sq-wrap { animation: stir .45s ease-in-out 2; }
+.bed--wake.is-up .sq-wrap { transform: translateY(-7%); }
+.bed--wake.is-up.is-stretch .sq-wrap { transform: translateY(-9%) scale(.92, 1.1); transition-duration: .95s; }
+.bed--wake .blanket-g { transition: transform .9s var(--squishy); }
+.bed--wake.is-up .blanket-g { transform: translateY(8px) rotate(1deg); }
+@keyframes stir { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-4deg); } 70% { transform: rotate(4deg); } }
+.hi-h { margin: 34px 0 8px; font-size: clamp(54px, 6.4vw, 92px); }
+.hi-sub { margin: 0 0 26px; font: 500 20px/1.4 var(--ui); color: var(--ink); }
+.hi-mail {
+  display: inline-flex; align-items: center; gap: 12px; padding: 15px 28px 16px 20px;
+  font: 700 22px/1 var(--ui); color: var(--plum); text-decoration: none;
+  background: var(--pink); border: 3px solid var(--plum); border-radius: 999px;
+  box-shadow: 0 5px 0 var(--plum), inset 0 -6px 0 rgba(75, 58, 90, .12), inset 0 4px 0 rgba(255, 255, 255, .55);
+  transition: transform .45s var(--squishy), box-shadow .2s;
+}
+.hi-mail svg { width: 28px; height: 28px; flex: none; }
+.hi-mail:hover { transform: translateY(-2px) scale(1.04, .97); }
+.hi-mail:active { transform: translateY(4px) scale(1.08, .88); box-shadow: 0 1px 0 var(--plum); transition-duration: .08s; }
+.hi-mail:focus-visible { outline-offset: 5px; border-radius: 999px; }
+
+.dream-link { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; margin-top: 4px; padding: 9px 16px 10px; border-radius: 999px;
+  font: 700 16px/1.2 var(--ui); color: var(--plum); text-decoration: none; background: var(--cream); border: 2.5px solid var(--plum); box-shadow: 0 3px 0 var(--plum); transition: transform .45s var(--squishy); }
+.dream-link::after { content: "\2192"; }
+.dream-link:hover { transform: translateY(-1px) scale(1.03); }
+.dream-link:active { transform: translateY(2px) scale(1.05, .92); transition-duration: .08s; }
+.dream-link:focus-visible { outline-offset: 4px; border-radius: 999px; }
+.foot { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 22px; width: var(--wrap); margin: 0 auto; padding: 80px 0 96px; font: 500 15px/1.4 var(--ui); color: var(--ink-2); }
+.foot-normal { padding: 6px 4px; border: 0; background: none; color: var(--ink); font: 600 15px/1.2 var(--ui); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: pointer; }
+.foot-normal:hover { text-decoration-color: var(--pink); }
+
+/* ------------------------------------------------ smaller screens */
+@media (max-width: 999px) {
+  .world { --D: min(86vw, 560px); --wrap: calc(100% - 32px); }
+  .hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "bed" "hint"; justify-items: center; text-align: center; min-height: max(640px, 92svh); padding: 92px 0 40px; }
+  .hero-title { align-self: auto; }
+  .headline { margin-left: auto; margin-right: auto; max-width: 12em; }
+  .hero-bed { margin-top: 26px; }
+  .bed { width: min(92vw, 420px); }
+  .scroll-hint { margin-top: 18px; }
+  .hero-moon { left: 6%; top: 11%; width: 46px; height: 46px; }
+  .dream, .dream--flip { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .dream--flip .dream-wrap { order: 0; }
+  .dream--flip .dream-text, .dream-text { justify-self: center; text-align: center; max-width: min(76vw, 460px); margin-top: 30px; }
+  .dream-status { margin-left: auto; margin-right: auto; }
+  .dream-act { justify-content: center; }
+  .dream-hint { margin-left: auto; margin-right: auto; }
+  .wake-scene { width: min(88vw, 440px); }
+}
+@media (max-width: 640px) {
+  .hero h1 { font-size: 66px; }
+  .headline { font-size: 26px; }
+  .dream-name { font-size: 38px; margin-bottom: 12px; }
+  .dream-status { font-size: 16px; margin-bottom: 20px; }
+  .dream-frame { left: 0; right: 0; height: 272px; border-radius: 40px; padding: 6px; }
+  .dream-toy { border-radius: 34px; }
+  .sealed-h { font-size: 24px; }
+  .fuzzy-name { font-size: 15px; }
+  .fuzzy { padding: 6px 4px 8px; }
+  .hi-h { font-size: 52px; }
+  .hi-sub { font-size: 18px; }
+  .hi-mail { font-size: 19px; padding: 13px 22px 14px 16px; }
+  .foot { flex-direction: column; padding-bottom: 104px; }
+}
+
+/* No drifting, no morphing. The pop is a plain fade. */
+@media (prefers-reduced-motion: reduce) {
+  .world .dream-bubble, .world .dream-frame { transform: translateY(0) !important; transition-property: opacity !important; transition-duration: .35s !important; }
+  .world .dream-frame { transform: translateY(-50%) !important; }
+  .world .fuzzy-art { transition-duration: .3s !important; }
+}
+</style>
+</head>
+<body>
+<div class="world k-nightfocus" id="world">
+  <div id="ctl"></div>
+  <div class="sky" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="stars" aria-hidden="true"></div>
+  <div class="drift" aria-hidden="true"><div id="clouds"></div><div class="sparks" id="sparks"></div></div>
+  <div class="trail" id="trail" aria-hidden="true"><svg id="trail-svg" width="0" height="0"><path id="trail-path" d="M0 0"/></svg></div>
+
+  <header class="hero" id="hero">
+    <svg class="hero-moon" id="hero-moon" viewBox="0 0 100 100" aria-hidden="true" focusable="false"></svg>
+    <div class="hero-title" id="hero-title">
+      <div class="title-float">
+        <h1 class="k-wordmark k-bob" aria-label="KEERAE" data-k-start><span>K</span><span>E</span><span>E</span><span>R</span><span>A</span><span>E</span></h1>
+      </div>
+      <div class="head-float"><p class="k-puff headline" id="headline"></p></div>
+    </div>
+    <p class="scroll-hint"><span class="hint-bub" aria-hidden="true"><i></i><i></i><i></i></span>Scroll into the dreams</p>
+    <div class="hero-bed">
+      <div class="bed-float">
+        <div class="bed bed--hero" id="bed"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="dreams" id="dreams"></div>
+
+  <section class="sealed" aria-labelledby="sealed-h">
+    <h2 class="sealed-h" id="sealed-h">Three more, still out of focus</h2>
+    <div class="fuzz" id="fuzz"></div>
+  </section>
+
+  <section class="wake" id="wake" aria-labelledby="hi-h">
+    <div class="wake-scene">
+      <div class="sun" aria-hidden="true"></div>
+      <svg class="wake-moon" id="wake-moon" viewBox="0 0 100 100" aria-hidden="true" focusable="false"></svg>
+      <div class="bed bed--wake" id="wake-bed"></div>
+    </div>
+    <h2 class="k-puff hi-h" id="hi-h">Say hi</h2>
+    <p class="hi-sub">I&rsquo;d love to hear from you.</p>
+    <a class="hi-mail" id="hi-mail" href="mailto:eric@keerae.com"><svg viewBox="0 0 28 28" aria-hidden="true" focusable="false"><rect x="3" y="6.5" width="22" height="15.5" rx="4" fill="#FFF6E5" stroke="#4B3A5A" stroke-width="2.4"/><path d="M5.5 9.5L14 15.5L22.5 9.5" fill="none" stroke="#4B3A5A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="hi-mail-t">eric@keerae.com</span></a>
+  </section>
+
+  <footer class="foot">
+    <span>&copy; <span id="yr">2026</span> KEERAE</span>
+    <span>No trackers. Nothing here phones home.</span>
+    <button type="button" class="foot-normal" id="foot-normal">Make it normal</button>
+  </footer>
+</div>
+<!-- Normal mode. The same content as the weird page, laid out plainly. Shown with no scripts, and after "Make it normal". -->
+<div id="normal">
+  <header class="n-top">
+    <div class="n-wrap">
+      <span class="k-wordmark" aria-label="KEERAE"><span>K</span><span>E</span><span>E</span><span>R</span><span>A</span><span>E</span></span>
+      <nav aria-label="Sections"><a href="#n-squish">Squish n Pops</a><a href="#n-ember">Into Ember Depths</a><a href="#n-rattlecup">Rattlecup</a><a href="#n-squish-on-a-roll">Squish on a Roll</a><a href="#n-hi">Say hi</a></nav>
+      <button class="n-weird" type="button">Make it weird again</button>
+    </div>
+  </header>
+  <main class="n-wrap">
+    <section class="n-hero">
+      <div>
+        <h1>I make games, or at least I try :D</h1>
+        <p>Seven of them going at once right now, on phones and desktops and in a browser. Four are far enough along that I&rsquo;m happy to put them in front of you. The other three really aren&rsquo;t, so I left them out.</p>
+        <p>The bubble game and the bullet hell look nothing like each other, and that&rsquo;s deliberate. I&rsquo;d rather each game just look like itself.</p>
+        <ul class="n-index">
+          <li><a href="#n-squish" style="--c:#A6E9C6"><span class="dot"></span><span><span class="nm">Squish n Pops</span><span class="kd">Mobile browser arcade, 400 levels</span></span><span class="k-chip">Free demo</span></a></li>
+          <li><a href="#n-ember" style="--c:#FFB37A"><span class="dot"></span><span><span class="nm">Into Ember Depths</span><span class="kd">Online bullet-hell action RPG</span></span><span class="k-chip">Playable in browser</span></a></li>
+          <li><a href="#n-rattlecup" style="--c:#E9C46A"><span class="dot"></span><span><span class="nm">Rattlecup</span><span class="kd">Liar&rsquo;s dice roguelike, iOS and Android</span></span><span class="k-chip">Vertical slice</span></a></li>
+          <li><a href="#n-squish-on-a-roll" style="--c:#9FD98A"><span class="dot"></span><span><span class="nm">Squish on a Roll</span><span class="kd">3D tilt platformer, iOS and Android</span></span><span class="k-chip">Builds running</span></a></li>
+        </ul>
+        <p style="margin-top:18px">Or skip all this and just say hi. <a href="mailto:eric@keerae.com">eric@keerae.com</a></p>
+      </div>
+      <div class="n-squish" aria-hidden="false"></div>
+    </section>
+
+    <section class="n-game" id="n-squish" style="--c:#A6E9C6">
+      <div class="n-head"><h2>Squish n Pops</h2><span class="n-st"><b>The free demo&rsquo;s out.</b> Ten levels on itch.io, and the rest of the 400 are on the way.</span></div>
+      <p>Hold your phone sideways. Tilt to steer, tap to fire. Every hit splits a bubble into two smaller ones, so a good shot basically hands you two new problems. Clear the screen and you&rsquo;re out.</p>
+      <div class="n-callout"><b>The demo&rsquo;s out. Ten levels, free, no ads.</b><p>The first seven teach you the basics. The last three skip ahead to where the weird bubbles start showing up. It runs right in your phone browser. No account, nothing to install.</p><a class="n-mail n-play" href="https://misterdinguz.itch.io/squish-n-pops">Play it on itch.io</a></div>
+      <div class="n-shots"><img src="img/squish-play-1.webp" width="1200" height="554" loading="lazy" alt="Squish n Pops gameplay: two green bubbles with lit fuses drift above four smaller pink bubbles, with the marshmallow player below a floating shelf."></div>
+      <p class="n-cap">This is SHORT FUSE, the last one in the demo. Set one bomb off and the chain pretty much plays the level for you.</p>
+      <div class="n-shots two"><img src="img/squish-play-2.webp" width="800" height="370" loading="lazy" alt="HARD CANDY. A green bubble inside a riveted metal ring that eats your first hit."><img src="img/squish-levels.webp" width="800" height="370" loading="lazy" alt="The demo&rsquo;s level select screen, showing all ten levels by name."></div>
+      <div class="n-body">
+        <div>
+          <p class="n-note">Nothing in this game ever speeds up. A bubble in level 200 moves at exactly the same speed as one in level 1, and each size always bounces back to the same height. All the difficulty is in how many there are, what they do, when they show up and how the room is shaped.</p>
+          <p class="n-note">iOS will only hand a web page the tilt sensors if you ask from inside a real tap, and only over HTTPS. So if someone says no, the game just flips to touch and lets them keep playing.</p>
+          <ul class="n-tags"><li>TypeScript</li><li>Phaser 3</li><li>Vite</li><li>Arcade Physics</li><li>PWA</li><li>Vitest</li></ul>
+        </div>
+        <dl>
+          <div><dt>Campaign</dt><dd>400 levels across five acts, opening up one at a time.</dd></div>
+          <div><dt>Vocabulary</dt><dd>Nineteen bubble traits, and they start stacking in the late acts. Plus eight powerups.</dd></div>
+          <div><dt>Controls</dt><dd>Tilt, touch or keyboard. Whatever angle you&rsquo;re holding it at when you start becomes neutral, so you can play lying down.</dd></div>
+          <div><dt>Co-op</dt><dd>Two phones over local Wi-Fi. Shared field, separate scores and lives.</dd></div>
+          <div><dt>Next</dt><dd>The itch.io demo&rsquo;s out. Steam and mobile are next.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="n-game" id="n-ember" style="--c:#FFB37A">
+      <div class="n-head"><h2>Into Ember Depths</h2><span class="n-st"><b>Playable in your browser.</b> Still in development.</span></div>
+      <p>An online bullet-hell action RPG. You start out in a daylight town and fight your way inward through rings that keep getting darker, then head down into a descent that doesn&rsquo;t end. Every floor&rsquo;s boss opens the next one.</p>
+      <div class="n-callout"><b>It&rsquo;s playable in your browser now.</b><p>Still in development, so expect it to change as I go. Browser players and desktop players share the same server.</p><a class="n-mail n-play" href="https://emberdepths.keerae.com/">Play it in your browser</a></div>
+      <div class="n-shots pix"><img src="img/ember-bosses-1x.png" width="759" height="207" loading="lazy" alt="A grid of all thirty-three boss sprites from Into Ember Depths, each one its own pixel-art design."></div>
+      <p class="n-cap">Every boss in the game, in no particular order. Seven up top, six in the dungeons, twenty down in the descent. Not a single palette swap.</p>
+      <div class="n-body">
+        <div>
+          <p class="n-note">The desktop build and the browser build run the exact same code now, and they play on the same server. I cut every cooldown so abilities come out of MP, tightened the aggro range, and gave the two easiest rings four map bosses each instead of one.</p>
+          <ul class="n-tags"><li>Electron</li><li>Node.js</li><li>Canvas2D</li><li>ES modules</li><li>WebSockets</li><li>No build step</li></ul>
+        </div>
+        <dl>
+          <div><dt>Bosses</dt><dd>33 of them, and no two are the same.</dd></div>
+          <div><dt>Classes</dt><dd>8 you can play.</dd></div>
+          <div><dt>Sprites</dt><dd>384 of them, all made for this game.</dd></div>
+          <div><dt>Score</dt><dd>33 original tracks. <a href="#n-score">Have a listen below.</a></dd></div>
+          <div><dt>Online</dt><dd>One server, with desktop and browser players on the same wire.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="n-game" id="n-rattlecup" style="--c:#E9C46A">
+      <div class="n-head"><h2>Rattlecup</h2><span class="n-st"><b>Vertical slice,</b> building for iOS and Android. Working title.</span></div>
+      <p>A liar&rsquo;s dice roguelike. One rule does all the heavy lifting here. Are they telling the truth, or do I call them a liar? That question carries a whole run. Three floors of a crooked gambling house, your dice are your build, and every claim that misses gets paid out of your own health.</p>
+      <div class="n-shots four">
+        <img src="img/rattlecup-menu.webp" width="390" height="844" loading="lazy" alt="Rattlecup title screen: a gilt-framed portrait and one candle above the RATTLECUP wordmark, in near-darkness.">
+        <img src="img/rattlecup-table.webp" width="390" height="844" loading="lazy" alt="Rattlecup table view: three gilt-framed opponent portraits above five bone dice lit in a pool of light.">
+        <img src="img/rattlecup-claim.webp" width="390" height="844" loading="lazy" alt="Rattlecup: a claim hanging in the air as lit type above the player&rsquo;s dice.">
+        <img src="img/rattlecup-strongbox.webp" width="390" height="844" loading="lazy" alt="Rattlecup&rsquo;s strongbox screen: a gold chest with straps and a red wax seal above the word Gilt.">
+      </div>
+      <p class="n-cap">The art direction is called The Vigil. A candle, some faces, nothing else. Warm gold nearly everywhere, and red pretty much just means damage or the call.</p>
+      <div class="n-body">
+        <div>
+          <p class="n-note">Special dice and charms run on one effect system. Tricks and table modifiers are basically just data. So a new item is usually a line in a file, not new code. The smarter opponents read a public tell ledger and price you into it, which is still my favourite thing in there.</p>
+          <ul class="n-tags"><li>Godot 4.7</li><li>GDScript</li><li>Deterministic core</li><li>Headless test suite</li></ul>
+        </div>
+        <dl>
+          <div><dt>Run</dt><dd>Three floors of tables, elites, corridor choices, a shop and events.</dd></div>
+          <div><dt>Strongbox</dt><dd>One on every table you win. Tin, Silver or Gilt.</dd></div>
+          <div><dt>Opponents</dt><dd>Six AI personalities, plus bosses that bend the rules. The Pit Boss, the Auditor, the Blind King.</dd></div>
+          <div><dt>Builds</dt><dd>Signed <code>.ipa</code> and <code>.apk</code>. Running on an iPhone and an Android phone since September.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <span id="n-rollaway" style="display:block"></span><!-- the working title, so links from before the name still land on it -->
+    <section class="n-game" id="n-squish-on-a-roll" style="--c:#9FD98A">
+      <div class="n-head"><h2>Squish on a Roll</h2><span class="n-st"><b>Running on real phones.</b> The art just landed.</span></div>
+      <p>A physics-based 3D tilt platformer for phones. Tilt to roll, flick the phone upward to jump.</p>
+      <div class="n-shots"><img src="img/rollaway-feature.webp" width="1400" height="684" loading="lazy" alt="Squish on a Roll: the marshmallow rolls across grassy floating islands above a sea of clouds, past a cross red cube and a stack of stone bricks."></div>
+      <p class="n-cap">Store art, made in the game&rsquo;s own engine. Real screenshots are next.</p>
+      <div class="n-body">
+        <div>
+          <p class="n-note">It did finally get off my desktop, which was a good week. There are signed Android and iOS builds now, so the flick to jump I could only ever guess at in the editor is something I can hold in my hand and be wrong about.</p>
+          <ul class="n-tags"><li>Godot 4.7</li><li>GDScript</li><li>iOS</li><li>Android</li><li>Device sensors</li></ul>
+        </div>
+        <dl>
+          <div><dt>Built</dt><dd>Core physics, lives and checkpoints, a goal with a star rating, and collectibles. Moving, rotating and crumbling platforms. Enemies, hazards and spawners.</dd></div>
+          <div><dt>Slice</dt><dd>A tutorial plus stages 1 to 3, a level select with an unlock chain, and settings that actually change things.</dd></div>
+          <div><dt>Open</dt><dd>Flick sensitivity works, I just haven&rsquo;t played it enough. It needs hours on an actual phone, not another test.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="n-game" id="n-hidden">
+      <h2>Three more, hidden.</h2>
+      <p>I&rsquo;ve only just started them. Nothing worth putting in front of anyone yet.</p>
+      <div class="n-sealed"><button type="button">Untitled 5</button><button type="button">Untitled 6</button><button type="button">Untitled 7</button></div>
+    </section>
+
+    <section class="n-game" id="n-range">
+      <h2 id="n-range-h">Yeah, it&rsquo;s all me.</h2>
+      <p class="n-prose">Four codebases and two engines. Into Ember Depths doesn&rsquo;t even use an engine. Here&rsquo;s what each tool is actually doing.</p>
+      <table aria-labelledby="n-range-h">
+        <thead><tr><th scope="col">Tool</th><th scope="col">Where</th><th scope="col">What I&rsquo;d tell you</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">TypeScript + Phaser 3</th><td>Squish n Pops</td><td>The game logic never touches the artwork directly, so I can swap out the sprite art without changing any game code.</td></tr>
+          <tr><th scope="row">Electron</th><td>Into Ember Depths</td><td>It wraps the same code as the browser build, so one codebase ships to both. For an action game that costs you bundle size and memory. I took the trade anyway.</td></tr>
+          <tr><th scope="row">Canvas2D, no build step</th><td>Into Ember Depths</td><td>Plain ES modules, served exactly as they are. Nothing to compile means nothing sitting between making a change and seeing it.</td></tr>
+          <tr><th scope="row">Node + WebSockets</th><td>Into Ember Depths</td><td>One server, and any mix of desktop and browser players on the same wire.</td></tr>
+          <tr><th scope="row">Godot 4 + GDScript</th><td>Rattlecup, Squish on a Roll</td><td>Picked it for the scene and component model. Both games are on 4.7 now, and neither one moved until its whole test suite came back green.</td></tr>
+          <tr><th scope="row">Headless test suites</th><td>All of them</td><td>The game rules all get tested without a renderer. That&rsquo;s the only reason I can make balance changes fast and still trust them.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="n-game" id="n-score">
+      <h2>I do the music too.</h2>
+      <p class="n-prose">Thirty-three original tracks for Into Ember Depths, one for every region, dungeon and depth. Here are three, about 26 seconds each.</p>
+      <div class="n-tracks">
+        <div class="n-track"><button type="button" aria-pressed="false" data-src="audio/ember-overworld.mp3" aria-label="Play Greenlands"><svg class="ico-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2v12l10-6z" fill="currentColor"/></svg><svg class="ico-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h3.5v12H3zM9.5 2H13v12H9.5z" fill="currentColor"/></svg></button><span><b>Greenlands</b><span>Overworld. The first ring past the beach.</span></span><span>0:26</span></div>
+        <div class="n-track"><button type="button" aria-pressed="false" data-src="audio/ember-depths.mp3" aria-label="Play The Maw"><svg class="ico-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2v12l10-6z" fill="currentColor"/></svg><svg class="ico-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h3.5v12H3zM9.5 2H13v12H9.5z" fill="currentColor"/></svg></button><span><b>The Maw</b><span>The descent. One of twenty down there.</span></span><span>0:26</span></div>
+        <div class="n-track"><button type="button" aria-pressed="false" data-src="audio/ember-sanctum.mp3" aria-label="Play Shattered Sanctum"><svg class="ico-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2v12l10-6z" fill="currentColor"/></svg><svg class="ico-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h3.5v12H3zM9.5 2H13v12H9.5z" fill="currentColor"/></svg></button><span><b>Shattered Sanctum</b><span>The endgame dungeon.</span></span><span>0:26</span></div>
+      </div>
+      <p class="n-cap">Plays one at a time, and nothing starts on its own.</p>
+    </section>
+
+    <section class="n-contact" id="n-hi">
+      <div>
+        <h2>Say hi. I&rsquo;d love to hear from you.</h2>
+        <p>The Squish n Pops demo is up on itch.io now, and Into Ember Depths is playable in your browser. Steam and mobile come after that. Want a heads up when they happen? Just say so. And if you only want to talk about any of this, that&rsquo;s just as good. I read everything that comes in.</p>
+        <a class="n-mail" href="mailto:eric@keerae.com">eric@keerae.com</a>
+      </div>
+      <div>
+        <h3>Where all this will show up</h3>
+        <a class="n-chan" href="https://misterdinguz.itch.io/"><span>itch.io</span><span>Live, with the Squish n Pops demo</span></a>
+        <a class="n-chan" href="https://emberdepths.keerae.com/"><span>emberdepths.keerae.com</span><span>Live, Into Ember Depths</span></a>
+        <div class="n-chan"><span>Steam</span><span>Not yet live</span></div>
+        <div class="n-chan"><span>GitHub</span><span>Not yet live</span></div>
+      </div>
+    </section>
+    <footer class="n-foot"><span>&copy; <span id="n-year">2026</span> KEERAE</span><span>No trackers, and nothing on this page phones home.</span></footer>
+  </main>
+</div>
+
+<script>
+KIT.ready(function () {
+  'use strict';
+  var K = KIT, doc = document, win = window, TAU = Math.PI * 2;
+  var PLUM = '#4B3A5A', CREAM = '#FFF6E5';
+  var world = K.$('#world'), REDUCE = K.reduce, TOUCH = K.touch;
+  var DPR = Math.min(2, win.devicePixelRatio || 1);
+
+  // ------------------------------------------------------------ helpers
+  function seeded(s) { return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  function hexA(h, a) { var n = parseInt(h.slice(1), 16); return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; }
+  function pagePos(e) { var x = 0, y = 0; while (e) { x += e.offsetLeft; y += e.offsetTop; e = e.offsetParent; } return { x: x, y: y }; }
+  function smooth(a, b, v) { var t = K.clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function angDiff(a, b) { var d = ((a - b) % TAU + TAU) % TAU; return d > Math.PI ? d - TAU : d; }
+  var STAR = 'M0-10Q1.4-1.4 10 0Q1.4 1.4 0 10Q-1.4 1.4-10 0Q-1.4-1.4 0-10Z';
+  // A real crescent: the moon's disc minus a bite circle up and to the right. The two arcs meet at
+  // the points where the circles cross, so both tips come to a clean point.
+  function moonPath(x, y, R) {
+    var phi = -.75, d = R * .55, r = R * .82, ux = Math.cos(phi), uy = Math.sin(phi);
+    var a = (R * R - r * r + d * d) / (2 * d), h = Math.sqrt(R * R - a * a);
+    function f(v) { return v.toFixed(2); }
+    var ax = x + a * ux - h * uy, ay = y + a * uy + h * ux, bx = x + a * ux + h * uy, by = y + a * uy - h * ux;
+    return 'M' + f(ax) + ' ' + f(ay) + 'A' + R + ' ' + R + ' 0 1 1 ' + f(bx) + ' ' + f(by) +
+      'A' + f(r) + ' ' + f(r) + ' 0 ' + (a > d ? 1 : 0) + ' 0 ' + f(ax) + ' ' + f(ay) + 'Z';
+  }
+  var MOON_SVG = '<path d="' + moonPath(46, 54, 38) + '" fill="#FFE9B8" stroke="#4B3A5A" stroke-width="5" stroke-linejoin="round"/>' +
+    '<circle cx="78" cy="22" r="3.5" fill="#FFE08A"/><circle cx="88" cy="36" r="2.4" fill="#FFE08A"/>';
+  K.$('#hero-moon').innerHTML = MOON_SVG;
+  K.$('#wake-moon').innerHTML = MOON_SVG;
+
+  // Controls first in the page, so Make it normal is the first thing a keyboard reaches.
+  K.controls({ parent: K.$('#ctl') });
+  K.$('#headline').innerHTML = K.HEADLINE.replace(/</g, '&lt;').replace(', ', ',<br>');
+  K.$('#yr').textContent = new Date().getFullYear();
+  var mail = K.$('#hi-mail'); mail.href = 'mailto:' + K.EMAIL; K.$('#hi-mail-t').textContent = K.EMAIL;
+  K.$('#foot-normal').addEventListener('click', function () { K.setMode('normal'); });
+  // The browser bar takes the sky's colour, or cream on the plain page.
+  var tc = doc.getElementById('theme-color');
+  function themeColor() { if (tc) tc.setAttribute('content', K.mode === 'normal' ? '#FFF6E5' : K.night ? '#0E1027' : '#D7C7F4'); }
+  themeColor(); doc.addEventListener('k:time', themeColor); doc.addEventListener('k:mode', themeColor);
+
+  // ------------------------------------------------- sky decorations
+  (function () {
+    var r = seeded(7), s = '';
+    for (var i = 0; i < 130; i++) {
+      var tw = i % 4 === 0;
+      s += '<circle cx="' + (r() * 1000).toFixed(1) + '" cy="' + (r() * 1000).toFixed(1) + '" r="' + (.6 + r() * 1.6).toFixed(2) + '"' +
+        (tw ? ' class="tw" style="animation-delay:' + (-r() * 4.2).toFixed(2) + 's"' : ' opacity="' + (.35 + r() * .5).toFixed(2) + '"') + '/>';
+    }
+    K.$('.stars').innerHTML = '<svg viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">' + s + '</svg>';
+    var CL = '<svg viewBox="0 0 200 100"><circle cx="52" cy="64" r="30"/><circle cx="94" cy="48" r="38"/><circle cx="140" cy="60" r="31"/><circle cx="170" cy="74" r="20"/><circle cx="28" cy="78" r="19"/><rect x="28" y="66" width="144" height="28" rx="14"/></svg>';
+    var c = '', rc = seeded(19);
+    for (var j = 0; j < 6; j++) {
+      var w = 150 + rc() * 220, dur = 120 + rc() * 100;
+      c += '<div class="cloud" style="top:' + (4 + j * 15 + rc() * 8).toFixed(1) + '%;width:' + w.toFixed(0) + 'px;--op:' + (.45 + rc() * .35).toFixed(2) +
+        ';--x:' + (rc() * 90).toFixed(1) + 'vw;animation-duration:' + dur.toFixed(0) + 's;animation-delay:' + (-rc() * dur).toFixed(1) + 's">' + CL + '</div>';
+    }
+    K.$('#clouds').innerHTML = c;
+    var sp = '';
+    for (var rep = 0; rep < 2; rep++) {
+      var rs = seeded(3);
+      for (var k = 0; k < 17; k++) {
+        var x = rs() * 100, y = rs() * 100, sz = 12 + rs() * 16, dd = 2.8 + rs() * 3.2, dl = -rs() * 6;
+        sp += '<svg class="spk t' + (k % 3) + '" viewBox="-10 -10 20 20" style="left:' + x.toFixed(2) + '%;top:' + (y / 2 + rep * 50).toFixed(2) + '%;width:' + sz.toFixed(1) + 'px;height:' + sz.toFixed(1) +
+          'px;animation-duration:' + dd.toFixed(2) + 's;animation-delay:' + dl.toFixed(2) + 's"><path d="' + STAR + '"/></svg>';
+      }
+    }
+    K.$('#sparks').innerHTML = sp;
+  })();
+
+  // ------------------------------------------------------------ the bed
+  function bedHTML(id) {
+    var C = [[70, 236, 46], [128, 212, 58], [196, 197, 64], [266, 194, 66], [336, 206, 58], [394, 230, 48], [60, 272, 40], [118, 274, 50], [188, 276, 50], [262, 276, 50], [332, 274, 50], [398, 268, 42], [230, 248, 74]];
+    function circles(d) { return C.map(function (c) { return '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + (c[2] + d) + '"/>'; }).join(''); }
+    var dots = [[150, 236], [214, 226], [284, 238], [330, 228], [178, 264], [254, 264], [316, 266], [122, 262]];
+    return '<svg class="bed-back" viewBox="0 0 460 330" aria-hidden="true" focusable="false">' +
+        '<defs><clipPath id="' + id + '-c">' + circles(0) + '</clipPath></defs>' +
+        '<g fill="#4B3A5A">' + circles(3.5) + '</g><g fill="#FFF6E5">' + circles(0) + '</g>' +
+        '<g clip-path="url(#' + id + '-c)"><ellipse cx="236" cy="330" rx="250" ry="62" fill="#EDE4F9"/><ellipse cx="236" cy="344" rx="224" ry="44" fill="#E1D5F4"/></g>' +
+        '<path d="M42 224Q50 202 72 197M100 186Q110 163 138 158M356 172Q380 174 392 192" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>' +
+        '<path d="M100 110C160 92 300 92 360 110C376 132 376 172 362 194C300 206 160 206 98 194C84 172 84 132 100 110Z" fill="#C9B8F0" stroke="#4B3A5A" stroke-width="3.5" stroke-linejoin="round"/>' +
+        '<path d="M114 117C170 103 290 103 346 117" fill="none" stroke="#E3D9FB" stroke-width="7" stroke-linecap="round"/>' +
+        '<path d="M110 121C164 107 296 107 350 121C359 139 359 165 351 183C296 193 164 193 109 183C101 165 101 139 110 121Z" fill="none" stroke="rgba(75,58,90,.3)" stroke-width="2" stroke-dasharray="5 6"/>' +
+      '</svg>' +
+      '<div class="sq-wrap"></div>' +
+      '<svg class="bed-front" viewBox="0 0 460 330" aria-hidden="true" focusable="false"><g class="blanket-g">' +
+        '<path d="M104 200C150 178 310 178 356 200L384 282Q372 296 356 290Q340 300 322 290Q304 300 286 290Q268 300 250 290Q232 300 214 290Q196 300 178 290Q160 300 142 290Q124 300 106 290Q88 296 76 282Z" fill="#F6A6BE" stroke="#4B3A5A" stroke-width="3.5" stroke-linejoin="round"/>' +
+        '<path d="M128 216Q118 250 104 280M334 216Q344 250 358 280" fill="none" stroke="#EA8DAB" stroke-width="6" stroke-linecap="round"/>' +
+        dots.map(function (p, i) {
+          return i % 2 ? '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="3.4" fill="#FFF6E5"/>' :
+            '<path transform="translate(' + p[0] + ' ' + p[1] + ') scale(.85)" d="' + STAR + '" fill="#FFE08A" stroke="#4B3A5A" stroke-width="1.8" stroke-linejoin="round"/>';
+        }).join('') +
+        '<path d="M98 200C150 174 310 174 362 200L364 216C312 192 148 192 96 216Z" fill="#FFF6E5" stroke="#4B3A5A" stroke-width="3.5" stroke-linejoin="round"/>' +
+      '</g></svg>';
+  }
+  var bedEl = K.$('#bed');
+  bedEl.innerHTML = bedHTML('bh') +
+    '<button class="sleep-bubble" id="sleep-bubble" type="button" aria-label="Squish&rsquo;s sleep bubble. Pop it.">' +
+      '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><defs>' +
+        '<radialGradient id="sbf" cx=".38" cy=".34" r=".7"><stop offset="0" stop-color="#F2FBFF" stop-opacity=".25"/><stop offset=".7" stop-color="#CEECFF" stop-opacity=".45"/><stop offset="1" stop-color="#E7DBFF" stop-opacity=".8"/></radialGradient>' +
+        '<linearGradient id="sbr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A6E9C6"/><stop offset=".5" stop-color="#C9B8F0"/><stop offset="1" stop-color="#F6A6BE"/></linearGradient></defs>' +
+        '<g class="sb-ball"><circle class="sb-hit" cx="50" cy="50" r="50" fill="transparent"/>' +
+        '<circle cx="50" cy="50" r="46" fill="url(#sbf)" stroke="#4B3A5A" stroke-width="3"/>' +
+        '<circle cx="50" cy="50" r="40.5" fill="none" stroke="url(#sbr)" stroke-width="5" opacity=".7"/>' +
+        '<path d="M23 42Q27 27 42 21" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/><circle cx="57" cy="21" r="3.6" fill="#fff"/>' +
+        '<path d="M70 76Q78 70 80 61" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".6"/></g>' +
+      '</svg></button>';
+  K.$('#wake-bed').innerHTML = bedHTML('bw');
+
+  // ------------------------------------------------------ burst bits
+  var DROP_COLS = ['#A6E9C6', '#C9B8F0', '#F6A6BE', '#FFE08A', '#BFD3F7'];
+  function burst(parent, cx, cy, rad, n, o) {
+    if (REDUCE) return;
+    o = o || {};
+    for (var i = 0; i < n; i++) {
+      var a = i / n * TAU + K.rnd(-.12, .12), nx = Math.cos(a), ny = Math.sin(a), s = K.rnd(o.min || 6, o.max || 14);
+      var e = doc.createElement('i'); e.className = 'drop';
+      e.style.cssText = 'left:' + (cx + nx * rad - s / 2).toFixed(1) + 'px;top:' + (cy + ny * rad - s / 2).toFixed(1) + 'px;width:' + s.toFixed(1) + 'px;height:' + s.toFixed(1) + 'px;--dc:' + DROP_COLS[i % 5];
+      parent.appendChild(e);
+      var dist = K.rnd(o.d0 || 26, o.d1 || 80), fall = o.fall || 36;
+      var an = e.animate([
+        { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+        { transform: 'translate(' + (nx * dist * .22).toFixed(1) + 'px,' + (ny * dist * .22).toFixed(1) + 'px) scale(1)', opacity: 1, offset: .12 },
+        { transform: 'translate(' + (nx * dist * .8).toFixed(1) + 'px,' + (ny * dist * .8 + fall * .25).toFixed(1) + 'px) scale(.85)', opacity: 1, offset: .58 },
+        { transform: 'translate(' + (nx * dist).toFixed(1) + 'px,' + (ny * dist + fall).toFixed(1) + 'px) scale(.25)', opacity: 0 }
+      ], { duration: K.rnd(700, 1050), easing: 'cubic-bezier(.2,.7,.35,1)', fill: 'forwards' });
+      an.onfinish = (function (el) { return function () { el.remove(); }; })(e);
+    }
+  }
+  function shimmer(parent, cx, cy, rad, sparks) {
+    if (REDUCE) return;
+    var e = doc.createElement('i'); e.className = 'shimmer';
+    e.style.cssText = 'left:' + (cx - rad) + 'px;top:' + (cy - rad) + 'px;width:' + rad * 2 + 'px;height:' + rad * 2 + 'px';
+    parent.appendChild(e);
+    e.animate([{ transform: 'scale(.96)', opacity: .95 }, { transform: 'scale(1.24)', opacity: 0 }], { duration: 560, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' }).onfinish = function () { e.remove(); };
+    for (var i = 0; i < (sparks || 7); i++) {
+      var a = K.rnd(0, TAU), rr = rad * K.rnd(.9, 1.15), s = K.rnd(14, 26);
+      var sp = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      sp.setAttribute('class', 'spk-pop'); sp.setAttribute('viewBox', '-11 -11 22 22');
+      sp.innerHTML = '<path d="' + STAR + '"/>';
+      sp.style.cssText = 'left:' + (cx + Math.cos(a) * rr - s / 2).toFixed(1) + 'px;top:' + (cy + Math.sin(a) * rr - s / 2).toFixed(1) + 'px;width:' + s.toFixed(1) + 'px;height:' + s.toFixed(1) + 'px';
+      parent.appendChild(sp);
+      sp.animate([{ transform: 'scale(0) rotate(0deg)', opacity: 1 }, { transform: 'scale(1.15) rotate(40deg)', opacity: 1, offset: .4 }, { transform: 'scale(0) rotate(90deg)', opacity: 0 }],
+        { duration: K.rnd(560, 820), delay: K.rnd(0, 140), easing: 'ease-out', fill: 'both' }).onfinish = (function (el) { return function () { el.remove(); }; })(sp);
+    }
+  }
+
+  // ===================================================== Squish, asleep
+  var POKE_DAY = ['Mm? I was resting my eyes.', 'Five more minutes…', 'The dreams are down there. Scroll.', 'Boop. Okay. Back to sleep.', 'I was dreaming about bubbles.'];
+  var POKE_NIGHT = ['It’s the middle of the night…', 'Shh. The dreams are loading.', 'Zzz… huh? Oh. Hi.', 'Come back in the morning.'];
+  var BUB_DAY = ['Hey! That was my dream bubble.', 'Huh? I was almost at level 400.', 'Oh! Hi. I was awake. Mostly.', 'My bubble… it was a good one.'];
+  var BUB_NIGHT = ['Shh. That was a really good dream.', 'Huh? Is it morning? No. Okay.', 'I was rolling around on an island…'];
+  var popWhy = '', lastPoke = 0;
+  var heroSq = K.squish({
+    pokeable: true, mood: 'asleep', cls: 'hero-sq', label: 'Squish, fast asleep. Poke it.',
+    base: function () { return 'asleep'; },
+    lines: function () { var w = popWhy; popWhy = ''; return K.pick(w === 'bubble' ? (K.night ? BUB_NIGHT : BUB_DAY) : (K.night ? POKE_NIGHT : POKE_DAY)); },
+    onPoke: function () { lastPoke = Date.now(); }
+  });
+  K.$('.sq-wrap', bedEl).appendChild(heroSq.el);
+
+  // The big sleep bubble: inflates and deflates with each breath. Poke it and it pops.
+  var sb = K.$('#sleep-bubble'), sbPopped = false, sbTimer = 0;
+  function popSleepBubble() {
+    if (sbPopped) return;
+    sbPopped = true;
+    var c = K.$('.sb-ball', sb).getBoundingClientRect(), p = bedEl.getBoundingClientRect();
+    if (c.width > 6) {
+      var bx = c.left - p.left + c.width / 2, by = c.top - p.top + c.height / 2;
+      burst(bedEl, bx, by, c.width * .46, 16, { min: 7, max: 14, d0: 24, d1: 70, fall: 34 });
+      shimmer(bedEl, bx, by, c.width * .5, 4);
+      K.sfx('pop', .55);
+    }
+    sb.classList.add('popped');
+    sb.setAttribute('aria-label', 'Squish’s sleep bubble. Popped. It grows back once Squish is asleep again.');
+  }
+  function regrowSleepBubble() {
+    clearTimeout(sbTimer);
+    sbTimer = setTimeout(function () {
+      if (!heroSq.el.classList.contains('m-asleep')) return;
+      sbPopped = false; sb.classList.remove('popped');
+      sb.setAttribute('aria-label', 'Squish’s sleep bubble. Pop it.');
+    }, 900);
+  }
+  sb.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (sbPopped) return;
+    popSleepBubble();
+    popWhy = 'bubble';
+    heroSq.poke();
+  });
+  new MutationObserver(function () {
+    var cl = heroSq.el.classList;
+    if (cl.contains('m-surprised')) popSleepBubble();
+    else if (cl.contains('m-asleep') && sbPopped) regrowSleepBubble();
+  }).observe(heroSq.el, { attributes: true, attributeFilter: ['class'] });
+  // Now and then it smiles in its sleep. It is having a nice dream.
+  (function smileLater() {
+    setTimeout(function () {
+      if (K.mode === 'weird' && !partyOn && Date.now() - lastPoke > 6000 && heroSq.el.classList.contains('m-asleep')) {
+        heroSq.hold('happy');
+        setTimeout(function () { if (!partyOn && Date.now() - lastPoke > 4400) heroSq.release(); }, 1500);
+      }
+      smileLater();
+    }, K.rnd(9000, 15000));
+  })();
+
+  // All four secrets found: Squish wakes up for a tiny party and keeps the hat.
+  var HAT = '<g class="sq-hat">' +
+    '<path d="M47 15L55 -22L75 9Z" fill="#F6A6BE"/>' +
+    '<path d="M49.1 5.4L69.8 .9L67 -3.4L50.2 .2ZM51.6 -6.5L63.4 -9L61 -12.7L52.6 -10.9Z" fill="#FFE08A"/>' +
+    '<path d="M47 15L55 -22L75 9Z" fill="none" stroke="#4B3A5A" stroke-width="3.5" stroke-linejoin="round"/>' +
+    '<circle cx="55" cy="-23" r="5.5" fill="#A6E9C6" stroke="#4B3A5A" stroke-width="3"/></g>';
+  var partyOn = false;
+  function wearHat(isNew) {
+    var body = K.$('.sq-body-g', heroSq.el);
+    if (!body || K.$('.sq-hat', body)) return;
+    body.insertAdjacentHTML('beforeend', HAT);
+    if (isNew) K.$('.sq-hat', body).classList.add('is-new');
+  }
+  if (K.party() === 'done') wearHat(false);
+  function throwParty() {
+    if (partyOn || K.party() !== 'due' || K.mode !== 'weird') return;
+    partyOn = true; K.party('done');
+    popSleepBubble(); heroSq.hold('happy'); wearHat(true);
+    var w = bedEl.offsetWidth;
+    burst(bedEl, w * .5, w * .2, w * .1, 22, { min: 7, max: 15, d0: 50, d1: 150, fall: 90 });
+    setTimeout(function () {
+      burst(bedEl, w * .28, w * .26, w * .07, 14, { min: 6, max: 13, d0: 40, d1: 110, fall: 80 });
+      burst(bedEl, w * .72, w * .24, w * .07, 14, { min: 6, max: 13, d0: 40, d1: 110, fall: 80 });
+    }, 420);
+    shimmer(bedEl, w * .5, w * .28, w * .26, 8);
+    K.sfx('secret'); setTimeout(function () { K.sfx('chime'); }, 520);
+    K.say(heroSq.el, 'You found all four!', { small: 'A tiny party. Then back to sleep.', ms: 5200 });
+    setTimeout(function () { partyOn = false; heroSq.release(); }, 6000);
+  }
+  // It starts once Squish is on screen: right away, or when you scroll back up.
+  if (window.IntersectionObserver) new IntersectionObserver(function (es) { if (es[0].isIntersecting) throwParty(); }, { threshold: .4 }).observe(bedEl);
+  doc.addEventListener('k:secret', function (e) { if (e.detail.all) setTimeout(function () { var r = bedEl.getBoundingClientRect(); if (r.bottom > 0 && r.top < innerHeight) throwParty(); }, 60); });
+
+  // ============================================================ scenes
+  // Each dream is painted in two layers: a still layer cached once (sky, walls, portraits)
+  // and a light moving layer drawn every frame (bubbles, embers, dice, sparkles).
+  function circ(g, x, y, r) { g.moveTo(x + r, y); g.arc(x, y, r, 0, TAU); }
+  function rrect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+  function sparkle(g, x, y, r, rot) {
+    g.beginPath();
+    for (var i = 0; i < 4; i++) {
+      var a = rot + i * Math.PI / 2, b = a + Math.PI / 4, c = a + Math.PI / 2;
+      if (!i) g.moveTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+      g.quadraticCurveTo(x + Math.cos(b) * r * .2, y + Math.sin(b) * r * .2, x + Math.cos(c) * r, y + Math.sin(c) * r);
+    }
+    g.closePath();
+  }
+  function moon(g, x, y, R) {
+    var phi = -.75, d = R * .55, r = R * .82, a = (R * R - r * r + d * d) / (2 * d), h = Math.sqrt(R * R - a * a);
+    var al = Math.atan2(h, a), be = Math.atan2(h, a - d);
+    g.save(); g.fillStyle = '#FFE9B8'; g.strokeStyle = PLUM; g.lineWidth = Math.max(1.5, R * .13); g.lineJoin = 'round';
+    g.beginPath(); g.arc(x, y, R, phi + al, phi - al, false); g.arc(x + d * Math.cos(phi), y + d * Math.sin(phi), r, phi - be, phi + be, true); g.closePath();
+    g.fill(); g.stroke(); g.restore();
+  }
+  function orb(g, x, y, r, col, a) {
+    g.globalAlpha = .28 * a; g.fillStyle = col; g.beginPath(); g.arc(x, y, r * 2.4, 0, TAU); g.fill();
+    g.globalAlpha = a; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+    g.fillStyle = '#FFF4E0'; g.beginPath(); g.arc(x, y, r * .45, 0, TAU); g.fill();
+  }
+  function glowDot(g, x, y, r, rgb, a) {
+    var gl = g.createRadialGradient(x, y, 0, x, y, r);
+    gl.addColorStop(0, 'rgba(' + rgb + ',' + a + ')'); gl.addColorStop(1, 'rgba(' + rgb + ',0)');
+    g.fillStyle = gl; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+  }
+  function fill(g, d, paint) { var X = d.cw / 2 + 2; g.fillStyle = paint; g.fillRect(-X, -X, 2 * X, 2 * X); }
+
+  // ---- Squish n Pops: navy night, a crescent moon, bubbles with faces
+  function initSquish(d) {
+    var r = seeded(11), st = [];
+    for (var i = 0; i < 52; i++) st.push({ x: r() * 2 - 1, y: r() * 1.55 - 1, r: .6 + r() * 1.3, a: .25 + r() * .55 });
+    d.s = { stars: st, bub: [
+      { s: 3, r: .155, x: .2, a: .16, w: .23, T: 3.1, h: .64, o: .3 },
+      { s: 2, r: .102, x: -.44, a: .11, w: .29, T: 2.4, h: .5, o: 1.4 },
+      { s: 1, r: .064, x: .56, a: .08, w: .41, T: 1.8, h: .36, o: .9 },
+      { s: 1, r: .064, x: -.08, a: .12, w: .37, T: 1.7, h: .32, o: .1 }
+    ] };
+  }
+  function bgSquish(g, R, d) {
+    var S = d.s, k = R / 300, X = d.cw / 2 + 2;
+    var gr = g.createLinearGradient(0, -R, 0, R);
+    gr.addColorStop(0, '#0F1129'); gr.addColorStop(.55, '#1A1939'); gr.addColorStop(1, '#2B2351');
+    fill(g, d, gr);
+    var nb = g.createRadialGradient(-R * .3, -R * .2, 0, -R * .3, -R * .2, R);
+    nb.addColorStop(0, 'rgba(201,184,240,.17)'); nb.addColorStop(1, 'rgba(201,184,240,0)');
+    fill(g, d, nb);
+    g.fillStyle = CREAM;
+    S.stars.forEach(function (s) { g.globalAlpha = s.a; g.beginPath(); g.arc(s.x * R, s.y * R, s.r * Math.max(.7, k), 0, TAU); g.fill(); });
+    g.globalAlpha = 1;
+    moon(g, R * .42, -R * .46, R * .13);
+    g.fillStyle = '#FFE08A'; g.beginPath(); circ(g, R * .62, -R * .64, R * .016); circ(g, R * .68, -R * .52, R * .011); g.fill();
+    rrect(g, -R * .74, -R * .04, R * .56, R * .05, R * .025); g.fillStyle = '#B9A7EC'; g.fill(); g.lineWidth = Math.max(1.6, 2.6 * k); g.strokeStyle = PLUM; g.stroke();
+    rrect(g, -R * .7, -R * .028, R * .46, R * .011, R * .006); g.fillStyle = 'rgba(255,255,255,.5)'; g.fill();
+    var floor = R * .6;
+    g.fillStyle = 'rgba(201,184,240,.55)'; g.fillRect(-X, floor, 2 * X, Math.max(2, 3 * k));
+    g.fillStyle = 'rgba(201,184,240,.16)'; g.fillRect(-X, floor + 3 * k, 2 * X, X);
+  }
+  function fgSquish(g, R, t, d) {
+    var S = d.s, k = R / 300, floor = R * .6, big = 0;
+    [[-.56, -.5, 10, '#E6DAFF'], [.04, -.74, 7, CREAM], [.76, .02, 8, '#BFD3F7'], [-.2, -.3, 5, '#FFE9B8'], [.12, -.18, 4, CREAM]].forEach(function (q, j) {
+      g.fillStyle = q[3]; sparkle(g, q[0] * R, q[1] * R, (.55 + .45 * Math.sin(t * 1.8 + j * 1.7)) * q[2] * k, 0); g.fill();
+    });
+    S.bub.forEach(function (b) {
+      var ph = ((t + b.o) / b.T) % 1, h = 4 * ph * (1 - ph), rr = b.r * R;
+      var y = floor - rr - h * b.h * R, x = (b.x + Math.sin(t * b.w + b.o) * b.a) * R;
+      var edge = Math.min(ph, 1 - ph), wob = edge < .06 ? .14 * (1 - edge / .06) : 0;
+      K.drawBubble(g, x, y, rr, b.s, wob);
+      if (b.s === 3) big = x;
+    });
+    var sx = -R * .12 + Math.sin(t * .33) * R * .2;
+    K.drawSquish(g, sx, floor + 1, R * .21, { mood: Math.sin(t * .45) > .82 ? 'happy' : 'awake', look: K.clamp((big - sx) / (R * .4), -1, 1) });
+  }
+
+  // ---- Into Ember Depths: pixel depths, real boss sprites, glowing embers
+  function initEmber(d) {
+    var r = seeded(23), em = [], wl = [], wr = [], cr = [];
+    for (var i = 0; i < 34; i++) em.push({ x: r() * 2 - 1, y: r() * 2 - 1, v: .04 + r() * .1, s: r() < .3 ? 1.5 : 1, p: r() * TAU });
+    for (var j = 0; j < 160; j++) { wl.push(Math.floor(r() * 3)); wr.push(Math.floor(r() * 3)); cr.push(r() < .08 ? 1 + Math.floor(r() * 2) : 0); }
+    d.s = { em: em, wl: wl, wr: wr, cr: cr, bosses: [
+      { cell: 4, x: 0, y: -.3, a: 1, p: 0 },
+      { cell: 18, x: -.42, y: .14, a: .85, p: 1.7 },
+      { cell: 32, x: .4, y: .32, a: .8, p: 3.1 }
+    ] };
+  }
+  function sprite(g, cell, x, y, sc, alpha) {
+    var sheet = K.img('ember-bosses-1x.png');
+    if (!sheet.complete || !sheet.naturalWidth) return;
+    var m = g.getTransform(), kd = Math.max(1, Math.round(sc * DPR)), size = 69 * kd;
+    var dx = Math.round(m.e + x * m.a - size / 2), dy = Math.round(m.f + y * m.d - size / 2);
+    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.globalAlpha = alpha;
+    g.drawImage(sheet, (cell % 11) * 69, Math.floor(cell / 11) * 69, 69, 69, dx, dy, size, size);
+    g.restore();
+  }
+  function bgEmber(g, R, d) {
+    var S = d.s, X = d.cw / 2 + 2, P = d.P;
+    var gr = g.createLinearGradient(0, -R, 0, R);
+    gr.addColorStop(0, '#1F1236'); gr.addColorStop(.55, '#130C23'); gr.addColorStop(1, '#0A0812');
+    fill(g, d, gr);
+    var heat = g.createRadialGradient(0, R * 1.08, 0, 0, R * 1.08, R * 1.05);
+    heat.addColorStop(0, 'rgba(255,122,47,.52)'); heat.addColorStop(.5, 'rgba(255,96,40,.13)'); heat.addColorStop(1, 'rgba(255,96,40,0)');
+    fill(g, d, heat);
+    // the shaft: pixel walls that close in as it goes down
+    var rows = Math.ceil(2 * X / (2 * P)) + 1, y0 = Math.floor(-X / (2 * P)) * 2 * P;
+    for (var i = 0; i < rows; i++) {
+      var y = y0 + i * 2 * P, depth = K.clamp((y + R) / (2 * R), 0, 1), inset = R * (.84 - .46 * depth);
+      var xl = Math.round((-inset + S.wl[i % 160] * P) / P) * P, xr = Math.round((inset - S.wr[i % 160] * P) / P) * P;
+      g.fillStyle = depth < .45 ? '#2B1B47' : depth < .75 ? '#22163C' : '#1A102E';
+      g.fillRect(-X, y, xl + X, 2 * P); g.fillRect(xr, y, X - xr, 2 * P);
+      g.fillStyle = depth < .6 ? '#4A3478' : '#3A2862'; g.fillRect(xl - P, y, P, 2 * P); g.fillRect(xr, y, P, 2 * P);
+      var c = S.cr[i % 160];
+      if (c) { g.fillStyle = c === 1 ? '#FF7A2F' : '#FFB347'; g.fillRect(xl - 4 * P, y, P, P); g.fillRect(xr + 3 * P, y + P, P, P); }
+    }
+    [[-.2, .02, .34], [.14, .5, .24], [-.06, .78, .14]].forEach(function (l, j) {
+      var lx = Math.round(l[0] * R / P) * P, ly = Math.round(l[1] * R / P) * P, lw = Math.round(l[2] * R / P) * P;
+      g.fillStyle = ['#3B2763', '#2E1F50', '#24183F'][j]; g.fillRect(lx, ly, lw, 2 * P);
+      g.fillStyle = ['#5B4392', '#47337A', '#3A2A63'][j]; g.fillRect(lx, ly, lw, P);
+      g.fillStyle = '#1A102E'; g.fillRect(lx + P, ly + 2 * P, lw - 2 * P, P); g.fillRect(lx + 3 * P, ly + 3 * P, lw - 6 * P, P);
+    });
+    // a soft glow behind each boss
+    S.bosses.forEach(function (b, j) { var size = 69 * (j === 0 && R >= 230 ? 2 : 1); glowDot(g, b.x * R, b.y * R, size * .95, '255,122,47', j ? .2 : .32); });
+  }
+  function fgEmber(g, R, t, d) {
+    var S = d.s, k = R / 300, P = d.P;
+    for (var e = 0; e < S.em.length; e++) {
+      var m = S.em[e], ey = ((m.y + 1 - t * m.v) % 2 + 2) % 2 - 1, sz = Math.max(2, Math.round(P * m.s * .8));
+      g.globalAlpha = .35 + .5 * (.5 + .5 * Math.sin(t * 3 + m.p));
+      g.fillStyle = e % 3 ? '#FF7A2F' : '#FFB347';
+      g.fillRect(Math.round(m.x * R * .9), Math.round(ey * R), sz, sz);
+    }
+    g.globalAlpha = 1;
+    S.bosses.forEach(function (b, j) {
+      var sc = j === 0 ? (R >= 230 ? 2 : 1) : 1;
+      sprite(g, b.cell, b.x * R, b.y * R + Math.round(Math.sin(t * 1.5 + b.p) * 3 * Math.max(1, k * 1.4)), sc, b.a);
+    });
+    // bullet rings: the boss is awake and firing
+    var b0 = S.bosses[0], bx0 = b0.x * R, by0 = b0.y * R, cols = ['#FF7A2F', '#FFB347', '#A06BFF', '#5FE0FF'], rad0 = 2.6 * Math.max(.8, k) + 1;
+    g.globalCompositeOperation = 'lighter';
+    for (var ring = 0; ring < 2; ring++) {
+      var cyc = t / 2.7 + ring * .5, ph = cyc % 1, rad = R * (.13 + ph * .82), col = cols[(Math.floor(cyc) * 2 + ring) % 4], a = 1 - ph * ph;
+      for (var q = 0; q < 16; q++) { var an = q / 16 * TAU + ring * .2 + ph * .45; orb(g, bx0 + Math.cos(an) * rad, by0 + Math.sin(an) * rad * .9, rad0, col, a); }
+    }
+    var b2 = S.bosses[2], vph = (t / 1.9) % 1;
+    for (var v = 0; v < 5; v++) {
+      var dd = (vph + v * .07) % 1, ang = 2.45 + (v - 2) * .1;
+      orb(g, b2.x * R + Math.cos(ang) * R * .9 * dd, b2.y * R + Math.sin(ang) * R * .9 * dd, rad0 * .85, '#5FE0FF', 1 - dd);
+    }
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  }
+
+  // ---- Rattlecup: The Vigil. One candle, bone dice, gold light, gilt portraits
+  var PIPS = { 1: [[0, 0]], 2: [[-1, -1], [1, 1]], 3: [[-1, -1], [0, 0], [1, 1]], 4: [[-1, -1], [1, -1], [-1, 1], [1, 1]], 5: [[-1, -1], [1, -1], [0, 0], [-1, 1], [1, 1]], 6: [[-1, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [1, 1]] };
+  var WORD = ['', 'One', 'Two', 'Three', 'Four', 'Five'], FACE = ['', 'ones', 'twos', 'threes', 'fours', 'fives', 'sixes'];
+  function initRattle(d) { d.s = { rolls: [[5, 5, 2, 5, 6], [6, 3, 6, 1, 6], [2, 4, 4, 1, 4], [3, 6, 3, 5, 3], [1, 5, 5, 2, 6]] }; }
+  function die(g, x, y, D, ang, v) {
+    g.save(); g.translate(x, y);
+    g.fillStyle = 'rgba(0,0,0,.42)'; g.beginPath(); g.ellipse(0, D * .52, D * .55, D * .14, 0, 0, TAU); g.fill();
+    g.rotate(ang);
+    var h = D / 2, r = D * .2;
+    rrect(g, -h, -h, D, D, r); g.fillStyle = '#EFE4CC'; g.fill();
+    var sh = g.createLinearGradient(0, -h, 0, h); sh.addColorStop(0, 'rgba(255,255,255,.3)'); sh.addColorStop(1, 'rgba(120,88,48,.22)');
+    g.fillStyle = sh; g.fill();
+    g.strokeStyle = 'rgba(90,60,30,.5)'; g.lineWidth = Math.max(1, D * .035); g.stroke();
+    g.fillStyle = '#2A1E12';
+    PIPS[v].forEach(function (q) { g.beginPath(); g.arc(q[0] * D * .25, q[1] * D * .25, D * .085, 0, TAU); g.fill(); });
+    g.restore();
+  }
+  function candle(g, x, base, R, t, fl) {
+    var ch = R * .27, cw = ch * .4, top = base - ch, fh = ch * .52 * fl, fw = fh * .46, fy = top - ch * .07;
+    glowDot(g, x, fy - fh * .5, fh * 2.9, '255,214,140', .55);
+    g.fillStyle = '#8A6A33'; g.beginPath(); g.ellipse(x, base, cw * 1.15, cw * .3, 0, 0, TAU); g.fill();
+    g.fillStyle = '#EADCC0'; rrect(g, x - cw / 2, top, cw, ch, cw * .2); g.fill();
+    g.fillStyle = '#F7EEDB'; g.beginPath(); g.ellipse(x - cw * .2, top + ch * .24, cw * .1, ch * .15, 0, 0, TAU); g.fill();
+    g.fillStyle = '#F1E4C8'; rrect(g, x + cw * .1, top, cw * .17, ch * .32, cw * .085); g.fill();
+    g.strokeStyle = '#2A1E12'; g.lineWidth = Math.max(1.2, R * .007); g.beginPath(); g.moveTo(x, top); g.lineTo(x, fy); g.stroke();
+    g.fillStyle = '#FFC861'; g.beginPath(); g.moveTo(x, fy - fh); g.quadraticCurveTo(x + fw, fy - fh * .35, x, fy); g.quadraticCurveTo(x - fw, fy - fh * .35, x, fy - fh); g.fill();
+    g.fillStyle = '#FFF1C4'; g.beginPath(); g.ellipse(x, fy - fh * .3, fw * .32, fh * .26, 0, 0, TAU); g.fill();
+    var blink = (t % 4.2) < .12 ? .25 : 1;
+    g.fillStyle = '#7A3E12';
+    g.beginPath(); g.ellipse(x - fw * .2, fy - fh * .3, fw * .065, fw * .085 * blink, 0, 0, TAU); g.fill();
+    g.beginPath(); g.ellipse(x + fw * .2, fy - fh * .3, fw * .065, fw * .085 * blink, 0, 0, TAU); g.fill();
+  }
+  function bgRattle(g, R, d) {
+    var k = R / 300, X = d.cw / 2 + 2;
+    fill(g, d, '#0E0A06');
+    var pool = g.createRadialGradient(0, R * .1, 0, 0, R * .1, R * 1.1);
+    pool.addColorStop(0, 'rgba(255,196,110,.36)'); pool.addColorStop(.45, 'rgba(201,162,79,.12)'); pool.addColorStop(1, 'rgba(0,0,0,0)');
+    fill(g, d, pool);
+    // three gilt portraits, straight from the game
+    var im = K.img('rattlecup-table.webp');
+    if (im.complete && im.naturalWidth) {
+      var sw = 390, sh = 128, w = R * 1.48, h = w * sh / sw;
+      g.globalCompositeOperation = 'lighten';
+      g.drawImage(im, 0, 79, sw, sh, -w / 2, -R * .8, w, h);
+      g.globalCompositeOperation = 'source-over';
+    }
+    var ty = R * .4;
+    g.fillStyle = 'rgba(52,32,16,.75)'; g.fillRect(-X, ty, 2 * X, X);
+    g.fillStyle = 'rgba(201,162,79,.42)'; g.fillRect(-X, ty, 2 * X, Math.max(1.5, 2 * k));
+  }
+  function overRattle(g, R, d) {
+    var vg = g.createRadialGradient(0, 0, R * .55, 0, 0, R * 1.05);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.45)');
+    fill(g, d, vg);
+  }
+  function fgRattle(g, R, t, d) {
+    var S = d.s, k = R / 300, fl = 1 + Math.sin(t * 11) * .035 + Math.sin(t * 17.3) * .025;
+    candle(g, 0, R * .46, R, t, fl);
+    var T = 4.6, cyc = Math.max(0, Math.floor(t / T)), ph = Math.max(0, t % T) / T, vals = S.rolls[cyc % S.rolls.length], D = R * .15, dy = R * .66, rolling = ph < .17;
+    for (var i = 0; i < 5; i++) {
+      var x = (-.56 + i * .28) * R, hop = rolling ? Math.sin(ph / .17 * Math.PI) * D * (1.1 - i * .07) : 0;
+      var v = rolling ? 1 + ((cyc * 7 + i * 3 + Math.floor(t * 13)) % 6) : vals[i];
+      var rot = rolling ? (ph / .17) * Math.PI * .5 * (i % 2 ? 1 : -1) : ((i * 37) % 9 - 4) * .025;
+      die(g, x, dy - hop, D, rot, v);
+    }
+    if (!rolling) {
+      var count = {}, best = 1, n = 0;
+      vals.forEach(function (v2) { count[v2] = (count[v2] || 0) + 1; });
+      for (var f = 6; f >= 1; f--) if ((count[f] || 0) > n) { n = count[f]; best = f; }
+      var claim = (n === 1 ? 'One ' + FACE[best].replace(/s$/, '') : WORD[n] + ' ' + FACE[best]).toUpperCase();
+      var a = K.clamp((ph - .22) / .1, 0, 1) * K.clamp((1 - ph) / .08, 0, 1), fs = Math.round(R * .085);
+      if (a > 0) {
+        g.save(); g.globalAlpha = a; g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.font = '600 ' + fs + 'px Georgia, "Times New Roman", serif';
+        if (g.letterSpacing !== undefined) g.letterSpacing = (fs * .16).toFixed(1) + 'px';
+        g.shadowColor = 'rgba(255,200,110,.85)'; g.shadowBlur = 12 * Math.max(.6, k); g.fillStyle = '#F2D48A';
+        g.fillText(claim, 0, -R * .1 - (1 - a) * 6);
+        g.restore();
+      }
+    }
+  }
+
+  // ---- Squish on a Roll (codename Rollaway): Squish on a floating island over a sea of clouds
+  function initRoll(d) { var r = seeded(5), st = []; for (var i = 0; i < 44; i++) st.push({ x: r() * 2 - 1, y: r() * 1.3 - 1, r: .5 + r() * 1.2, a: .3 + r() * .55 }); d.s = { stars: st }; }
+  function miniIsland(g, x, y, w, cube, night) {
+    var th = w * .09, dh = w * .34;
+    g.fillStyle = '#7D6BC9'; g.beginPath(); g.moveTo(x - w * .42, y + dh); g.lineTo(x - w * .06, y + dh + w * .44); g.lineTo(x + w * .12, y + dh + w * .3); g.lineTo(x + w * .4, y + dh); g.closePath(); g.fill();
+    g.fillStyle = '#9B8BE0'; g.beginPath(); g.moveTo(x - w * .42, y + dh); g.lineTo(x - w * .06, y + dh + w * .44); g.lineTo(x - w * .16, y + dh); g.closePath(); g.fill();
+    var bands = ['#E8A060', '#D98B4E', '#E09356', '#C9783F'];
+    for (var b = 0; b < 4; b++) { g.fillStyle = bands[b]; g.fillRect(x - w / 2, y + th + (dh - th) * b / 4, w, (dh - th) / 4 + .8); }
+    g.fillStyle = '#8FCF6A'; rrect(g, x - w / 2 - 2, y - 2, w + 4, th + 5, Math.min(5, th)); g.fill();
+    g.fillStyle = '#A9E07F'; g.fillRect(x - w / 2, y - 2, w, th * .45);
+    if (night) { g.fillStyle = 'rgba(27,30,58,.28)'; g.fillRect(x - w / 2 - 2, y - 2, w + 4, dh + 2); }
+    if (cube) {
+      var cs = w * .22, cx = x + w * .14, cy = y - cs - 1;
+      g.fillStyle = '#E8595B'; rrect(g, cx - cs / 2, cy, cs, cs, cs * .18); g.fill(); g.strokeStyle = '#7A2E34'; g.lineWidth = 1.5; g.stroke();
+      g.strokeStyle = '#4B2030'; g.lineWidth = Math.max(1.2, cs * .08); g.lineCap = 'round';
+      g.beginPath(); g.moveTo(cx - cs * .32, cy + cs * .28); g.lineTo(cx - cs * .1, cy + cs * .38); g.moveTo(cx + cs * .32, cy + cs * .28); g.lineTo(cx + cs * .1, cy + cs * .38); g.stroke();
+      g.lineCap = 'butt';
+      g.fillStyle = '#4B2030'; g.beginPath(); circ(g, cx - cs * .17, cy + cs * .52, cs * .065); circ(g, cx + cs * .17, cy + cs * .52, cs * .065); g.fill();
+    }
+  }
+  function cloudRow(g, R, t, y, size, col, speed, seed) {
+    var X = R * 1.4, n = 6, span = (2 * X) / n, off = (t * speed) % span;
+    g.fillStyle = col; g.beginPath();
+    for (var i = -1; i <= n; i++) {
+      var x = -X + i * span + off, r = size * (.82 + .22 * Math.sin(i * 2.3 + seed));
+      circ(g, x, y, r); circ(g, x + r * .92, y + r * .2, r * .72); circ(g, x - r * .86, y + r * .25, r * .62);
+    }
+    g.fill();
+  }
+  function bgRoll(g, R, d) {
+    var S = d.s, k = R / 300, night = K.night;
+    var gr = g.createLinearGradient(0, -R, 0, R);
+    if (night) { gr.addColorStop(0, '#1B1E3A'); gr.addColorStop(1, '#3A2F66'); }
+    else { gr.addColorStop(0, '#A7C2F4'); gr.addColorStop(.62, '#D3D7F7'); gr.addColorStop(1, '#EDE5F9'); }
+    fill(g, d, gr);
+    if (night) {
+      g.fillStyle = CREAM;
+      S.stars.forEach(function (s) { g.globalAlpha = s.a; g.beginPath(); g.arc(s.x * R, s.y * R, s.r * Math.max(.7, k), 0, TAU); g.fill(); });
+      g.globalAlpha = 1;
+    } else glowDot(g, -R * .5, -R * .7, R * .8, '255,248,225', .75);
+  }
+  function fgRoll(g, R, t, d) {
+    var k = R / 300, night = K.night;
+    miniIsland(g, -R * .6, -R * .44 + Math.sin(t * .7) * R * .015, R * .28, false, night);
+    miniIsland(g, R * .62, -R * .1 + Math.sin(t * .6 + 1) * R * .015, R * .22, true, night);
+    cloudRow(g, R, t, R * .66, R * .2, night ? 'rgba(200,190,240,.3)' : 'rgba(255,255,255,.78)', 5 * k, 1);
+    var im = K.img('rollaway-island.webp');
+    if (im.complete && im.naturalWidth) {
+      var s = R * 1.5, bob = Math.sin(t * .8) * R * .022;
+      g.save(); g.translate(0, R * .12 + bob); g.rotate(Math.sin(t * .5) * .018); g.drawImage(im, -s / 2, -s / 2, s, s); g.restore();
+    }
+    cloudRow(g, R, t, R * .96, R * .24, night ? 'rgba(200,190,240,.36)' : 'rgba(255,255,255,.95)', 8 * k, 4);
+    [[-.34, -.44, 12], [.3, -.46, 10], [.54, .3, 9], [-.6, .26, 8]].forEach(function (q, j) {
+      var s2 = (.65 + .35 * Math.sin(t * 2.2 + j * 1.9)) * q[2] * Math.max(.8, k), rot = t * .5 + j, x = q[0] * R, y = q[1] * R;
+      glowDot(g, x, y, s2 * 2.2, '255,224,138', .5);
+      g.fillStyle = '#FFE08A'; sparkle(g, x, y, s2, rot); g.fill();
+      g.strokeStyle = PLUM; g.lineWidth = Math.max(1, 1.5 * k); g.lineJoin = 'round'; g.stroke();
+    });
+  }
+  var SCENES = {
+    squish: { init: initSquish, bg: bgSquish, fg: fgSquish },
+    ember: { init: initEmber, bg: bgEmber, fg: fgEmber },
+    rattlecup: { init: initRattle, bg: bgRattle, fg: fgRattle, over: overRattle, needs: 'rattlecup-table.webp' },
+    rollaway: { init: initRoll, bg: bgRoll, fg: fgRoll, night: true }
+  };
+  var DESC = {
+    squish: 'A dream of Squish n Pops. Smiling bubbles bounce under a crescent moon while Squish watches.',
+    ember: 'A dream of Into Ember Depths. Pixel bosses float down a glowing shaft and fire rings of light.',
+    rattlecup: 'A dream of Rattlecup. Three gilt portraits, one candle and five bone dice in the dark.',
+    rollaway: 'A dream of Squish on a Roll. Squish on a floating grassy island above a sea of clouds.'
+  };
+
+  // ======================================================== the dreams
+  var dreamsEl = K.$('#dreams'), dreams = [];
+  var TRY_HINT = (TOUCH ? 'Tap' : 'Click') + ' the dream for a tiny taste. It\u2019s a toy, not the real game.';
+  K.GAMES.forEach(function (g, i) {
+    var sec = doc.createElement('section');
+    sec.className = 'dream' + (i % 2 === 0 ? ' dream--flip' : '');
+    sec.id = 'dream-' + g.id; sec.setAttribute('data-game', g.id); sec.setAttribute('aria-labelledby', 'dn-' + g.id);
+    sec.style.setProperty('--c', g.color); sec.style.setProperty('--deep', g.deep); sec.style.setProperty('--glow', hexA(g.color, .55));
+    sec.innerHTML =
+      '<div class="dream-wrap"><div class="dream-float" style="animation-delay:' + (-i * 2.1).toFixed(1) + 's"><div class="dream-stage">' +
+        '<div class="dream-bubble" role="img" id="dd-' + g.id + '" aria-label="' + DESC[g.id] + '"><canvas></canvas></div>' +
+        '<button class="dream-try" type="button" aria-label="Try a tiny toy of ' + g.name + '. It isn&rsquo;t the real game." aria-describedby="dd-' + g.id + '"></button>' +
+        '<div class="dream-frame"><div class="dream-toy"></div>' +
+          '<button class="dream-close" type="button" aria-label="Close the toy"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></button></div>' +
+      '</div></div></div>' +
+      '<div class="dream-text">' +
+        '<h2 class="dream-name k-puff" id="dn-' + g.id + '">' + g.name + '</h2>' +
+        '<p class="k-status dream-status">' + g.status + '</p>' +
+        '<div class="dream-act"></div>' +
+        '<p class="k-hint dream-hint" aria-live="polite">' + TRY_HINT + '</p>' +
+      '</div>';
+    dreamsEl.appendChild(sec);
+    var d = {
+      g: g, i: i, sec: sec, wrap: K.$('.dream-wrap', sec), stage: K.$('.dream-stage', sec), cv: K.$('canvas', sec), host: K.$('.dream-toy', sec),
+      N: 20, off: new Float32Array(20), vel: new Float32Array(20), pts: new Float32Array(40),
+      ph: [K.rnd(0, TAU), K.rnd(0, TAU), K.rnd(0, TAU)], vis: true, hidden: false, popped: false, par: 0, R: 0, cursor: ''
+    };
+    d.ctx = d.cv.getContext('2d');
+    var sc = SCENES[g.id]; sc.init(d); d.bg = sc.bg; d.fg = sc.fg; d.over = sc.over; d.needs = sc.needs; d.nightBg = !!sc.night;
+    // More info opens the game's part of the plain page. The real demo link, where there is one.
+    var act = K.$('.dream-act', sec);
+    act.appendChild(K.makeMore(g.id));
+    if (g.link) { var ln = doc.createElement('a'); ln.className = 'dream-link'; ln.href = g.link; ln.textContent = g.linkText; act.appendChild(ln); }
+    // A tap on the bubble pops it, and a tiny toy of the game runs in its place. The x closes it.
+    d.tryBtn = K.$('.dream-try', sec); d.closeBtn = K.$('.dream-close', sec); d.frame = K.$('.dream-frame', sec); d.hint = K.$('.dream-hint', sec);
+    d.tryBtn.addEventListener('click', function (e) {
+      if (d.popped) return;
+      if (e.detail) { // a pointer: only inside the round bubble, not its square corners
+        var r = d.stage.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+        if (dx * dx + dy * dy > Math.pow(r.width / 2 * .98, 2)) return;
+      }
+      tryDream(d, !e.detail);
+    });
+    d.closeBtn.addEventListener('click', function (e) { e.stopPropagation(); K.stopToy(); });
+    if (K.found(g.id)) starBadge(d);
+    dreams.push(d);
+  });
+
+  function sizeDream(d) {
+    var w = d.stage.offsetWidth; if (!w) return;
+    var cw = Math.round(w * .59) * 2;
+    d.cw = cw; d.R = w / 2 * .955; d.P = Math.max(2, Math.round(d.R / 72));
+    d.cv.style.width = d.cv.style.height = cw + 'px';
+    d.cv.style.left = d.cv.style.top = ((w - cw) / 2) + 'px';
+    var bw = Math.round(cw * DPR);
+    if (d.cv.width !== bw) { d.cv.width = bw; d.cv.height = bw; }
+    d.key = '';
+  }
+
+  // The blob: 20 points round a circle, each with its own slow wobble and a spring for the cursor bulge.
+  function blobPath(p, N) {
+    var path = new Path2D();
+    path.moveTo(p[0], p[1]);
+    for (var i = 0; i < N; i++) {
+      var i0 = (i - 1 + N) % N, i2 = (i + 1) % N, i3 = (i + 2) % N;
+      path.bezierCurveTo(p[i * 2] + (p[i2 * 2] - p[i0 * 2]) / 6, p[i * 2 + 1] + (p[i2 * 2 + 1] - p[i0 * 2 + 1]) / 6,
+        p[i2 * 2] - (p[i3 * 2] - p[i * 2]) / 6, p[i2 * 2 + 1] - (p[i3 * 2 + 1] - p[i * 2 + 1]) / 6, p[i2 * 2], p[i2 * 2 + 1]);
+    }
+    path.closePath();
+    return path;
+  }
+  var PTR = { x: 0, y: 0, on: false };
+  if (!TOUCH) {
+    doc.addEventListener('pointermove', function (e) { if (e.pointerType !== 'touch') { PTR.x = e.clientX; PTR.y = e.clientY; PTR.on = true; } }, { passive: true });
+    doc.documentElement.addEventListener('mouseleave', function () { PTR.on = false; });
+    win.addEventListener('blur', function () { PTR.on = false; });
+  }
+  var hasConic = !!(CanvasRenderingContext2D.prototype.createConicGradient);
+  function irid(g, R, t) {
+    var cg;
+    if (hasConic) cg = g.createConicGradient(t * .22, 0, 0);
+    else cg = g.createLinearGradient(-R, -R, R, R);
+    cg.addColorStop(0, '#A6E9C6'); cg.addColorStop(.2, '#BFD3F7'); cg.addColorStop(.4, '#C9B8F0'); cg.addColorStop(.6, '#F6A6BE'); cg.addColorStop(.8, '#FFE08A'); cg.addColorStop(1, '#A6E9C6');
+    return cg;
+  }
+  function drawDream(d, t, dt, sy) {
+    var g = d.ctx, R = d.R, N = d.N, cw = d.cw;
+    var prox = 0, tAng = 0, inside = false;
+    if (PTR.on && !d.popped && !REDUCE) {
+      var cx = d.pcx - (win.scrollX || 0), cy = d.pcy - sy + d.par;
+      var dx = PTR.x - cx, dy = PTR.y - cy, u = Math.sqrt(dx * dx + dy * dy) / R;
+      tAng = Math.atan2(dy, dx); inside = u < .98;
+      prox = u < 1 ? smooth(.2, .92, u) : 1 - smooth(1, 1.75, u);
+    }
+    var cur = inside ? 'pointer' : '';
+    if (cur !== d.cursor) { d.cursor = cur; d.stage.style.cursor = cur; }
+    for (var i = 0; i < N; i++) {
+      var th = i / N * TAU, wob;
+      if (REDUCE) wob = .013 * Math.sin(2 * th + d.ph[0]) + .008 * Math.sin(3 * th + d.ph[1]);
+      else {
+        wob = .017 * Math.sin(2 * th + t * .8 + d.ph[0]) + .011 * Math.sin(3 * th - t * .63 + d.ph[1]) + .006 * Math.sin(5 * th + t * 1.17 + d.ph[2]) + .006 * Math.sin(t * .9 + d.i);
+        var ad = angDiff(th, tAng), far = Math.PI - Math.abs(ad);
+        var target = prox * (.1 * Math.exp(-ad * ad / .24) - .024 * Math.exp(-far * far / .8)) * R;
+        d.vel[i] += ((target - d.off[i]) * 170 - d.vel[i] * 11) * dt;
+        d.off[i] += d.vel[i] * dt;
+      }
+      var rr = R * (1 + wob) + d.off[i];
+      d.pts[i * 2] = Math.cos(th) * rr; d.pts[i * 2 + 1] = Math.sin(th) * rr;
+    }
+    if (d.key !== cacheKey(d)) buildCache(d);
+    var path = blobPath(d.pts, N), ow = R > 230 ? 3.2 : 2.6, rimW = Math.max(4, R * .028);
+    g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, cw, cw);
+    g.translate(cw / 2, cw / 2);
+    g.lineJoin = 'round';
+    g.strokeStyle = 'rgba(255,246,229,.92)'; g.lineWidth = ow + 6; g.stroke(path);
+    g.save(); g.clip(path);
+    g.drawImage(d.bgc, -cw / 2, -cw / 2, cw, cw);
+    d.fg(g, R, t, d);
+    g.drawImage(d.ovc, -cw / 2, -cw / 2, cw, cw);
+    g.globalAlpha = .95; g.strokeStyle = irid(g, R, t); g.lineWidth = rimW * 2; g.stroke(path);
+    g.restore();
+    g.strokeStyle = PLUM; g.lineWidth = ow; g.stroke(path);
+    // shine
+    g.lineCap = 'round';
+    g.strokeStyle = 'rgba(255,255,255,.78)'; g.lineWidth = R * .045;
+    g.beginPath(); g.arc(0, 0, R * .8, Math.PI * 1.08, Math.PI * 1.3); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.85)'; g.beginPath(); g.arc(Math.cos(Math.PI * 1.39) * R * .8, Math.sin(Math.PI * 1.39) * R * .8, R * .026, 0, TAU); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,.3)'; g.lineWidth = R * .028;
+    g.beginPath(); g.arc(0, 0, R * .84, Math.PI * .1, Math.PI * .3); g.stroke();
+    g.lineCap = 'butt';
+  }
+  // The still layers of a dream, painted once and reused every frame.
+  function cacheKey(d) {
+    var ready = 1;
+    if (d.needs) { var im = K.img(d.needs); ready = im.complete && im.naturalWidth ? 1 : 0; }
+    return d.cv.width + '|' + (d.nightBg ? K.night : '') + '|' + ready;
+  }
+  function layer(c, d) { c.width = d.cv.width; c.height = d.cv.height; var g = c.getContext('2d'); g.setTransform(DPR, 0, 0, DPR, 0, 0); g.translate(d.cw / 2, d.cw / 2); return g; }
+  function buildCache(d) {
+    d.key = cacheKey(d);
+    var R = d.R;
+    d.bg(layer(d.bgc || (d.bgc = doc.createElement('canvas')), d), R, d);
+    var o = layer(d.ovc || (d.ovc = doc.createElement('canvas')), d);
+    if (d.over) d.over(o, R, d);
+    var film = o.createRadialGradient(0, 0, R * .6, 0, 0, R * 1.04);
+    film.addColorStop(0, 'rgba(255,255,255,0)'); film.addColorStop(.75, 'rgba(255,255,255,.05)'); film.addColorStop(1, 'rgba(255,255,255,.3)');
+    o.fillStyle = film; o.beginPath(); o.arc(0, 0, R * 1.25, 0, TAU); o.fill();
+    o.globalAlpha = .36; o.strokeStyle = irid(o, R, 0); o.lineWidth = R * .16; o.beginPath(); o.arc(0, 0, R * 1.02, 0, TAU); o.stroke();
+    o.globalAlpha = 1;
+  }
+
+  // Each toy hides a secret. Once found, its dream keeps a little gold star.
+  function starBadge(d, isNew) {
+    if (K.$('.dream-star', d.stage)) return;
+    var b = doc.createElement('span');
+    b.className = 'dream-star' + (isNew ? ' is-new' : ''); b.setAttribute('role', 'img');
+    b.setAttribute('aria-label', 'Secret found'); b.title = 'Secret found';
+    b.innerHTML = '<svg viewBox="-12 -12 24 24" aria-hidden="true" focusable="false"><path d="' + STAR + '"/></svg>';
+    d.stage.appendChild(b);
+  }
+  doc.addEventListener('k:secret', function (e) {
+    dreams.forEach(function (d) { if (d.g.id === e.detail.id) starBadge(d, true); });
+  });
+  function tryDream(d, keyboard) {
+    K.startToy(d.g.id, d.host, {
+      bg: true,
+      onStart: function (toy) {
+        popDream(d, toy); d.hint.textContent = d.g.hint;
+        if (keyboard) setTimeout(function () { d.closeBtn.focus({ preventScroll: true }); }, REDUCE ? 20 : 150);
+      },
+      onStop: function () {
+        var inside = d.frame.contains(doc.activeElement);
+        reformDream(d); d.hint.textContent = TRY_HINT;
+        if (inside) d.tryBtn.focus({ preventScroll: true });
+      }
+    });
+  }
+  function popDream(d, toy) {
+    // Keep a snapshot of the toy so it can fade out softly when it stops.
+    var stop = toy.stop;
+    toy.stop = function () { ghost(d, toy.canvas); stop(); };
+    d.popped = true;
+    d.sec.classList.add('is-bursting');
+    for (var i = 0; i < d.N; i++) d.vel[i] += d.R * 2.4;
+    setTimeout(function () {
+      if (!d.popped) return;
+      d.sec.classList.remove('is-bursting'); d.sec.classList.add('is-popped'); d.hidden = true;
+      K.sfx('pop', .9);
+      var w = d.stage.offsetWidth;
+      burst(d.stage, w / 2, w / 2, d.R, 30, { min: 7, max: 17, d0: 40, d1: 120, fall: 60 });
+      shimmer(d.stage, w / 2, w / 2, d.R);
+    }, REDUCE ? 0 : 110);
+  }
+  function ghost(d, cv) {
+    try {
+      var c = doc.createElement('canvas'); c.width = cv.width; c.height = cv.height; c.className = 'toy-ghost';
+      c.getContext('2d').drawImage(cv, 0, 0); d.host.appendChild(c);
+      setTimeout(function () { c.remove(); }, 800);
+    } catch (e) {}
+  }
+  function reformDream(d) {
+    d.popped = false; d.hidden = false;
+    var sec = d.sec;
+    sec.classList.remove('is-bursting');
+    if (REDUCE) { sec.classList.remove('is-popped'); drawStatic(d); return; }
+    sec.classList.add('is-reform'); sec.classList.remove('is-popped');
+    void sec.offsetWidth;
+    sec.classList.remove('is-reform');
+    for (var i = 0; i < d.N; i++) { d.off[i] = -d.R * .08; d.vel[i] = K.rnd(-1, 1) * d.R * 1.3; }
+  }
+  function drawStatic(d) { if (d.R) drawDream(d, 0, 0, win.scrollY || 0); }
+
+  // =================================================== sealed, blurry
+  var FUZZ = [['#A6E9C6', '#FFE08A', '#BFD3F7'], ['#F6A6BE', '#C9B8F0', '#FFC9A3'], ['#FFC9A3', '#A6E9C6', '#C9B8F0']];
+  function fuzzSVG(i) {
+    var P = FUZZ[i], id = 'fz' + i, r = seeded(31 + i * 7), blobs = '';
+    for (var j = 0; j < 4; j++) blobs += '<circle cx="' + (24 + r() * 72).toFixed(1) + '" cy="' + (24 + r() * 72).toFixed(1) + '" r="' + (14 + r() * 20).toFixed(1) + '" fill="' + P[j % 3] + '" opacity=".85"/>';
+    return '<svg viewBox="0 0 120 120" aria-hidden="true" focusable="false"><defs>' +
+      '<radialGradient id="' + id + 'a" cx=".4" cy=".36" r=".72"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="' + P[2] + '"/><stop offset="1" stop-color="' + P[0] + '"/></radialGradient>' +
+      '<linearGradient id="' + id + 'r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A6E9C6"/><stop offset=".5" stop-color="#C9B8F0"/><stop offset="1" stop-color="#F6A6BE"/></linearGradient>' +
+      '<clipPath id="' + id + 'c"><circle cx="60" cy="60" r="52"/></clipPath></defs>' +
+      '<circle cx="60" cy="60" r="58" fill="rgba(255,246,229,.85)"/>' +
+      '<g clip-path="url(#' + id + 'c)"><rect width="120" height="120" fill="url(#' + id + 'a)"/>' + blobs +
+        '<path d="M30 70Q48 48 66 64T100 58" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".7"/></g>' +
+      '<circle cx="60" cy="60" r="50" fill="none" stroke="url(#' + id + 'r)" stroke-width="6"/>' +
+      '<circle cx="60" cy="60" r="54" fill="none" stroke="#4B3A5A" stroke-width="3"/>' +
+      '<path d="M28 44Q34 30 48 25" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>';
+  }
+  var fuzz = K.$('#fuzz'), FZ_SIZE = [168, 146, 158];
+  K.SEALED.forEach(function (s, i) {
+    var wrap = doc.createElement('div'); wrap.className = 'fz';
+    var b = doc.createElement('button'); b.type = 'button'; b.className = 'fuzzy';
+    b.style.setProperty('--s', 'min(' + FZ_SIZE[i] + 'px, ' + (FZ_SIZE[i] / 6).toFixed(1) + 'vw)');
+    b.innerHTML = '<span class="fuzzy-art">' + fuzzSVG(i) + '</span><span class="fuzzy-name">' + s.name + '</span>';
+    K.bindSealed(b, i);
+    b.addEventListener('click', function () {
+      b.classList.add('is-focus'); clearTimeout(b._ft);
+      b._ft = setTimeout(function () { b.classList.remove('is-focus'); }, 1400);
+    });
+    wrap.appendChild(b); fuzz.appendChild(wrap);
+  });
+
+  // ================================================ waking up, at the bottom
+  var WAKE_LINES = ['Hi again.', 'That’s all my dreams. For now.', 'Say hi. I’ll pass it on.', 'I’m up. I’m up.'];
+  var woke = false, wakeArmed = true, wakeTimers = [];
+  var wakeBed = K.$('#wake-bed');
+  var wakeSq = K.squish({
+    pokeable: true, follow: true, idle: false, mood: 'asleep', label: 'Squish, waking up. Poke it.',
+    base: function () { return woke ? 'awake' : 'asleep'; },
+    lines: function () { return woke ? K.pick(WAKE_LINES) : K.pick(['Mm… not yet…', 'Zzz… one more dream…']); }
+  });
+  K.$('.sq-wrap', wakeBed).appendChild(wakeSq.el);
+  function wakeAt(ms, fn) { wakeTimers.push(setTimeout(fn, ms)); }
+  function wakeUp() {
+    if (!wakeArmed) return;
+    wakeArmed = false;
+    wakeSq.hold('drowsy'); wakeBed.classList.add('is-stir');
+    wakeAt(800, function () { wakeBed.classList.remove('is-stir'); wakeBed.classList.add('is-up'); });
+    wakeAt(1250, function () { wakeBed.classList.add('is-stretch'); wakeSq.hold('yawn'); K.sfx('yawn'); });
+    wakeAt(2500, function () {
+      wakeBed.classList.remove('is-stretch'); woke = true; wakeSq.hold('happy');
+      K.say(wakeSq.el, 'Oh. Hi.', { ms: 4200 }); K.sfx('chime');
+    });
+    wakeAt(6400, function () { wakeSq.release(); });
+  }
+  function sleepAgain() {
+    wakeTimers.forEach(clearTimeout); wakeTimers = [];
+    woke = false; wakeArmed = true;
+    wakeBed.classList.remove('is-stir', 'is-up', 'is-stretch');
+    wakeSq.hold('asleep');
+  }
+  if (win.IntersectionObserver) {
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (K.mode !== 'weird') return;
+        if (e.intersectionRatio >= .5) wakeUp();
+        else if (!e.isIntersecting) sleepAgain();
+      });
+    }, { threshold: [0, .5] }).observe(wakeBed);
+  }
+
+  // ===================================================== the trail
+  var trail = { el: K.$('#trail'), svg: K.$('#trail-svg'), path: K.$('#trail-path'), lut: null, len: 0, step: 6, bubs: [] };
+  function crPath(p) {
+    var s = 'M' + p[0].x.toFixed(1) + ' ' + p[0].y.toFixed(1);
+    for (var i = 0; i < p.length - 1; i++) {
+      var a = p[i - 1] || p[i], b = p[i], c = p[i + 1], e = p[i + 2] || c;
+      s += 'C' + (b.x + (c.x - a.x) / 6).toFixed(1) + ' ' + (b.y + (c.y - a.y) / 6).toFixed(1) + ' ' +
+        (c.x - (e.x - b.x) / 6).toFixed(1) + ' ' + (c.y - (e.y - b.y) / 6).toFixed(1) + ' ' + c.x.toFixed(1) + ' ' + c.y.toFixed(1);
+    }
+    return s;
+  }
+  function buildTrail() {
+    var W = world.clientWidth, H = world.scrollHeight, wide = W >= 1000, pts = [];
+    var bp = pagePos(bedEl), bw = bedEl.offsetWidth, bh = bedEl.offsetHeight;
+    var hx = bp.x + bw * .5, hy = bp.y + bh * .21;
+    pts.push({ x: hx, y: hy });
+    if (wide) {
+      pts.push({ x: hx + bw * .04, y: hy - bh * .36 });
+      pts.push({ x: hx + bw * .3, y: hy - bh * .5 });
+      pts.push({ x: Math.min(W - 40, hx + bw * .6), y: hy - bh * .08 });
+      pts.push({ x: Math.min(W - 40, hx + bw * .56), y: hy + bh * .78 });
+    } else {
+      pts.push({ x: hx + bw * .05, y: hy - bh * .3 });
+      pts.push({ x: hx + bw * .3, y: hy - bh * .42 });
+      pts.push({ x: W * .93, y: hy + bh * .15 });
+    }
+    var cs = dreams.map(function (d) { var p = pagePos(d.stage), w = d.stage.offsetWidth; return { x: p.x + w / 2, y: p.y + w / 2, r: w / 2, d: d }; });
+    function textMid(c) { var tx = K.$('.dream-text', c.d.sec), tp = pagePos(tx); return tp.y + tx.offsetHeight / 2; }
+    cs.forEach(function (c, i) {
+      if (i === 0) pts.push({ x: wide ? c.x + c.r * .45 : W * .93, y: c.y - c.r - (wide ? 70 : 34) });
+      pts.push({ x: c.x, y: c.y });
+      var n = cs[i + 1];
+      if (n) {
+        if (wide) pts.push({ x: (c.x + n.x) / 2, y: (c.y + c.r + n.y - n.r) / 2 });
+        else pts.push({ x: i % 2 ? W * .945 : W * .055, y: textMid(c) });
+      }
+    });
+    var mid = K.$('.fz:nth-child(2) .fuzzy-art'), mp = pagePos(mid), ms = mid.offsetWidth;
+    var end = { x: mp.x + ms / 2, y: mp.y + ms / 2 }, last = cs[cs.length - 1];
+    var hd = K.$('#sealed-h'), hp = pagePos(hd);
+    if (wide) { pts.push({ x: last.x + last.r * .2, y: last.y + last.r + 110 }); pts.push({ x: hp.x - 70, y: hp.y + hd.offsetHeight * .6 }); }
+    else { pts.push({ x: W * .93, y: textMid(last) }); pts.push({ x: W * .93, y: end.y - ms * .9 }); }
+    pts.push(end);
+    trail.el.style.height = H + 'px';
+    trail.svg.setAttribute('width', W); trail.svg.setAttribute('height', H);
+    trail.path.setAttribute('d', crPath(pts));
+    var len = trail.path.getTotalLength(), n = Math.ceil(len / trail.step) + 1, lut = new Float32Array(n * 2 + 4);
+    for (var i = 0; i <= n; i++) { var q = trail.path.getPointAtLength(Math.min(len, i * trail.step)); lut[i * 2] = q.x; lut[i * 2 + 1] = q.y; }
+    lut[n * 2 + 2] = lut[n * 2]; lut[n * 2 + 3] = lut[n * 2 + 1];
+    trail.len = len; trail.lut = lut; trail.n = n;
+    // o o O, over and over
+    var gap = wide ? 250 : 200, sizes = wide ? [10, 14, 23] : [8, 11, 17], offs = wide ? [0, 26, 58] : [0, 20, 45];
+    var need = Math.floor(len / gap) * 3;
+    while (trail.bubs.length < need) { var e = doc.createElement('i'); e.className = 'tb'; trail.el.appendChild(e); trail.bubs.push({ el: e }); }
+    while (trail.bubs.length > need) trail.bubs.pop().el.remove();
+    trail.bubs.forEach(function (b, j) {
+      var s = sizes[j % 3]; b.base = Math.floor(j / 3) * gap + offs[j % 3]; b.size = s; b.off = null;
+      b.el.style.width = b.el.style.height = s + 'px'; b.el.style.marginLeft = b.el.style.marginTop = (-s / 2) + 'px';
+    });
+    trail.gapLen = Math.floor(len / gap) * gap;
+  }
+  function updateTrail(t, sy, vh) {
+    if (!trail.len) return;
+    var lut = trail.lut, step = trail.step, v = REDUCE ? 0 : 14, top = sy - 80, bot = sy + vh + 80, L = trail.len, loop = trail.gapLen;
+    for (var j = 0; j < trail.bubs.length; j++) {
+      var b = trail.bubs[j], s = (b.base + t * v) % loop;
+      if (s > L) s = L;
+      var fi = s / step, i0 = Math.floor(fi), f = fi - i0;
+      var x = lut[i0 * 2] + (lut[i0 * 2 + 2] - lut[i0 * 2]) * f, y = lut[i0 * 2 + 1] + (lut[i0 * 2 + 3] - lut[i0 * 2 + 1]) * f;
+      var vis = REDUCE || (y > top && y < bot);
+      if (!vis) { if (b.off !== true) { b.el.style.visibility = 'hidden'; b.off = true; } continue; }
+      if (b.off !== false) { b.el.style.visibility = ''; b.off = false; }
+      var sc = K.clamp(s / 110, .3, 1) * K.clamp((L - s) / 140, 0, 1) * (1 + .07 * Math.sin(t * 2.1 + j));
+      x += REDUCE ? 0 : Math.sin(t * 1.1 + b.base * .031) * 5;
+      b.el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) scale(' + sc.toFixed(3) + ')';
+    }
+  }
+
+  // =================================================== sky and parallax
+  var skyLayers = K.$$('.sky i'), skyOp = [], anchors = [];
+  function updateSky(sy, vh) {
+    if (!anchors.length) return;
+    var c = sy + vh * .5, f = 0, last = anchors.length - 1;
+    if (c >= anchors[last]) f = last;
+    else if (c > anchors[0]) for (var j = 0; j < last; j++) if (c < anchors[j + 1]) { f = j + smooth(0, 1, (c - anchors[j]) / (anchors[j + 1] - anchors[j])); break; }
+    var fl = Math.floor(f), fr = f - fl;
+    for (var i = 0; i < skyLayers.length; i++) {
+      var o = i === fl ? 1 : i === fl + 1 ? Math.round(fr * 1000) / 1000 : 0;
+      if (skyOp[i] !== o) { skyOp[i] = o; skyLayers[i].style.opacity = o; }
+    }
+  }
+  var heroTitle = K.$('#hero-title'), sparks = K.$('#sparks'), lastTitle = -1, lastSpark = -1;
+  function updateParallax(sy, vh) {
+    var mid = sy + vh / 2;
+    for (var i = 0; i < dreams.length; i++) {
+      var d = dreams[i], off = Math.round(K.clamp((d.pcy - mid) * -.075, -48, 48) * 2) / 2;
+      if (d.par !== off) { d.par = off; d.wrap.style.transform = 'translate3d(0,' + off + 'px,0)'; }
+    }
+    var tt = sy < vh * 1.3 ? Math.round(sy * .16) : lastTitle;
+    if (tt !== lastTitle) { lastTitle = tt; heroTitle.style.transform = 'translate3d(0,' + tt + 'px,0)'; }
+    var sp = -Math.round((sy * .22) % vh);
+    if (sp !== lastSpark) { lastSpark = sp; sparks.style.transform = 'translate3d(0,' + sp + 'px,0)'; }
+  }
+
+  // ===================================================== layout + loop
+  var hero = K.$('#hero'), sealedSec = K.$('.sealed'), wakeSec = K.$('#wake');
+  function layout() {
+    if (K.mode !== 'weird') return;
+    dreams.forEach(function (d) {
+      sizeDream(d);
+      var p = pagePos(d.stage), w = d.stage.offsetWidth;
+      d.pcx = p.x + w / 2; d.pcy = p.y + w / 2;
+    });
+    var secs = [hero].concat(dreams.map(function (d) { return d.sec; }), [sealedSec, wakeSec]);
+    anchors = secs.map(function (s) { return pagePos(s).y + s.offsetHeight / 2; });
+    buildTrail();
+    skyOp = [];
+    var sy = win.scrollY || 0;
+    updateSky(sy, win.innerHeight);
+    if (REDUCE) { updateTrail(0, sy, win.innerHeight); dreams.forEach(function (d) { if (!d.popped) drawStatic(d); }); }
+  }
+  var rzT = 0;
+  win.addEventListener('resize', function () { clearTimeout(rzT); rzT = setTimeout(layout, 140); });
+  win.addEventListener('load', layout);
+  if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { layout(); });
+  doc.addEventListener('k:mode', function (e) { if (e.detail === 'weird') setTimeout(layout, 40); });
+  doc.addEventListener('k:time', function () { if (REDUCE) dreams.forEach(function (d) { if (!d.popped) drawStatic(d); }); });
+  ['rattlecup-table.webp', 'rollaway-island.webp', 'ember-bosses-1x.png'].forEach(function (n) {
+    var im = K.img(n); if (!im.complete) im.addEventListener('load', function () { if (REDUCE) dreams.forEach(function (d) { if (!d.popped) drawStatic(d); }); });
+  });
+  if (REDUCE) win.addEventListener('scroll', function () { updateSky(win.scrollY || 0, win.innerHeight); }, { passive: true });
+  if (win.IntersectionObserver) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { e.target._d.vis = e.isIntersecting; }); }, { rootMargin: '200px 0px' });
+    dreams.forEach(function (d) { d.stage._d = d; io.observe(d.stage); });
+  }
+  layout();
+
+  var T0 = performance.now(), lastT = T0, cost = 0, tick = 0;
+  function frame(now) {
+    requestAnimationFrame(frame);
+    var dt = Math.min(.05, (now - lastT) / 1000); lastT = now;
+    if (K.mode !== 'weird' || doc.hidden || REDUCE) return;
+    var t = Math.max(0, (now - T0) / 1000), sy = win.scrollY || 0, vh = win.innerHeight;
+    updateSky(sy, vh);
+    updateParallax(sy, vh);
+    updateTrail(t, sy, vh);
+    // On a slow machine the dreams wobble at half rate; everything else stays smooth.
+    if (cost > 10 && (++tick & 1)) return;
+    var c0 = performance.now();
+    for (var i = 0; i < dreams.length; i++) {
+      var d = dreams[i];
+      if (d.vis && !d.hidden && d.R) { var ddt = d.lt ? Math.min(.05, t - d.lt) : dt; d.lt = t; drawDream(d, t, ddt, sy); }
+    }
+    cost = cost * .9 + (performance.now() - c0) * .1;
+  }
+  requestAnimationFrame(frame);
+
+});
+</script>
+</body>
+</html>
