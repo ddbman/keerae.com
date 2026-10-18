@@ -25,14 +25,15 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="preload" href="fonts/dynapuff.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/fredoka.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="kit/kit.css">
-<script src="kit/kit.js"></script>
-<script src="kit/toys.js"></script>
+<link rel="stylesheet" href="kit/kit.css?v=2026-10-18">
+<script src="kit/kit.js?v=2026-10-18"></script>
+<script src="kit/toys.js?v=2026-10-18"></script>
 <style>
 /* ===================================================================
    Dream Bubbles. Squish is asleep up top, and every game is a dream
-   floating out of its head. Scroll down through the dreams. Play pops
-   one so the dream runs. At the bottom, Squish wakes up and says hi.
+   floating out of its head. Scroll down through the dreams. Tap one and
+   it pops into a tiny toy of that game; More info opens the game's part
+   of the plain page. At the bottom, Squish wakes up and says hi.
    =================================================================== */
 @property --rim { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 
@@ -193,8 +194,23 @@
 .dream-text { position: relative; max-width: 450px; }
 .dream-name { margin: 0 0 16px; font-size: clamp(42px, 4.3vw, 64px); color: var(--c); text-wrap: balance; }
 .dream-status { margin: 0 0 26px; font-size: 19px; line-height: 1.42; color: var(--ink); max-width: 25em; text-wrap: pretty; }
-.dream-act { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
-.dream-act .k-hint { margin: 0; max-width: 15em; color: var(--ink); opacity: .9; }
+.dream-act { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 16px; }
+.dream-hint { margin: 18px 0 0; max-width: 30em; font-size: 15px; color: var(--ink); opacity: .9; }
+
+/* the bubble itself is the button that pops it */
+.dream-try { position: absolute; z-index: 2; inset: 2.25%; margin: 0; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.dream-try:focus-visible { outline: 3px solid var(--ink); outline-offset: 8px; border-radius: 50%; }
+.dream.is-bursting .dream-try, .dream.is-popped .dream-try { visibility: hidden; }
+.dream-close {
+  position: absolute; z-index: 6; top: -15px; right: -15px; display: grid; place-items: center;
+  width: 46px; height: 46px; margin: 0; padding: 0; border: 3px solid var(--plum); border-radius: 50%;
+  background: var(--cream); color: var(--plum); box-shadow: 0 3px 0 var(--plum); cursor: pointer;
+  transition: transform .45s var(--squishy);
+}
+.dream-close svg { width: 20px; height: 20px; }
+.dream-close:hover { transform: scale(1.08) rotate(8deg); }
+.dream-close:active { transform: translateY(2px) scale(.92); transition-duration: .08s; }
+.dream-close:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; border-radius: 50%; }
 
 /* burst bits */
 .drop { position: absolute; z-index: 6; border-radius: 50%; pointer-events: none; border: 2px solid var(--plum); background: radial-gradient(circle at 34% 30%, #fff 0 22%, var(--dc) 62%); }
@@ -282,7 +298,7 @@
   .dream--flip .dream-text, .dream-text { justify-self: center; text-align: center; max-width: min(76vw, 460px); margin-top: 30px; }
   .dream-status { margin-left: auto; margin-right: auto; }
   .dream-act { justify-content: center; }
-  .dream-act .k-hint { flex-basis: 100%; max-width: none; }
+  .dream-hint { margin-left: auto; margin-right: auto; }
   .wake-scene { width: min(88vw, 440px); }
 }
 @media (max-width: 640px) {
@@ -1036,6 +1052,7 @@ KIT.ready(function () {
 
   // ======================================================== the dreams
   var dreamsEl = K.$('#dreams'), dreams = [];
+  var TRY_HINT = (TOUCH ? 'Tap' : 'Click') + ' the dream for a tiny taste. It\u2019s a toy, not the real game.';
   K.GAMES.forEach(function (g, i) {
     var sec = doc.createElement('section');
     sec.className = 'dream' + (i % 2 === 0 ? ' dream--flip' : '');
@@ -1043,13 +1060,16 @@ KIT.ready(function () {
     sec.style.setProperty('--c', g.color); sec.style.setProperty('--deep', g.deep); sec.style.setProperty('--glow', hexA(g.color, .55));
     sec.innerHTML =
       '<div class="dream-wrap"><div class="dream-float" style="animation-delay:' + (-i * 2.1).toFixed(1) + 's"><div class="dream-stage">' +
-        '<div class="dream-bubble" role="img" aria-label="' + DESC[g.id] + '"><canvas></canvas></div>' +
-        '<div class="dream-frame"><div class="dream-toy"></div></div>' +
+        '<div class="dream-bubble" role="img" id="dd-' + g.id + '" aria-label="' + DESC[g.id] + '"><canvas></canvas></div>' +
+        '<button class="dream-try" type="button" aria-label="Try a tiny toy of ' + g.name + '. It isn&rsquo;t the real game." aria-describedby="dd-' + g.id + '"></button>' +
+        '<div class="dream-frame"><div class="dream-toy"></div>' +
+          '<button class="dream-close" type="button" aria-label="Close the toy"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></button></div>' +
       '</div></div></div>' +
       '<div class="dream-text">' +
         '<h2 class="dream-name k-puff" id="dn-' + g.id + '">' + g.name + '</h2>' +
         '<p class="k-status dream-status">' + g.status + '</p>' +
-        '<div class="dream-act"><p class="k-hint">' + g.hint + '</p></div>' +
+        '<div class="dream-act"></div>' +
+        '<p class="k-hint dream-hint" aria-live="polite">' + TRY_HINT + '</p>' +
       '</div>';
     dreamsEl.appendChild(sec);
     var d = {
@@ -1059,21 +1079,21 @@ KIT.ready(function () {
     };
     d.ctx = d.cv.getContext('2d');
     var sc = SCENES[g.id]; sc.init(d); d.bg = sc.bg; d.fg = sc.fg; d.over = sc.over; d.needs = sc.needs; d.nightBg = !!sc.night;
-    var btn = K.makePlay(g.id), act = K.$('.dream-act', sec);
-    act.insertBefore(btn, act.firstChild);
+    // More info opens the game's part of the plain page. The real demo link, where there is one.
+    var act = K.$('.dream-act', sec);
+    act.appendChild(K.makeMore(g.id));
     if (g.link) { var ln = doc.createElement('a'); ln.className = 'dream-link'; ln.href = g.link; ln.textContent = g.linkText; act.appendChild(ln); }
-    d.btn = btn;
-    K.bindPlay(btn, g.id, d.host, {
-      bg: true,
-      onStart: function (toy) { popDream(d, toy); },
-      onStop: function () { reformDream(d); }
-    });
-    // A tap on the bubble itself pops it too.
-    d.stage.addEventListener('click', function (e) {
+    // A tap on the bubble pops it, and a tiny toy of the game runs in its place. The x closes it.
+    d.tryBtn = K.$('.dream-try', sec); d.closeBtn = K.$('.dream-close', sec); d.frame = K.$('.dream-frame', sec); d.hint = K.$('.dream-hint', sec);
+    d.tryBtn.addEventListener('click', function (e) {
       if (d.popped) return;
-      var r = d.stage.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
-      if (dx * dx + dy * dy < Math.pow(r.width / 2 * .98, 2)) btn.click();
+      if (e.detail) { // a pointer: only inside the round bubble, not its square corners
+        var r = d.stage.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+        if (dx * dx + dy * dy > Math.pow(r.width / 2 * .98, 2)) return;
+      }
+      tryDream(d, !e.detail);
     });
+    d.closeBtn.addEventListener('click', function (e) { e.stopPropagation(); K.stopToy(); });
     dreams.push(d);
   });
 
@@ -1180,6 +1200,20 @@ KIT.ready(function () {
     o.globalAlpha = 1;
   }
 
+  function tryDream(d, keyboard) {
+    K.startToy(d.g.id, d.host, {
+      bg: true,
+      onStart: function (toy) {
+        popDream(d, toy); d.hint.textContent = d.g.hint;
+        if (keyboard) setTimeout(function () { d.closeBtn.focus({ preventScroll: true }); }, REDUCE ? 20 : 150);
+      },
+      onStop: function () {
+        var inside = d.frame.contains(doc.activeElement);
+        reformDream(d); d.hint.textContent = TRY_HINT;
+        if (inside) d.tryBtn.focus({ preventScroll: true });
+      }
+    });
+  }
   function popDream(d, toy) {
     // Keep a snapshot of the toy so it can fade out softly when it stops.
     var stop = toy.stop;

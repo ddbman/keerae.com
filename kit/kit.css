@@ -65,30 +65,26 @@ button { font: inherit; color: inherit; }
 /* Outlined bubbly heading, like the Squish n Pops logo */
 .k-puff { font-family: var(--display); font-weight: 700; paint-order: stroke fill; -webkit-text-stroke: .14em var(--plum); color: var(--cream); letter-spacing: .02em; line-height: 1.02; }
 
-/* --------------------------------------------------------- the Play button */
-.k-play {
+/* ---------------------------------------------------- the More info button */
+.k-more {
   --c: var(--mint);
   position: relative; display: inline-flex; align-items: center; gap: .45em;
-  min-height: 52px; padding: .45em 1.15em .5em .9em;
-  font: 700 21px/1 var(--display); color: var(--plum); letter-spacing: .02em;
+  min-height: 52px; padding: .45em 1.15em .5em .85em;
+  font: 700 21px/1 var(--display); color: var(--plum); letter-spacing: .02em; text-decoration: none;
   background: var(--c); border: 3px solid var(--plum); border-radius: 999px;
   box-shadow: 0 5px 0 var(--plum), inset 0 -6px 0 rgba(75, 58, 90, .14), inset 0 4px 0 rgba(255, 255, 255, .55);
   cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation;
   transition: transform .5s var(--squishy), box-shadow .2s;
 }
-.k-play::after { /* shine */
+.k-more::after { /* shine */
   content: ""; position: absolute; left: 14%; top: 6px; width: 26%; height: 7px; border-radius: 9px;
   background: rgba(255, 255, 255, .7); pointer-events: none;
 }
-.k-play svg { width: 1em; height: 1em; flex: none; }
-.k-play .k-stop-ico { display: none; }
-.k-play[aria-pressed="true"] .k-play-ico { display: none; }
-.k-play[aria-pressed="true"] .k-stop-ico { display: block; }
-.k-play:hover { transform: translateY(-2px) scale(1.04, .97); }
-.k-play:active, .k-play.k-squashed { transform: translateY(4px) scale(1.12, .84); box-shadow: 0 1px 0 var(--plum), inset 0 -4px 0 rgba(75, 58, 90, .14), inset 0 3px 0 rgba(255, 255, 255, .5); transition-duration: .08s; }
-.k-play:focus-visible { outline: 3px solid var(--plum); outline-offset: 4px; border-radius: 999px; }
-.k-dark .k-play:focus-visible { outline-color: var(--cream); }
-.k-play.k-small { min-height: 44px; font-size: 17px; padding: .4em 1em .45em .8em; }
+.k-more svg { width: 1.05em; height: 1.05em; flex: none; }
+.k-more:hover { transform: translateY(-2px) scale(1.04, .97); }
+.k-more:active { transform: translateY(4px) scale(1.12, .84); box-shadow: 0 1px 0 var(--plum), inset 0 -4px 0 rgba(75, 58, 90, .14), inset 0 3px 0 rgba(255, 255, 255, .5); transition-duration: .08s; }
+.k-more:focus-visible { outline: 3px solid var(--plum); outline-offset: 4px; border-radius: 999px; }
+.k-dark .k-more:focus-visible { outline-color: var(--cream); }
 
 /* ------------------------------------------------- status line + hint */
 .k-status { font: 500 16px/1.35 var(--ui); }
@@ -210,6 +206,7 @@ button { font: inherit; color: inherit; }
 #normal .n-index .nm { font: 700 19px/1.2 var(--ui); }
 #normal .n-index .kd { display: block; font: 500 15px/1.3 var(--body); opacity: .8; }
 #normal .n-game { padding: 56px 0; border-top: 2px dashed rgba(75, 58, 90, .18); }
+#normal [id^="n-"] { scroll-margin-top: 24px; }
 #normal .n-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px; margin-bottom: 14px; }
 #normal .n-st { display: inline-block; padding: 4px 12px 5px; border-radius: 999px; background: var(--c); border: 2px solid var(--plum); font: 600 15px/1.3 var(--ui); }
 #normal .n-game > p, #normal .n-prose { max-width: 40em; }

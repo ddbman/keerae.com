@@ -66,16 +66,52 @@
   if (!pinned) setInterval(function () { var t = clockTime(); if (t !== K.time) K.setTime(t); }, 60000);
 
   // -------------------------------------------------------------- mode
+  // "Make it normal" picks the plain page for good (remembered). A game's "More info" only
+  // borrows it: the address gets that game's #n-... section, and Back or "Make it weird
+  // again" goes back to the dream it came from. A #n-... address opens the plain page there.
+  var INFO = /^#n-[\w-]+$/, borrowed = false, cameFrom = null;
   K.mode = store('local', 'keerae-mode') === 'normal' ? 'normal' : 'weird';
+  if (K.mode === 'weird' && INFO.test(location.hash)) { K.mode = 'normal'; borrowed = true; }
   root.setAttribute('data-mode', K.mode);
   root.className = root.className.replace(/\bno-js\b/, 'js');
+  function focusOn(el) {
+    if (!el) return;
+    if (el.tabIndex < 0 && !el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+    el.focus({ preventScroll: true });
+  }
+  function applyMode(m) { K.mode = m; root.setAttribute('data-mode', m); K.stopToy(); K.emit('k:mode', m); }
+  function showSection(el) { applyMode('normal'); el.scrollIntoView(); focusOn(K.$('h2', el) || el); }
+  function goBack() {
+    var c = cameFrom; cameFrom = null; borrowed = false;
+    applyMode('weird');
+    if (c) { window.scrollTo(0, c.y); focusOn(c.el); }
+    else { window.scrollTo(0, 0); focusOn(K.$('.world [data-k-start]') || K.$('.world h1')); }
+  }
   K.setMode = function (m) {
-    K.mode = m; root.setAttribute('data-mode', m);
     store('local', 'keerae-mode', m === 'normal' ? 'normal' : null);
-    K.stopToy(); window.scrollTo(0, 0); K.emit('k:mode', m);
-    var target = m === 'normal' ? K.$('#normal h1') : K.$('.world [data-k-start]') || K.$('.world h1');
-    if (target) { if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1'); target.focus({ preventScroll: true }); }
+    if (m === 'weird' && borrowed) {
+      // Undo the step "More info" added, so Back doesn't land on the same page twice.
+      if (history.state && history.state.kInfo) { history.back(); return; }
+      if (INFO.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
+      goBack(); return;
+    }
+    borrowed = false; cameFrom = null;
+    if (INFO.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
+    applyMode(m); window.scrollTo(0, 0);
+    focusOn(m === 'normal' ? K.$('#normal h1') : K.$('.world [data-k-start]') || K.$('.world h1'));
   };
+  // "More info" on a dream: the plain page, scrolled to that game. from is the link pressed.
+  K.showInfo = function (id, from) {
+    var el = doc.getElementById('n-' + id); if (!el) return;
+    if (K.mode === 'weird') { cameFrom = { y: window.scrollY, el: from || null }; borrowed = true; }
+    history.pushState({ kInfo: id }, '', '#n-' + id);
+    showSection(el);
+  };
+  window.addEventListener('popstate', function () {
+    var el = INFO.test(location.hash) ? doc.getElementById(location.hash.slice(1)) : null;
+    if (el && K.mode === 'weird') { borrowed = true; showSection(el); }
+    else if (!el && borrowed) goBack();
+  });
 
   // ------------------------------------------------------------- sound
   // Off until someone switches it on. Tiny synth, no files.
@@ -332,33 +368,34 @@
     return box;
   };
 
-  // ------------------------------------------------------ Play buttons
-  var PLAY_SVG = '<svg class="k-play-ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 3.6C6 2.8 6.9 2.3 7.6 2.8L16.4 9.2C17 9.6 17 10.4 16.4 10.8L7.6 17.2C6.9 17.7 6 17.2 6 16.4Z" fill="currentColor"/></svg>' +
-                 '<svg class="k-stop-ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="4.5" y="4.5" width="11" height="11" rx="3" fill="currentColor"/></svg>';
-  K.makePlay = function (id, cls) {
-    var g = K.game(id), b = doc.createElement('button');
-    b.type = 'button'; b.className = 'k-play' + (cls ? ' ' + cls : '');
-    b.style.setProperty('--c', g.color);
-    b.setAttribute('aria-pressed', 'false'); b.setAttribute('data-game', id);
-    b.setAttribute('aria-label', 'Play the ' + g.name + ' toy');
-    b.innerHTML = PLAY_SVG + '<span class="k-play-label">Play</span>';
-    return b;
+  // ----------------------------------------------- More info buttons
+  var INFO_SVG = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.7" fill="none" stroke="currentColor" stroke-width="2.3"/>' +
+                 '<circle cx="10" cy="6.3" r="1.5" fill="currentColor"/><path d="M10 9.4V14.1" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>';
+  K.makeMore = function (id) {
+    var g = K.game(id), a = doc.createElement('a');
+    a.className = 'k-more'; a.href = '#n-' + id; a.setAttribute('data-game', id);
+    a.style.setProperty('--c', g.color);
+    a.setAttribute('aria-label', 'More info about ' + g.name);
+    a.innerHTML = INFO_SVG + '<span>More info</span>';
+    a.addEventListener('click', function (e) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0) return; // a new tab opens the plain page there
+      e.preventDefault(); K.showInfo(id, a);
+    });
+    return a;
   };
-  var running = null; // { btn, host, toy, id, opts }
+
+  // ------------------------------------------------------------ toys
+  // The little toys that run inside a popped dream. One at a time.
+  var running = null; // { host, toy, id, opts }
   K.stopToy = function () {
     if (!running) return;
     var r = running; running = null;
     try { r.toy.stop(); } catch (e) {}
-    if (r.btn) {
-      r.btn.setAttribute('aria-pressed', 'false');
-      r.btn.querySelector('.k-play-label').textContent = 'Play';
-      r.btn.setAttribute('aria-label', 'Play the ' + K.game(r.id).name + ' toy');
-    }
     r.host.classList.remove('k-toy-on');
     if (r.opts.onStop) r.opts.onStop();
     K.emit('k:toy', { id: r.id, on: false, host: r.host });
   };
-  K.startToy = function (id, host, btn, opts) {
+  K.startToy = function (id, host, opts) {
     opts = opts || {};
     if (id === 'rollaway') K.askTilt();
     K.stopToy();
@@ -366,26 +403,11 @@
     host.classList.add('k-toy', 'k-toy-on');
     if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
     var toy = K.toys[id](host, opts);
-    running = { btn: btn, host: host, toy: toy, id: id, opts: opts };
-    if (btn) {
-      btn.setAttribute('aria-pressed', 'true');
-      btn.querySelector('.k-play-label').textContent = 'Stop';
-      btn.setAttribute('aria-label', 'Stop the ' + K.game(id).name + ' toy');
-      btn.classList.remove('k-squashed'); void btn.offsetWidth; btn.classList.add('k-squashed');
-      setTimeout(function () { btn.classList.remove('k-squashed'); }, 120);
-    }
+    running = { host: host, toy: toy, id: id, opts: opts };
     K.sfx('boing');
     if (opts.onStart) opts.onStart(toy);
     K.emit('k:toy', { id: id, on: true, host: host });
     return toy;
-  };
-  // Binds a Play button to a host element the toy will fill. host can be a function returning one.
-  K.bindPlay = function (btn, id, host, opts) {
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      if (running && running.btn === btn) { K.stopToy(); return; }
-      K.startToy(id, typeof host === 'function' ? host() : host, btn, opts);
-    });
   };
   K.running = function () { return running; };
   doc.addEventListener('keydown', function (e) { if (e.key === 'Escape' && running) K.stopToy(); });
