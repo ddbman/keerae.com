@@ -288,10 +288,10 @@
   }
 
   // ===================================================== INTO EMBER DEPTHS
-  // Three bosses from the real sprite sheet wake up and fire rings, spirals and aimed shots.
+  // Three bosses from the game's own sprites wake up and fire rings, spirals and aimed shots.
   function ember(host, opts) {
     return runner(host, function (S) {
-      var o = S.opts, sheet = K.img('ember-bosses-1x.png'), CELL = 69, shots = [], embers = [], bosses = [], wakeT = .7, lastPew = 0;
+      var o = S.opts, sheet = K.img('ember-bosses-cells.png'), CELL = 69, shots = [], embers = [], bosses = [], wakeT = .7, lastPew = 0;
       // The secret: the cursor (or a finger held down) is the player. Twenty seconds in the arena without a scratch.
       var dodge = { t: 0, hit: 0, calm: 0 }, sparks = [];
       S.cv.style.cursor = 'none';
@@ -307,7 +307,7 @@
         secretCard(S, 'ember', 'Twenty seconds without a scratch. They need a nap.');
       }
       var COLS = ['#FF7A2F', '#FFB347', '#A06BFF', '#5FE0FF', '#FF4D6D'];
-      var cells = []; for (var c = 0; c < 33; c++) cells.push(c);
+      var cells = []; for (var c = 0; c < 34; c++) cells.push(c); // ember-bosses-cells.png holds 34 of them, 11 to a row
       cells.sort(function () { return Math.random() - .5; });
       function layout() {
         var n = S.W < 360 ? 2 : 3, sc = Math.max(1, Math.floor(Math.min(S.W / (n * 92), S.H / 190)));
@@ -425,33 +425,211 @@
   }
 
   // ===================================================== RATTLECUP
-  // The Vigil: one candle, five bone dice, and a claim lit up above them.
-  var PIPS = { 1: [[0, 0]], 2: [[-1, -1], [1, 1]], 3: [[-1, -1], [0, 0], [1, 1]], 4: [[-1, -1], [1, -1], [-1, 1], [1, 1]], 5: [[-1, -1], [1, -1], [0, 0], [-1, 1], [1, 1]], 6: [[-1, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [1, 1]] };
-  var WORD = ['', 'One', 'Two', 'Three', 'Four', 'Five'], FACE = ['', 'ones', 'twos', 'threes', 'fours', 'fives', 'sixes'];
-  var REPLY = ['The Rock calls it.', 'The Owl lets it go.', 'The Peacock raises.', 'The Rock squints at you.', 'The Owl believes you. For now.'];
-  function drawDie(g, x, y, D, ang, v, glow) {
-    g.save(); g.translate(x, y); g.rotate(ang);
-    var r = D * .2, h = D / 2;
-    g.shadowColor = 'rgba(0,0,0,.45)'; g.shadowBlur = D * .25; g.shadowOffsetY = D * .08;
-    g.fillStyle = glow ? '#FFF3D6' : '#EFE4CC';
-    g.beginPath(); g.moveTo(-h + r, -h); g.arcTo(h, -h, h, h, r); g.arcTo(h, h, -h, h, r); g.arcTo(-h, h, -h, -h, r); g.arcTo(-h, -h, h, -h, r); g.closePath(); g.fill();
-    g.shadowColor = 'transparent';
-    g.strokeStyle = 'rgba(90,60,30,.5)'; g.lineWidth = Math.max(1, D * .035); g.stroke();
-    g.fillStyle = '#2A1E12';
-    PIPS[v].forEach(function (q) { g.beginPath(); g.arc(q[0] * D * .25, q[1] * D * .25, D * .085, 0, TAU); g.fill(); });
+  // The Vault (the game's look since its Floor Show): velvet that changes colour as the table heats up,
+  // three faces in gilt frames, a candle (which is you, and a little bit alive), five bone dice, the claim in gold.
+  var VAULT = {
+    jewel: ['#0B4A3D', '#123B78', '#3D1B7A', '#741237', '#7A400A'],   // emerald, sapphire, amethyst, ruby, topaz
+    heat: ['#2FE0A8', '#3F8CFF', '#B05CFF', '#FF3B6A', '#FFC04A'],
+    seat: { you: '#FFE2A0', rock: '#5B8CFF', peacock: '#21D4C4', owl: '#FFB52E', king: '#C45BFF' },
+    cast: { rock: 0, peacock: 1, owl: 2, king: 3 }, cellW: 280, cellH: 350,
+    gold: '#F5C84B', blood: '#FF3B5C', dark: '#1D0E06',
+    confetti: ['#18D38B', '#2F7DFF', '#A65CFF', '#FF3B5C', '#FFB31F', '#F5C84B', '#F4ECDC']
+  };
+  var SLAM = '"Fraunces Black", Georgia, "Times New Roman", serif';
+  function rgb(h) { var n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+  function mix(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+  function ramp(list, t) { t = clamp(t, 0, 1) * (list.length - 1); var i = Math.min(list.length - 2, Math.floor(t)); return mix(rgb(list[i]), rgb(list[i + 1]), t - i); }
+  function rgba(c, a) { return 'rgba(' + Math.round(c[0]) + ',' + Math.round(c[1]) + ',' + Math.round(c[2]) + ',' + (a == null ? 1 : Math.max(0, +a).toFixed(3)) + ')'; }
+  function darker(c, k) { return [c[0] * k, c[1] * k, c[2] * k]; }
+  function lighter(c, k) { return mix(c, [255, 255, 255], k); }
+  function outBack(u) { var c = 1.7; u = clamp(u, 0, 1) - 1; return 1 + (c + 1) * u * u * u + c * u * u; }
+  function outQuart(u) { u = 1 - clamp(u, 0, 1); return 1 - u * u * u * u; }
+  // A soft ellipse of light.
+  function glowE(g, x, y, rx, ry, c, a) {
+    if (!(a > 0) || rx <= 0 || ry <= 0) return;
+    g.save(); g.translate(x, y); g.scale(1, ry / rx);
+    var gr = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+    gr.addColorStop(0, rgba(c, a)); gr.addColorStop(.45, rgba(c, a * .42)); gr.addColorStop(1, rgba(c, 0));
+    g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, TAU); g.fill(); g.restore();
+  }
+  // The velvet's nap: a small tile of soft noise, laid over the room in overlay.
+  var napTile = null;
+  function napCanvas() {
+    if (napTile) return napTile;
+    var c = document.createElement('canvas'); c.width = c.height = 96;
+    var x = c.getContext('2d'), id = x.createImageData(96, 96), s = 7;
+    for (var i = 0; i < id.data.length; i += 4) { s = (s * 16807) % 2147483647; var v = s % 256; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 26; }
+    x.putImageData(id, 0, 0);
+    return (napTile = c);
+  }
+  // The room itself: the jewel of the moment, lit from the middle. Still, so the dream can cache it.
+  function vaultRoom(g, x, y, w, h, heat) {
+    var jewel = ramp(VAULT.jewel, heat), cx = x + w / 2, cy = y + h * .42, big = Math.max(w, h);
+    var gr = g.createRadialGradient(cx, cy, big * .04, cx, cy + h * .06, big * .86);
+    gr.addColorStop(0, rgba(lighter(jewel, .14 + heat * .06))); gr.addColorStop(.55, rgba(jewel)); gr.addColorStop(1, rgba(darker(jewel, .3)));
+    g.fillStyle = gr; g.fillRect(x, y, w, h);
+    try { g.save(); g.globalCompositeOperation = 'overlay'; g.fillStyle = g.createPattern(napCanvas(), 'repeat'); g.fillRect(x, y, w, h); } catch (e) {}
     g.restore();
   }
+  // What moves in it: slow caustic light, the lamp over the table, and the heat rising off the floor.
+  function vaultLight(g, x, y, w, h, heat, t, inten) {
+    var cc = mix(rgb('#9FF6E4'), rgb('#FFE0A0'), heat), hc = ramp(VAULT.heat, heat), k = inten == null ? 1 : inten;
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < 4; i++) {
+      var ph = t * (.18 + i * .04) + i * 1.9;
+      glowE(g, x + w * (.5 + Math.sin(ph) * .4), y + h * (.14 + i * .25) + Math.cos(ph * .7) * h * .05,
+        w * (.34 + .09 * Math.sin(ph * 1.3)), h * .075, cc, (.07 + heat * .06) * k);
+    }
+    glowE(g, x + w / 2, y + h * .4, w * .6, h * .5, mix(rgb('#FFF1C8'), hc, .4), (.15 + heat * .2) * k);
+    glowE(g, x + w / 2, y + h * 1.04, w * .72, h * .38, hc, heat * .34 * k);
+    g.restore();
+  }
+  function vaultSparkle(g, x, y, w, h, t, n, inten) {
+    var k = inten == null ? 1 : inten;
+    for (var i = 0; i < n; i++) {
+      var sx = (i * .6180339 + .13) % 1, sy = (i * .3819 + .71) % 1, sp = 6 + (i % 5) * 2;
+      var yy = (((sy * h - t * sp) % h) + h) % h, tw = Math.max(0, Math.sin(t * (1.5 + (i % 4) * .5) + i));
+      if (tw < .05) continue;
+      g.globalAlpha = .42 * tw * k; g.fillStyle = i % 3 ? '#FFE9B0' : '#BFF7FF';
+      star4(g, x + sx * w, y + yy, 2 + 4.5 * tw, 0);
+    }
+    g.globalAlpha = 1;
+  }
+  // A bone die. The one is wild, so it wears the gold ring the game gives it.
+  function vaultDie(g, x, y, D, ang, v, o) {
+    o = o || {};
+    var h = D / 2, r = D * .22;
+    g.save(); g.translate(x, y); g.rotate(ang || 0);
+    if (o.glow) glowE(g, 0, 0, D * 1.15, D * 1.15, rgb('#FFD45E'), .6 * o.glow);
+    g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowBlur = D * .28; g.shadowOffsetY = D * .1;
+    g.beginPath(); g.moveTo(-h + r, -h); g.arcTo(h, -h, h, h, r); g.arcTo(h, h, -h, h, r); g.arcTo(-h, h, -h, -h, r); g.arcTo(-h, -h, h, -h, r); g.closePath();
+    var gr = g.createLinearGradient(0, -h, 0, h); gr.addColorStop(0, o.glow ? '#FFFBF0' : '#FFF8EA'); gr.addColorStop(1, '#E4D6BA');
+    g.fillStyle = gr; g.fill(); g.shadowColor = 'transparent';
+    g.lineWidth = Math.max(1, D * .045); g.strokeStyle = 'rgba(146,104,44,.7)'; g.stroke();
+    if (v === 1 && o.wild !== false) {
+      g.strokeStyle = VAULT.gold; g.lineWidth = Math.max(1.2, D * .065); g.beginPath(); g.arc(0, 0, D * .22, 0, TAU); g.stroke();
+      g.fillStyle = '#C9921F'; g.beginPath(); g.arc(0, 0, D * .1, 0, TAU); g.fill();
+    } else {
+      g.fillStyle = '#2A1B10';
+      PIPS[v].forEach(function (q) { g.beginPath(); g.arc(q[0] * D * .25, q[1] * D * .25, D * .085, 0, TAU); g.fill(); });
+    }
+    g.restore();
+  }
+  // Words slammed down the way the game does it: Fraunces, a gold edge, a dark outline, a glow.
+  function vaultSlam(g, text, x, y, size, col, a, o) {
+    if (!(a > 0)) return 0;
+    o = o || {};
+    var c = rgb(col);
+    g.save(); g.globalAlpha *= a; g.textAlign = o.align || 'center'; g.textBaseline = 'middle';
+    g.font = Math.round(size) + 'px ' + SLAM; g.lineJoin = 'round';
+    if (g.letterSpacing !== undefined) g.letterSpacing = (o.track || 0) + 'px';
+    var w = g.measureText(text).width;
+    g.shadowColor = rgba(c, .7); g.shadowBlur = size * .3;
+    g.strokeStyle = VAULT.dark; g.lineWidth = size * .19; g.strokeText(text, x, y);
+    g.shadowColor = 'transparent';
+    g.strokeStyle = VAULT.gold; g.lineWidth = size * .07; g.strokeText(text, x, y);
+    var gr = g.createLinearGradient(0, y - size * .42, 0, y + size * .38);
+    gr.addColorStop(0, rgba(lighter(c, .62))); gr.addColorStop(.55, rgba(c)); gr.addColorStop(1, rgba(darker(c, .7)));
+    g.fillStyle = gr; g.fillText(text, x, y);
+    g.restore();
+    return w;
+  }
+  function slamWidth(g, text, size) { g.save(); g.font = Math.round(size) + 'px ' + SLAM; var w = g.measureText(text).width; g.restore(); return w; }
+  // A face from the game, in its gilt frame. (x, y) is the centre, w the width.
+  function vaultFace(g, who, x, y, w, a) {
+    var im = K.img('rattlecup-cast.webp');
+    if (!im.complete || !im.naturalWidth || !(a > 0)) return;
+    var h = w * VAULT.cellH / VAULT.cellW, i = VAULT.cast[who];
+    g.save(); g.globalAlpha *= a;
+    g.drawImage(im, i * VAULT.cellW, 0, VAULT.cellW, VAULT.cellH, x - w / 2, y - h / 2, w, h);
+    g.restore();
+  }
+  // The candle: you, at the table. Two sleepy dots on the flame.
+  function vaultCandle(g, x, base, ch, t, flare, faces) {
+    var cw = ch * .4, top = base - ch, fl = 1 + Math.sin(t * 11) * .04 + Math.sin(t * 17) * .03;
+    var fh = ch * .55 * fl * (1 + flare * .45), fw = fh * .48, fy = top - ch * .07;
+    glowE(g, x, fy - fh * .5, fh * 2.4, fh * 2.4, rgb('#FFD88C'), .5 + flare * .25);
+    g.fillStyle = '#8A6A33'; g.beginPath(); g.ellipse(x, base, cw * 1.1, cw * .28, 0, 0, TAU); g.fill();
+    var bd = g.createLinearGradient(x - cw / 2, 0, x + cw / 2, 0); bd.addColorStop(0, '#F4E8CF'); bd.addColorStop(1, '#D9C59E');
+    g.fillStyle = bd; g.beginPath(); if (g.roundRect) g.roundRect(x - cw / 2, top, cw, ch, cw * .18); else g.rect(x - cw / 2, top, cw, ch); g.fill();
+    g.fillStyle = '#FFF6E3'; g.beginPath(); g.ellipse(x - cw * .18, top + ch * .22, cw * .1, ch * .14, 0, 0, TAU); g.fill();
+    g.strokeStyle = '#2A1E12'; g.lineWidth = Math.max(1.2, ch * .025); g.beginPath(); g.moveTo(x, top); g.lineTo(x, fy); g.stroke();
+    g.fillStyle = '#FFC861'; g.beginPath(); g.moveTo(x, fy - fh); g.quadraticCurveTo(x + fw, fy - fh * .35, x, fy); g.quadraticCurveTo(x - fw, fy - fh * .35, x, fy - fh); g.fill();
+    g.fillStyle = '#FFF1C4'; g.beginPath(); g.ellipse(x, fy - fh * .3, fw * .32, fh * .26, 0, 0, TAU); g.fill();
+    if (faces !== false && fh > 12) {
+      var blink = (t % 4.2) < .12 ? .25 : 1;
+      g.fillStyle = '#7A3E12';
+      g.beginPath(); g.ellipse(x - fw * .2, fy - fh * .3, fw * .065, fw * .085 * blink, 0, 0, TAU); g.ellipse(x + fw * .2, fy - fh * .3, fw * .065, fw * .085 * blink, 0, 0, TAU); g.fill();
+    }
+  }
+  // Rainbow rays turning slowly, as when a box bursts open.
+  function vaultRays(g, x, y, R, t, a) {
+    if (!(a > 0)) return;
+    g.save(); g.globalCompositeOperation = 'lighter'; g.translate(x, y); g.rotate(K.reduce ? 0 : t * .22);
+    for (var i = 0; i < 14; i++) {
+      var an = i / 14 * TAU, gr = g.createRadialGradient(0, 0, R * .05, 0, 0, R);
+      gr.addColorStop(0, rgba(rgb(VAULT.confetti[i % 6]), .3 * a)); gr.addColorStop(1, rgba(rgb(VAULT.confetti[i % 6]), 0));
+      g.fillStyle = gr; g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, R, an - .075, an + .075); g.closePath(); g.fill();
+    }
+    g.restore();
+  }
+  function ringFx(g, x, y, u, R, c, w) {
+    if (u < 0 || u > 1) return;
+    g.strokeStyle = rgba(c, (1 - u) * .9); g.lineWidth = Math.max(1, (w || 4) * (1 - u));
+    g.beginPath(); g.arc(x, y, R * (.12 + .88 * outQuart(u)), 0, TAU); g.stroke();
+  }
+  function confetti(list, x, y, n, sp) {
+    for (var i = 0; i < n; i++) {
+      var a = -Math.PI / 2 + rnd(-1.25, 1.25), v = rnd(sp * .4, sp);
+      list.push({ x: x + rnd(-10, 10), y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: rnd(0, TAU), vr: rnd(-9, 9), w: rnd(4, 8), h: rnd(2, 4), c: VAULT.confetti[i % 7], life: rnd(1.8, 2.8) });
+    }
+  }
+  function stepConfetti(list, dt) {
+    for (var j = list.length - 1; j >= 0; j--) { var p = list[j]; p.vy += 420 * dt; p.vx *= 1 - dt * .8; p.x += p.vx * dt; p.y += p.vy * dt; p.r += p.vr * dt; p.life -= dt; if (p.life <= 0) list.splice(j, 1); }
+  }
+  function drawConfetti(g, list) {
+    for (var j = 0; j < list.length; j++) {
+      var p = list[j]; g.save(); g.globalAlpha = clamp(p.life, 0, 1); g.translate(p.x, p.y); g.rotate(p.r);
+      g.fillStyle = p.c; g.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * (.6 + .4 * Math.abs(Math.sin(p.r * 1.7)))); g.restore();
+    }
+  }
+  // The claim the dice make, ones wild, the way the game counts it.
+  function claimOf(vals) {
+    var count = [0, 0, 0, 0, 0, 0, 0], face = 6, n = 0;
+    vals.forEach(function (v) { count[v]++; });
+    if (count[1] === vals.length) return { n: vals.length, face: 1 };
+    for (var f = 6; f >= 2; f--) if (count[f] + count[1] > n) { n = count[f] + count[1]; face = f; }
+    return { n: n, face: face };
+  }
+  K.vault = { C: VAULT, room: vaultRoom, light: vaultLight, sparkle: vaultSparkle, die: vaultDie, slam: vaultSlam, slamWidth: slamWidth,
+    face: vaultFace, candle: vaultCandle, glow: glowE, ring: ringFx, rgb: rgb, ramp: ramp, claimOf: claimOf, outBack: outBack };
+
+  var PIPS = { 1: [[0, 0]], 2: [[-1, -1], [1, 1]], 3: [[-1, -1], [0, 0], [1, 1]], 4: [[-1, -1], [1, -1], [-1, 1], [1, 1]], 5: [[-1, -1], [1, -1], [0, 0], [-1, 1], [1, 1]], 6: [[-1, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [1, 1]] };
+  var WORD = ['', 'One', 'Two', 'Three', 'Four', 'Five'], FACE = ['', 'ones', 'twos', 'threes', 'fours', 'fives', 'sixes'];
+  var SEATS = ['rock', 'peacock', 'owl'];
+  var REPLY = [
+    { who: 'rock', line: 'The Rock calls it.', liar: true },
+    { who: 'owl', line: 'The Owl lets it go.' },
+    { who: 'peacock', line: 'The Peacock raises.' },
+    { who: 'rock', line: 'The Rock squints at you.' },
+    { who: 'owl', line: 'The Owl believes you. For now.' }
+  ];
   function rattlecup(host, opts) {
     return runner(host, function (S) {
-      var o = S.opts, dice = [], D, floor, claim = null, claimT = 0, reply = '', settledOnce = false, flick = 0;
+      var o = S.opts, dice = [], D, floor, claim = null, claimT = 0, reply = null, settledOnce = false;
       // The secret: five of a kind, ones wild. Until someone finds it, the dice get kinder the longer they keep throwing.
-      var throws = 0, five = false, sparks = [];
-      function dims() { D = clamp(Math.min(S.W / 9.5, S.H / 5.2), 22, 62); floor = S.H * .84; }
+      var throws = 0, five = false, fiveT = 0, sparks = [], conf = [], heat = 0, heatTo = 0, liarT = -1;
+      if (document.fonts && document.fonts.load) { try { document.fonts.load('48px "Fraunces Black"'); } catch (e) {} }
+      K.img('rattlecup-cast.webp');
+      function dims() { D = clamp(Math.min(S.W / 10, S.H / 5.6), 22, 58); floor = S.H * .9; }
       dims();
       for (var i = 0; i < 5; i++) dice.push({ x: S.W * (.3 + i * .1), y: floor - D / 2, vx: 0, vy: 0, a: 0, av: 0, v: 1 + Math.floor(Math.random() * 6), rest: true, flip: 0 });
-      function cx() { return o.candleX != null ? o.candleX * S.W : S.W * .5; }
+      function lay() { // where everything sits, for this size
+        var fw = clamp(S.H * .2, 40, 92), fh = fw * VAULT.cellH / VAULT.cellW;
+        return { fw: fw, fy: S.H * .05 + fh / 2, gap: clamp(S.W * .26, fw * 1.25, fw * 2.4), cy: S.H * .53, fs: clamp(S.H * .16, 26, 60) };
+      }
       function throwAll() {
-        claim = null; claimT = 0; settledOnce = false; five = false; throws++;
+        claim = null; claimT = 0; settledOnce = false; reply = null; liarT = -1; five = false; throws++;
         var fin = null;
         if (!K.found('rattlecup') && (throws >= 20 || Math.random() < Math.pow(clamp((throws - 5) / 15, 0, 1), 2))) {
           var face = 2 + Math.floor(Math.random() * 5), wild = Math.floor(Math.random() * 3);
@@ -459,28 +637,28 @@
           fin.sort(function () { return Math.random() - .5; });
         }
         dice.forEach(function (d, i) {
-          d.rest = false; d.vy = -rnd(520, 760) * (S.H / 420); d.vx = rnd(-170, 170) + (S.W * (.28 + i * .11) - d.x) * 1.4;
+          d.rest = false; d.vy = -rnd(520, 760) * (S.H / 420); d.vx = rnd(-170, 170) + (S.W * (.3 + i * .1) - d.x) * 1.4;
           d.av = rnd(-13, 13); d.flip = 0; d.final = fin ? fin[i] : 0;
         });
         K.sfx('clack', .5);
       }
       setTimeout(throwAll, 180);
-      function makeClaim() { // ones are wild, the way the game plays
-        var count = [0, 0, 0, 0, 0, 0, 0], best = 6, n = 0;
-        dice.forEach(function (d) { count[d.v]++; });
-        if (count[1] === 5) { best = 1; n = 5; }
-        else for (var f = 6; f >= 2; f--) if (count[f] + count[1] > n) { n = count[f] + count[1]; best = f; }
-        claim = (n === 1 ? 'One ' + FACE[best].replace(/s$/, '') : WORD[n] + ' ' + FACE[best]).toUpperCase();
-        claimT = 0;
-        if (n === 5) {
-          five = true; throws = 0; reply = 'The Blind King stands up.';
+      function makeClaim() {
+        claim = claimOf(dice.map(function (d) { return d.v; }));
+        claim.text = (claim.n === 1 ? 'One ' + FACE[claim.face].replace(/s$/, '') : WORD[claim.n] + ' ' + FACE[claim.face]).toUpperCase();
+        claimT = 0; heatTo = (claim.n - 1) / 4;
+        if (claim.n === 5) {
+          five = true; fiveT = 0; throws = 0; heatTo = 1;
+          reply = { who: 'king', line: 'The Blind King stands up.' };
           secretCard(S, 'rattlecup', 'Ones wild. The House noticed you.');
+          confetti(conf, S.W * .3, S.H * .62, K.reduce ? 14 : 34, 620); confetti(conf, S.W * .7, S.H * .62, K.reduce ? 14 : 34, 620);
         } else reply = K.pick(REPLY);
+        K.sfx('thud', claim.n / 5);
       }
       return {
         resize: function () { dims(); dice.forEach(function (d) { d.x = clamp(d.x, D, S.W - D); if (d.rest) d.y = floor - D / 2; }); },
         step: function (dt) {
-          flick += dt;
+          heat += (heatTo - heat) * Math.min(1, dt * 2.4);
           var G = 2300 * (S.H / 420), all = true;
           dice.forEach(function (d) {
             if (d.rest) return;
@@ -501,61 +679,71 @@
           }
           if (all && !settledOnce) { settledOnce = true; makeClaim(); }
           if (claim) claimT += dt;
-          if (five && Math.random() < dt * 14) burstBits(sparks, cx() + rnd(-6, 6), S.H * .3 - clamp(S.H * .17, 26, 74) * .5, 1, ['#FFE08A', '#FFF1C4', '#FFC861'], 70, 1.2);
-          stepBits(sparks, dt, -60);
+          if (reply && reply.liar && claimT > .9 && liarT < 0) { liarT = 0; heatTo = 0; K.sfx('thud', 1); }
+          if (liarT >= 0) liarT += dt;
+          if (five) {
+            fiveT += dt;
+            if (Math.random() < dt * 12) { var d0 = K.pick(dice); burstBits(sparks, d0.x + rnd(-D * .4, D * .4), d0.y - D * .4, 1, ['#FFE08A', '#FFF1C4', '#FFC861'], 80, 1.2); }
+          }
+          stepBits(sparks, dt, -60); stepConfetti(conf, dt);
         },
         tap: function () { throwAll(); return true; },
         key: function (e, down) { if (down && (e.key === ' ' || e.key === 'Enter') && e.target === document.body) { throwAll(); return true; } return false; },
         draw: function (g) {
-          var x0 = cx(), cy = S.H * .3, fl = 1 + Math.sin(flick * 11) * .04 + Math.sin(flick * 17) * .03;
-          if (o.bg !== false) {
-            g.fillStyle = '#0E0A06'; g.fillRect(0, 0, S.W, S.H);
-            var pool = g.createRadialGradient(x0, cy + S.H * .2, 0, x0, cy + S.H * .2, Math.max(S.W, S.H) * .62 * fl);
-            pool.addColorStop(0, 'rgba(255,196,110,.34)'); pool.addColorStop(.45, 'rgba(201,162,79,.12)'); pool.addColorStop(1, 'rgba(0,0,0,0)');
-            g.fillStyle = pool; g.fillRect(0, 0, S.W, S.H);
-            g.fillStyle = 'rgba(70,42,20,.5)'; g.fillRect(0, floor + D * .02, S.W, S.H - floor);
-            g.fillStyle = 'rgba(201,162,79,.35)'; g.fillRect(0, floor, S.W, 2);
+          var L = lay(), t = S.t;
+          if (o.bg !== false) vaultRoom(g, 0, 0, S.W, S.H, heat);
+          vaultLight(g, 0, 0, S.W, S.H, heat, K.reduce ? 0 : t, 1);
+          vaultSparkle(g, 0, 0, S.W, S.H * .86, t, 16, 1);
+          // the Blind King, standing up out of the dark behind the table
+          var up = five ? outBack(fiveT / .75) : 0, kw = L.fw * 1.55;
+          if (five) {
+            vaultRays(g, S.W / 2, S.H * .5, Math.max(S.W, S.H) * .9, t, clamp(fiveT / .4, 0, 1));
+            var ky = floor + kw - (floor + kw - S.H * .5) * up;
+            glowE(g, S.W / 2, ky, kw * 1.3, kw * 1.4, rgb(VAULT.seat.king), .5 * clamp(fiveT / .5, 0, 1));
+            vaultFace(g, 'king', S.W / 2, ky, kw, 1);
+            ringFx(g, S.W / 2, S.H * .5, (fiveT - .6) / .7, kw * 1.6, rgb(VAULT.seat.king), 5);
           }
-          // the candle, which is a little bit alive
-          var ch = clamp(S.H * .17, 26, 74), cw = ch * .42, top = cy - ch * .1;
-          g.fillStyle = '#EADCC0'; g.beginPath(); g.roundRect ? g.roundRect(x0 - cw / 2, top, cw, ch, cw * .18) : g.rect(x0 - cw / 2, top, cw, ch); g.fill();
-          g.fillStyle = '#F7EEDB'; g.beginPath(); g.ellipse(x0 - cw * .18, top + ch * .2, cw * .1, ch * .14, 0, 0, TAU); g.fill();
-          g.strokeStyle = '#2A1E12'; g.lineWidth = 2; g.beginPath(); g.moveTo(x0, top); g.lineTo(x0, top - ch * .08); g.stroke();
-          var fh = ch * .5 * fl * (five ? 1.5 : 1), fw = fh * .48, fy = top - ch * .08;
-          var glow = g.createRadialGradient(x0, fy - fh * .5, 0, x0, fy - fh * .5, fh * 2.2);
-          glow.addColorStop(0, 'rgba(255,220,140,.5)'); glow.addColorStop(1, 'rgba(255,200,120,0)');
-          g.fillStyle = glow; g.beginPath(); g.arc(x0, fy - fh * .5, fh * 2.2, 0, TAU); g.fill();
-          g.fillStyle = '#FFC861'; g.beginPath(); g.moveTo(x0, fy - fh); g.quadraticCurveTo(x0 + fw, fy - fh * .35, x0, fy); g.quadraticCurveTo(x0 - fw, fy - fh * .35, x0, fy - fh); g.fill();
-          g.fillStyle = '#FFF1C4'; g.beginPath(); g.ellipse(x0, fy - fh * .3, fw * .32, fh * .26, 0, 0, TAU); g.fill();
-          if (o.faces !== false && fh > 14) { // two sleepy dots on the flame
-            g.fillStyle = '#7A3E12'; var blink = (flick % 4.2) < .12 ? .25 : 1;
-            g.beginPath(); g.ellipse(x0 - fw * .2, fy - fh * .3, fw * .06, fw * .08 * blink, 0, 0, TAU); g.ellipse(x0 + fw * .2, fy - fh * .3, fw * .06, fw * .08 * blink, 0, 0, TAU); g.fill();
-          }
-          drawBits(g, sparks);
-          if (five) dice.forEach(function (d) {
-            var gl = g.createRadialGradient(d.x, d.y, D * .2, d.x, d.y, D * 1.15);
-            gl.addColorStop(0, 'rgba(255,224,138,.75)'); gl.addColorStop(1, 'rgba(255,200,110,0)');
-            g.fillStyle = gl; g.beginPath(); g.arc(d.x, d.y, D * 1.15, 0, TAU); g.fill();
-          });
-          dice.forEach(function (d) { drawDie(g, d.x, d.y, D, d.a, d.v, five); });
-          if (claim) {
-            var a = clamp(claimT / .5, 0, 1), fs = clamp(S.W / 16, 18, 34);
-            g.save(); g.globalAlpha = a; g.textAlign = 'center';
-            g.font = '600 ' + fs + 'px Georgia, "Times New Roman", serif';
-            if (g.letterSpacing !== undefined) g.letterSpacing = (fs * .14).toFixed(1) + 'px';
-            g.shadowColor = 'rgba(255,200,110,.8)'; g.shadowBlur = five ? 30 : 14; g.fillStyle = five ? '#FFE9A8' : '#F2D48A';
-            g.fillText(claim, S.W / 2, floor - D * 1.35 - (1 - a) * 8);
-            g.shadowBlur = 0;
-            if (claimT > .9) {
-              g.globalAlpha = clamp((claimT - .9) / .4, 0, 1) * .85;
-              g.font = 'italic 500 ' + Math.round(fs * .52) + 'px Georgia, serif'; if (g.letterSpacing !== undefined) g.letterSpacing = '0px';
-              g.fillStyle = five ? '#FFE08A' : reply.indexOf('calls') > -1 ? '#FF7A6B' : '#D9C49A';
-              g.fillText(reply, S.W / 2, floor - D * 1.35 + fs * .9);
+          // the three at the table, the one who answers lit up
+          var talk = reply && claimT > .9 ? reply.who : null;
+          SEATS.forEach(function (who, i) {
+            var x = S.W / 2 + (i - 1) * L.gap, y = L.fy, lit = talk === who;
+            if (lit) {
+              var liar = reply.liar && liarT >= 0, sh = liar && !K.reduce ? Math.sin(liarT * 70) * 3 * Math.max(0, 1 - liarT / .4) : 0;
+              x += sh; y -= 3;
+              glowE(g, x, y + L.fw * .1, L.fw * .95, L.fw * 1.1, rgb(liar ? VAULT.blood : VAULT.seat[who]), .55);
             }
+            vaultFace(g, who, x, y, L.fw, five ? .4 : 1);
+          });
+          // your claim: the candle, the count, the face
+          var fs = L.fs, nw = slamWidth(g, '5', fs), cd = fs * .82, ch = fs * 1.15, gap = fs * .32;
+          var total = ch * .45 + gap + nw + gap + cd, x0 = S.W / 2 - total / 2, cy = L.cy;
+          var k = claim ? clamp(claimT / .2, 0, 1) : 0, sc = claim ? 1.45 - .45 * outQuart(claimT / .2) : 1, dim = liarT >= 0 ? .35 : five ? Math.max(0, 1 - fiveT * 6) : 1;
+          vaultCandle(g, x0 + ch * .22 - (five ? up * kw * .62 : 0), cy + ch * .5, ch, t, claim ? Math.max(0, 1 - claimT * 1.6) : 0, o.faces);
+          if (claim && dim > 0) {
+            var nx = x0 + ch * .45 + gap + nw / 2, dx = nx + nw / 2 + gap + cd / 2;
+            g.save(); g.translate(nx, cy); g.scale(sc, sc); vaultSlam(g, String(claim.n), 0, 0, fs, VAULT.seat.you, k * dim); g.restore();
+            g.save(); g.globalAlpha = k * dim; vaultDie(g, dx, cy, cd * (sc * .5 + .5), 0, claim.face); g.restore();
+            ringFx(g, nx, cy, claimT / .6, fs * 1.6, rgb(VAULT.gold), 3);
+          }
+          if (liarT >= 0) {
+            var lk = clamp(liarT / .16, 0, 1), ls = 1.6 - .6 * outQuart(liarT / .16);
+            if (!K.reduce) { g.fillStyle = rgba(rgb(VAULT.blood), .2 * Math.max(0, 1 - liarT / .35)); g.fillRect(0, 0, S.W, S.H); }
+            g.save(); g.translate(x0 + ch * .45 + gap + (nw + gap + cd) / 2, cy); g.scale(ls, ls); vaultSlam(g, 'LIAR!', 0, 0, fs * .95, VAULT.blood, lk); g.restore();
+          }
+          if (reply && claimT > .9) {
+            var ra = clamp((claimT - .9) / .4, 0, 1) * .92;
+            g.save(); g.globalAlpha = ra; g.textAlign = 'center'; g.textBaseline = 'middle';
+            g.font = 'italic 500 ' + Math.round(clamp(fs * .42, 13, 22)) + 'px Georgia, "Times New Roman", serif';
+            g.shadowColor = 'rgba(0,0,0,.85)'; g.shadowBlur = 8;
+            g.fillStyle = reply.who === 'king' ? '#FFE9A8' : reply.liar ? '#FFC2C2' : '#FFF4DE';
+            g.fillText(reply.line, S.W / 2, reply.who === 'king' ? floor + (S.H - floor) * .5 + 1 : cy + fs * .98);
             g.restore();
           }
+          drawBits(g, sparks);
+          dice.forEach(function (d) { vaultDie(g, d.x, d.y, D, d.a, d.v, { glow: five ? .9 : 0 }); });
+          drawConfetti(g, conf);
         },
-        peek: function () { return { dice: dice, five: function () { return five; }, throws: function () { return throws; }, claim: function () { return claim; } }; }
+        peek: function () { return { dice: dice, five: function () { return five; }, throws: function () { return throws; }, claim: function () { return claim ? claim.text : null; }, heat: function () { return heat; } }; }
       };
     }, opts);
   }
