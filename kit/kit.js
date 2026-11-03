@@ -30,26 +30,27 @@
   K.HEADLINE = 'I make games, or at least I try :D';
   K.EMAIL = 'eric@keerae.com';
   K.GAMES = [
-    { id: 'squish', name: 'Squish n Pops', kind: 'Bubble-splitting arcade, right in your phone browser',
-      status: '<b>The free demo’s out.</b> Ten levels on itch.io, and the rest of the 400 are on the way.', statusText: 'The free demo’s out. Ten levels on itch.io, and the rest of the 400 are on the way.',
-      short: 'Free demo', hint: 'Tap a bubble. It splits in two. Pop every last one.', color: '#A6E9C6', deep: '#171A2E',
-      link: 'https://misterdinguz.itch.io/squish-n-pops', linkText: 'Play the real demo on itch.io' },
+    { id: 'squish', name: 'Squish n Pops', kind: 'Bubble-splitting arcade for phones',
+      status: '<b>Out now on iPhone.</b> Free. The demo’s on itch.io too.', statusText: 'Out now on iPhone. Free. The demo’s on itch.io too.',
+      short: 'On iPhone', hint: 'Tap a bubble. It splits in two. Pop every last one.', color: '#A6E9C6', deep: '#171A2E',
+      links: [['https://apps.apple.com/app/squish-n-pops/id6822392757', 'Get it on the App Store'], ['https://misterdinguz.itch.io/squish-n-pops', 'Or play the demo on itch.io']] },
     { id: 'ember', name: 'Into Ember Depths', kind: 'Online bullet-hell action RPG',
-      status: '<b>Playable in your browser.</b> Still in development.', statusText: 'Playable in your browser. Still in development.',
+      status: '<b>Playable in your browser.</b> The big island update just went live.', statusText: 'Playable in your browser. The big island update just went live.',
       short: 'Playable in browser', hint: 'The bosses wake up. Click one. Or just don\u2019t get hit.', color: '#FFB37A', deep: '#0A0812',
       link: 'https://emberdepths.keerae.com/', linkText: 'Play it in your browser' },
     { id: 'rattlecup', name: 'Rattlecup', kind: 'Liar’s dice roguelike for phones',
-      status: '<b>Vertical slice,</b> building for iOS and Android. Working title.', statusText: 'Vertical slice, building for iOS and Android. Working title.',
-      short: 'Vertical slice', hint: 'A candle and five dice. Tap them to throw again. Ones are wild.', color: '#E9C46A', deep: '#0E0A06' },
+      status: '<b>Vertical slice,</b> on my phones with a brand new look. Working title.', statusText: 'Vertical slice, on my phones with a brand new look. Working title.',
+      short: 'Vertical slice', hint: 'A candle and five dice. Tap them to throw again. Ones are wild.', color: '#E9C46A', deep: '#062B24' },
     { id: 'rollaway', name: 'Squish on a Roll', kind: '3D tilt platformer for phones', anchor: 'n-squish-on-a-roll',
-      status: '<b>Running on real phones.</b> The art just landed.', statusText: 'Running on real phones. The art just landed.',
-      short: 'Builds running', hint: 'Tilt, or use the arrow keys. Tap Squish to hop. Try not to fall.', color: '#9FD98A', deep: '#7D6BC9' }
+      status: '<b>The demo’s out.</b> All of World 1, free, right in your browser.', statusText: 'The demo’s out. All of World 1, free, right in your browser.',
+      short: 'Free demo', hint: 'Tilt, or use the arrow keys. Tap Squish to hop. Try not to fall.', color: '#9FD98A', deep: '#7D6BC9',
+      link: 'https://misterdinguz.itch.io/squish-on-a-roll', linkText: 'Play the demo on itch.io' }
   ];
   K.game = function (id) { for (var i = 0; i < K.GAMES.length; i++) if (K.GAMES[i].id === id) return K.GAMES[i]; return null; };
   K.SEALED = [
-    { id: 'u5', name: 'Untitled 5', why: 'Only just started. Nothing worth showing yet.' },
-    { id: 'u6', name: 'Untitled 6', why: 'Same. Ask me in a few months.' },
-    { id: 'u7', name: 'Untitled 7', why: 'Barely has a name. Untitled 7 is generous.' }
+    { id: 'u5', name: 'Untitled 5', why: 'Has a playable demo now. Still keeping it to myself.' },
+    { id: 'u6', name: 'Untitled 6', why: 'This one too. A demo and everything.' },
+    { id: 'u7', name: 'Untitled 7', why: 'Got a real name since last time. That’s all you get.' }
   ];
 
   // ------------------------------------------------------- time of day
@@ -152,6 +153,7 @@
     chime: function () { tone('sine', 1318, 1318, .3, .22); tone('sine', 1760, 1760, .36, .18, .09); },
     whoosh: function () { noise(.7, .35, 300, 2600, .7); },
     blip: function () { tone('sine', 620, 760, .07, .22); },
+    thud: function (a) { tone('sine', 150 + a * 40, 52, .24, .34 + a * .12); noise(.12, .3, 900, 160, 1.4); },
     sneeze: function () { tone('sine', 300, 620, .45, .18, 0, 4); noise(.38, .7, 3200, 500, .6, .48); tone('sine', 520, 140, .25, .3, .48); },
     hum: function () { tone('sine', 392, 392, .5, .12); tone('sine', 494, 494, .5, .1, .12); },
     secret: function () { [1047, 1319, 1568, 2093].forEach(function (f, i) { tone('sine', f, f, .34, .17, i * .08); tone('triangle', f * 2, f * 2, .2, .035, i * .08 + .02); }); }
