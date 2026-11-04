@@ -28,7 +28,7 @@
 
   // ------------------------------------------------------------ content
   K.HEADLINE = 'I make games, or at least I try :D';
-  K.EMAIL = 'eric@keerae.com';
+  K.EMAIL = 'help@keerae.com';
   K.GAMES = [
     { id: 'squish', name: 'Squish n Pops', kind: 'Bubble-splitting arcade for phones',
       status: '<b>Out now on iPhone.</b> Free. The demo’s on itch.io too.', statusText: 'Out now on iPhone. Free. The demo’s on itch.io too.',
