@@ -31,19 +31,20 @@
   K.EMAIL = 'help@keerae.com';
   K.GAMES = [
     { id: 'squish', name: 'Squish n Pops', kind: 'Bubble-splitting arcade for phones',
-      status: '<b>Out now on iPhone.</b> Free. The demo’s on itch.io too.', statusText: 'Out now on iPhone. Free. The demo’s on itch.io too.',
+      status: '<b>Out now on iPhone.</b> Free. On Steam 9 March 2027.', statusText: 'Out now on iPhone. Free. On Steam 9 March 2027.',
       short: 'On iPhone', hint: 'Tap a bubble. It splits in two. Pop every last one.', color: '#A6E9C6', deep: '#171A2E',
       links: [['https://apps.apple.com/app/squish-n-pops/id6822392757', 'Get it on the App Store'], ['https://misterdinguz.itch.io/squish-n-pops', 'Or play the demo on itch.io']] },
     { id: 'ember', name: 'Into Ember Depths', kind: 'Online bullet-hell action RPG',
-      status: '<b>Playable in your browser.</b> The big island update just went live.', statusText: 'Playable in your browser. The big island update just went live.',
+      status: '<b>Playable in your browser.</b> And on CrazyGames now too.', statusText: 'Playable in your browser. And on CrazyGames now too.',
       short: 'Playable in browser', hint: 'The bosses wake up. Click one. Or just don\u2019t get hit.', color: '#FFB37A', deep: '#0A0812',
-      link: 'https://emberdepths.keerae.com/', linkText: 'Play it in your browser' },
-    { id: 'rattlecup', name: 'Rattlecup', kind: 'Liar’s dice roguelike for phones',
-      status: '<b>Vertical slice,</b> on my phones with a brand new look. Working title.', statusText: 'Vertical slice, on my phones with a brand new look. Working title.',
-      short: 'Vertical slice', hint: 'A candle and five dice. Tap them to throw again. Ones are wild.', color: '#E9C46A', deep: '#062B24' },
+      links: [['https://emberdepths.keerae.com/', 'Play it in your browser'], ['https://www.crazygames.com/game/into-ember-depths', 'Or play it on CrazyGames']] },
+    { id: 'rattlecup', name: 'Rattlecup', kind: 'Liar’s dice roguelike for phones and Steam',
+      status: '<b>The demo’s out.</b> Floor one, free in your browser.', statusText: 'The demo’s out. Floor one, free in your browser.',
+      short: 'Free demo', hint: 'A candle and five dice. Tap them to throw again. Ones are wild.', color: '#E9C46A', deep: '#062B24',
+      links: [['https://misterdinguz.itch.io/rattlecup', 'Play the demo on itch.io']] },
     { id: 'rollaway', name: 'Squish on a Roll', kind: '3D tilt platformer for phones', anchor: 'n-squish-on-a-roll',
-      status: '<b>The demo’s out.</b> All of World 1, free, right in your browser.', statusText: 'The demo’s out. All of World 1, free, right in your browser.',
-      short: 'Free demo', hint: 'Tilt, or use the arrow keys. Tap Squish to hop. Try not to fall.', color: '#9FD98A', deep: '#7D6BC9',
+      status: '<b>Coming to iPhone on December 10.</b> Free. The World 1 demo’s out now.', statusText: 'Coming to iPhone on December 10. Free. The World 1 demo’s out now.',
+      short: 'Dec 10', hint: 'Tilt, or use the arrow keys. Tap Squish to hop. Try not to fall.', color: '#9FD98A', deep: '#7D6BC9',
       link: 'https://misterdinguz.itch.io/squish-on-a-roll', linkText: 'Play the demo on itch.io' }
   ];
   K.game = function (id) { for (var i = 0; i < K.GAMES.length; i++) if (K.GAMES[i].id === id) return K.GAMES[i]; return null; };
